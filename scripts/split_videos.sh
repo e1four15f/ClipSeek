@@ -2,7 +2,7 @@
 
 # Specify the input/output directory containing your mp4 files
 input_dir="data/MSRVTT/videos/all"
-output_dir="data/MSRVTT/videoclips/all"
+output_dir="data/MSRVTT/videos/5sec"
 num_jobs=12  # processors
 clip_duration=5  # seconds
 
