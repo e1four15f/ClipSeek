@@ -5,8 +5,42 @@ description = ""
 authors = ["v.karmazin"]
 readme = "README.md"
 
+[[tool.poetry.source]]
+name = "pytorch"
+# GPU (cu116)
+#url = "https://download.pytorch.org/whl/cu116"
+# CPU
+url = "https://download.pytorch.org/whl/cpu"
+priority = "explicit"
+
 [tool.poetry.dependencies]
 python = "^3.9"
+more-itertools = "^10.2.0"
+tqdm = "^4.66.2"
+numpy = "^1.26.4"
+pandas = "^2.2.2"
+torch = [
+    { version = "^1.13.1", source = "pypi", platform = "darwin" },
+    { version = "^1.13.1", source = "pytorch", platform = "linux" },
+    { version = "^1.13.1", source = "pytorch", platform = "win32" },
+]
+torchvision = [
+    { version = "^0.14.1", source = "pypi", platform = "darwin" },
+    { version = "^0.14.1", source = "pytorch", platform = "linux" },
+    { version = "^0.14.1", source = "pytorch", platform = "win32" },
+]
+torchaudio = [
+    { version = "^0.13.1", source = "pypi", platform = "darwin" },
+    { version = "^0.13.1", source = "pytorch", platform = "linux" },
+    { version = "^0.13.1", source = "pytorch", platform = "win32" },
+]
+transformers = "4.30.2"
+einops = "^0.8.0"
+peft = "^0.10.0"
+opencv-python = "^4.9.0.80"
+eva-decord = "^0.6.1"  # decord = "^0.6.0 "
+pytorchvideo = "^0.1.5"
+soundfile = "^0.12.1"
 
 [tool.poetry.group.dev.dependencies]
 ruff = "^0.4.2"
