@@ -4,6 +4,7 @@ version = "0.1.0"
 description = ""
 authors = ["v.karmazin"]
 readme = "README.md"
+package-mode = false
 
 [[tool.poetry.source]]
 name = "pytorch"
@@ -36,9 +37,9 @@ torchaudio = [
 ]
 transformers = "4.30.2"
 einops = "^0.8.0"
-peft = "^0.10.0"
+peft = { git = "https://github.com/huggingface/peft", rev = "08cb3dde577747f6ca6638c884fd66fd16cf2e9d" } # 0.10.0 does not fit
 opencv-python = "^4.9.0.80"
-eva-decord = "^0.6.1"  # decord = "^0.6.0 "
+eva-decord = "^0.6.1"  # decord = "^0.6.0" does not have bindings for macos
 pytorchvideo = "^0.1.5"
 soundfile = "^0.12.1"
 

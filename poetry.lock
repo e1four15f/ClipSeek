@@ -1060,32 +1060,28 @@ dev = ["jinja2"]
 
 [[package]]
 name = "peft"
-version = "0.10.0"
+version = "0.4.0.dev0"
 description = "Parameter-Efficient Fine-Tuning (PEFT)"
 optional = false
-python-versions = ">=3.8.0"
-files = [
-    {file = "peft-0.10.0-py3-none-any.whl", hash = "sha256:d5249c97e818d3e31f92553c73c2953acd0ec12649b8b749afff7152cbc86cbb"},
-    {file = "peft-0.10.0.tar.gz", hash = "sha256:36a7628c15f88d37abb26cfc74c22468f9037ee02e9c9b65de943cfe7c672049"},
-]
+python-versions = ">=3.7.0"
+files = []
+develop = false
 
 [package.dependencies]
-accelerate = ">=0.21.0"
-huggingface-hub = ">=0.17.0"
+accelerate = "*"
 numpy = ">=1.17"
 packaging = ">=20.0"
 psutil = "*"
 pyyaml = "*"
 safetensors = "*"
 torch = ">=1.13.0"
-tqdm = "*"
 transformers = "*"
 
-[package.extras]
-dev = ["black", "hf-doc-builder", "ruff (>=0.2.1,<0.3.0)"]
-docs-specific = ["black", "hf-doc-builder"]
-quality = ["black", "hf-doc-builder", "ruff (>=0.2.1,<0.3.0)"]
-test = ["black", "datasets", "diffusers (<0.21.0)", "hf-doc-builder", "parameterized", "pytest", "pytest-cov", "pytest-xdist", "ruff (>=0.2.1,<0.3.0)", "scipy"]
+[package.source]
+type = "git"
+url = "https://github.com/huggingface/peft"
+reference = "08cb3dde577747f6ca6638c884fd66fd16cf2e9d"
+resolved_reference = "08cb3dde577747f6ca6638c884fd66fd16cf2e9d"
 
 [[package]]
 name = "pillow"
@@ -2257,4 +2253,4 @@ PyYAML = "*"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.9"
-content-hash = "f8a9607e3cb1b0b0fc57f1b9fbb79fc2200759ede40bcb6199395462488b681a"
+content-hash = "036e5b89afd779a94fe249cf00cfd4c0447899f924fd4020f2dd08628f55bb9d"
