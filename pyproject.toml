@@ -15,7 +15,7 @@ url = "https://download.pytorch.org/whl/cpu"
 priority = "explicit"
 
 [tool.poetry.dependencies]
-python = "^3.9"
+python = "^3.9.8"
 more-itertools = "^10.2.0"
 tqdm = "^4.66.2"
 numpy = "^1.26.4"
@@ -42,6 +42,8 @@ opencv-python = "^4.9.0.80"
 eva-decord = "^0.6.1"  # decord = "^0.6.0" does not have bindings for macos
 pytorchvideo = "^0.1.5"
 soundfile = "^0.12.1"
+streamlit = "^1.33.0"
+faiss-cpu = "^1.8.0"
 
 [tool.poetry.group.dev.dependencies]
 ruff = "^0.4.2"
