@@ -47,7 +47,12 @@ def render(embedder: LanguageBindEmbedder, retriever: MultipleRetrievers) -> Non
             for i, candidate in enumerate(candidates):
                 filename, score = candidate
                 with cols[i]:
-                    st.video(filename)
+                    if 'mp4' in filename:
+                        st.video(filename)
+                    elif 'jpg' in filename:
+                        st.image(filename)
+                    else:
+                        raise Exception('Unknown format')
                     st.write(
                         f"Filename: {filename}\n\n"
                         f"Score: {score:.4f}"

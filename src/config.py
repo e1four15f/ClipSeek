@@ -7,23 +7,32 @@ DATASETS_PATH = Path('data')
 DATASETS = [
     {
         'dataset': 'MSRVTT',
-        'version': 'videos/test',
+        'version': '5sec',
         'modality': Modality.VIDEO,
     },
     {
-        'dataset': 'MSRVTT',
-        'version': 'videos/5sec',
+        'dataset': 'MSVD',
+        'version': '5sec',
         'modality': Modality.VIDEO,
     },
+    # {
+    #     'dataset': 'MSRVTT',
+    #     'version': 'all',
+    #     'modality': Modality.VIDEO,
+    # },
     {
-        'dataset': 'MSRVTT',
-        'version': 'videos/all',
-        'modality': Modality.VIDEO,
+        'dataset': 'COCO',
+        'version': 'val2017',
+        'modality': Modality.IMAGE,
     }
 ]
 
 # Models
-CLIP_MODELS = {Modality.VIDEO: 'LanguageBind_Video'}
+CLIP_MODELS = {
+    Modality.VIDEO: "LanguageBind_Video",
+    # Modality.AUDIO: "LanguageBind_Audio",
+    Modality.IMAGE: "LanguageBind_Image",
+}
 
 # System
 CANDIDATES_PER_PAGE = 32
