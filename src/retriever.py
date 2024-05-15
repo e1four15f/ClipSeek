@@ -23,18 +23,19 @@ class VideoRetriever(IRetriever):
             embedding = torch.tensor(embedding).to(self._device)
 
         faiss.normalize_L2(embedding)
-        distances, indices = self._index.search(embedding, k)
+        distances, indices = self._index.search(embedding, k)  # noqa
         return [(self._labels[i], 1 - distances[0][j]) for j, i in enumerate(indices[0])]
 
 
-class MultipleRetrievers(IRetriever):
+class MultipleRetrievers:
     def __init__(self, retrievers: list[VideoRetriever]):
         self._retrievers = retrievers
 
-    def retrieve(self, embedding: np.ndarray, k: int = 32) -> list[tuple[str, float]]:
+    def retrieve(self, embedding: np.ndarray, ignore_retrievers: list[int], k: int = 32) -> list[tuple[str, float]]:
         results = []
-        for retriever in self._retrievers:
-            results += retriever.retrieve(embedding, k=k)
+        for retriever, is_enabled in zip(self._retrievers, ignore_retrievers):
+            if is_enabled:
+                results += retriever.retrieve(embedding, k=k)
 
         results.sort(key=lambda x: x[1], reverse=False)
         return results[:k]

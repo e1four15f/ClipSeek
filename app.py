@@ -5,7 +5,7 @@ import streamlit as st
 
 from src.config import DATASETS_PATH, DATASETS, CANDIDATES_PER_PAGE, DEVICE, CLIP_MODELS
 from src.embedder import LanguageBindEmbedder, Modality
-from src.retriever import VideoRetriever, MultipleRetrievers, IRetriever
+from src.retriever import VideoRetriever, MultipleRetrievers
 
 
 def main() -> None:
@@ -17,14 +17,25 @@ def main() -> None:
     render(embedder=embedder, retriever=retriever)
 
 
-def render(embedder: LanguageBindEmbedder, retriever: IRetriever) -> None:
+def render(embedder: LanguageBindEmbedder, retriever: MultipleRetrievers) -> None:
     st.title("Video Search")
+    # st.write(DATASETS)
+
+    datasets_mask = []
+    for d in DATASETS:
+        agree = st.checkbox(f"{d['dataset']} {d['version']}")
+        datasets_mask.append(agree)
+
     query = st.text_input("Text query:")
 
     if query:
         # Search for videos based on query
-        text_embedding = embedder.embed(query, modality=Modality.TEXT)
-        candidates = retriever.retrieve(text_embedding.detach().numpy(), k=CANDIDATES_PER_PAGE)
+        query_embedding = embedder.embed(query, modality=Modality.TEXT)
+        candidates = retriever.retrieve(
+            query_embedding.detach().numpy(),
+            ignore_retrievers=datasets_mask,
+            k=CANDIDATES_PER_PAGE
+        )
 
         if candidates:
             n_cols = 4
