@@ -2,6 +2,7 @@ from pathlib import Path
 
 import numpy as np
 import streamlit as st
+from streamlit.runtime.media_file_storage import MediaFileStorageError
 
 from src.config import DATASETS_PATH, DATASETS, CANDIDATES_PER_PAGE, DEVICE, CLIP_MODELS
 from src.embedder import LanguageBindEmbedder, Modality
@@ -20,13 +21,17 @@ def main() -> None:
 def render(embedder: LanguageBindEmbedder, retriever: MultipleRetrievers) -> None:
     st.title("Video Search")
     # st.write(DATASETS)
+    search_left, search_right = st.columns([3, 1])
 
-    datasets_mask = []
-    for d in DATASETS:
-        agree = st.checkbox(f"{d['dataset']} {d['version']}")
-        datasets_mask.append(agree)
+    with search_left:
+        query = st.text_input("Text query:")
 
-    query = st.text_input("Text query:")
+    with search_right:
+        st.write("Datasets")
+        datasets_mask = []
+        for d in DATASETS:
+            agree = st.checkbox(f"{d['dataset']} {d['version']}")
+            datasets_mask.append(agree)
 
     if query:
         # Search for videos based on query
@@ -47,12 +52,15 @@ def render(embedder: LanguageBindEmbedder, retriever: MultipleRetrievers) -> Non
             for i, candidate in enumerate(candidates):
                 filename, score = candidate
                 with cols[i]:
-                    if 'mp4' in filename:
-                        st.video(filename)
-                    elif 'jpg' in filename:
-                        st.image(filename)
-                    else:
-                        raise Exception('Unknown format')
+                    try:
+                        if 'mp4' in filename:
+                            st.video(filename)
+                        elif 'jpg' in filename:
+                            st.image(filename)
+                        else:
+                            raise MediaFileStorageError('Unknown format')
+                    except MediaFileStorageError:
+                        st.write("X")
                     st.write(
                         f"Filename: {filename}\n\n"
                         f"Score: {score:.4f}"
