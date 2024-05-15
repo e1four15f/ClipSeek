@@ -1,7 +1,8 @@
 import numpy as np
-import pandas as pd
 import streamlit as st
-from src.embedder import LanguageBindEmbedder
+
+from src.config import DATASET_PATH, DATASET, DATASET_TYPE, CANDIDATES_PER_PAGE
+from src.embedder import LanguageBindEmbedder, Modality
 from src.retriever import VideoRetriever
 
 
@@ -20,8 +21,8 @@ def render(embedder: LanguageBindEmbedder, retriever: VideoRetriever) -> None:
 
     if query:
         # Search for videos based on query
-        text_embedding = embedder.embed_text(text=query)
-        candidates = retriever.retrieve(text_embedding.detach().numpy())
+        text_embedding = embedder.embed(query, modality=Modality.TEXT)
+        candidates = retriever.retrieve(text_embedding.detach().numpy(), k=CANDIDATES_PER_PAGE)
 
         if candidates:
             n_cols = 4
@@ -35,7 +36,7 @@ def render(embedder: LanguageBindEmbedder, retriever: VideoRetriever) -> None:
                 with cols[i]:
                     st.video(filename)
                     st.write(
-                        f"Filename: {filename}\n"
+                        f"Filename: {filename}\n\n"
                         f"Score: {score:.4f}"
                     )
         else:
@@ -45,25 +46,23 @@ def render(embedder: LanguageBindEmbedder, retriever: VideoRetriever) -> None:
 @st.cache_resource()
 def load_embedder() -> LanguageBindEmbedder:
     return LanguageBindEmbedder(
-        models={'video': 'LanguageBind_Video'},
+        models={Modality.VIDEO: 'LanguageBind_Video'},
         device='cpu'
     )
 
 
 @st.cache_resource()
 def load_retriever() -> VideoRetriever:
-    msrvtt_train_embeddings = np.load('data/MSRVTT/embeddings/all/MSR-VTT_train_video_embeddings.npy')
-    labels = (
-        pd.read_csv('data/MSRVTT/MSRVTT_train.9k.csv')['video_id']
-        .apply(lambda x: str(f'data/MSRVTT/videos/all/{x}.mp4'))
-        .values
-        .tolist()
-    )
-    return VideoRetriever(
-        embeddings=msrvtt_train_embeddings,
-        labels=labels,
-        device='cpu'
-    )
+    dataset_path = DATASET_PATH / DATASET
+    index_path = dataset_path / 'index/videos' / DATASET_TYPE
+
+    index_embeddings = np.load(index_path / 'video_embeddings.npy')
+    labels = [
+        str(dataset_path / s)
+        for s in (index_path / 'labels.txt').open().read().splitlines()
+    ]
+
+    return VideoRetriever(embeddings=index_embeddings, labels=labels, device='cpu')
 
 
 if __name__ == "__main__":
