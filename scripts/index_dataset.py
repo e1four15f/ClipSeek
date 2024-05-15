@@ -63,7 +63,8 @@ if __name__ == "__main__":
 
     parser.add_argument("--models", type=json.loads, default=json.dumps({
         Modality.VIDEO: "LanguageBind_Video",
-        Modality.AUDIO: "LanguageBind_Audio"
+        Modality.AUDIO: "LanguageBind_Audio",
+        Modality.IMAGE: "LanguageBind_Image",
     }), help="JSON string of models by modality")
     parser.add_argument("--data-path", type=str, default="data/<dataset>", help="Path to the dataset directory")
     parser.add_argument("--media-path", type=str, default="data/<dataset>/videos/all", help="Path to the dataset raw media directory")
