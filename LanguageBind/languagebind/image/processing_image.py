@@ -26,7 +26,7 @@ def get_image_transform(config):
 
 
 def load_and_transform_image(image_path, transform):
-    image = Image.open(image_path)
+    image = Image.open(image_path).convert('RGB')
     image_outputs = transform(image)
     return image_outputs
 
