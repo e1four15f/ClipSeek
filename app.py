@@ -60,6 +60,7 @@ def load_retriever() -> MultipleRetrievers:
             get_retriever(
                 dataset_path=DATASETS_PATH / d['dataset'],
                 version=d['version'],
+                modality=d['modality'],
                 device=DEVICE,
             )
             for d in DATASETS
@@ -67,9 +68,9 @@ def load_retriever() -> MultipleRetrievers:
     )
 
 
-def get_retriever(dataset_path: Path, version: str, device: str) -> VideoRetriever:
+def get_retriever(dataset_path: Path, version: str, modality: str, device: str) -> VideoRetriever:
     index_path = dataset_path / 'index' / version
-    index_embeddings = np.load(index_path / 'video_embeddings.npy')
+    index_embeddings = np.load(index_path / f'{modality}_embeddings.npy')
     labels = [
         str(dataset_path / s)
         for s in (index_path / 'labels.txt').open().read().splitlines()
