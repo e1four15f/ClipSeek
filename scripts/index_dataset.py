@@ -10,7 +10,9 @@ from src.embedder import LanguageBindEmbedder, Modality
 
 EMBEDDINGS_DIM = 768
 MODALITY_PATTERN = {
-    Modality.VIDEO: '*.mp4'  # TODO (v.karmazin): avi and other formats
+    # TODO (v.karmazin): avi, png and other formats
+    Modality.VIDEO: '*.mp4',
+    Modality.IMAGE: '*.jpg',
 }
 
 
