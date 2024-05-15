@@ -1,9 +1,11 @@
+from pathlib import Path
+
 import numpy as np
 import streamlit as st
 
-from src.config import DATASET_PATH, DATASET, DATASET_TYPE, CANDIDATES_PER_PAGE, DEVICE, CLIP_MODELS
+from src.config import DATASETS_PATH, DATASETS, CANDIDATES_PER_PAGE, DEVICE, CLIP_MODELS
 from src.embedder import LanguageBindEmbedder, Modality
-from src.retriever import VideoRetriever
+from src.retriever import VideoRetriever, MultipleRetrievers, IRetriever
 
 
 def main() -> None:
@@ -15,7 +17,7 @@ def main() -> None:
     render(embedder=embedder, retriever=retriever)
 
 
-def render(embedder: LanguageBindEmbedder, retriever: VideoRetriever) -> None:
+def render(embedder: LanguageBindEmbedder, retriever: IRetriever) -> None:
     st.title("Video Search")
     query = st.text_input("Text query:")
 
@@ -52,17 +54,27 @@ def load_embedder() -> LanguageBindEmbedder:
 
 
 @st.cache_resource()
-def load_retriever() -> VideoRetriever:
-    dataset_path = DATASET_PATH / DATASET
-    index_path = dataset_path / 'index/videos' / DATASET_TYPE
+def load_retriever() -> MultipleRetrievers:
+    return MultipleRetrievers(
+        retrievers=[
+            get_retriever(
+                dataset_path=DATASETS_PATH / d['dataset'],
+                version=d['version'],
+                device=DEVICE,
+            )
+            for d in DATASETS
+        ]
+    )
 
+
+def get_retriever(dataset_path: Path, version: str, device: str) -> VideoRetriever:
+    index_path = dataset_path / 'index' / version
     index_embeddings = np.load(index_path / 'video_embeddings.npy')
     labels = [
         str(dataset_path / s)
         for s in (index_path / 'labels.txt').open().read().splitlines()
     ]
-
-    return VideoRetriever(embeddings=index_embeddings, labels=labels, device=DEVICE)
+    return VideoRetriever(embeddings=index_embeddings, labels=labels, device=device)
 
 
 if __name__ == "__main__":
