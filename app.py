@@ -30,7 +30,7 @@ def render(embedder: LanguageBindEmbedder, retriever: MultipleRetrievers) -> Non
         st.write("Datasets")
         datasets_mask = []
         for d in DATASETS:
-            agree = st.checkbox(f"{d['dataset']} {d['version']}")
+            agree = st.checkbox(f"{d['dataset']}[{d['version']}]")
             datasets_mask.append(agree)
 
     if query:
