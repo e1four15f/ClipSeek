@@ -1,4 +1,5 @@
 from enum import Enum
+from functools import lru_cache
 from typing import Any, Optional, Union
 
 import torch
@@ -40,6 +41,7 @@ class LanguageBindEmbedder:
         self._modality_transform = {c: transform_dict[c](self._model.modality_config[c]) for c in clip_type.keys()}
         self._modality_transform[Modality.TEXT] = lambda text: self._tokenizer(text, max_length=77, padding='max_length', truncation=True, return_tensors='pt')
 
+    @lru_cache()
     def embed(self, data: Union[str, list[str], torch.Tensor], modality: Modality) -> torch.Tensor:
         inputs = {modality: data}
         if not isinstance(data, torch.Tensor):

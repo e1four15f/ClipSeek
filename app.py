@@ -11,6 +11,11 @@ from src.retriever import VideoRetriever, MultipleRetrievers
 
 def main() -> None:
     st.set_page_config(layout="wide")
+    if 'query' not in st.session_state:
+        st.session_state.query = "Cat in black suit is having meeting"
+
+    if 'modality' not in st.session_state:
+        st.session_state.modality = Modality.TEXT
 
     embedder = load_embedder()
     retriever = load_retriever()
@@ -21,26 +26,47 @@ def main() -> None:
 def render(embedder: LanguageBindEmbedder, retriever: MultipleRetrievers) -> None:
     st.title("Video Search")
     # st.write(DATASETS)
+    # st.write(st.session_state)
     search_left, search_right = st.columns([3, 1])
 
     with search_left:
-        query = st.text_input("Text query:")
+        query = st.text_input("Query:", key="query")
 
     with search_right:
-        st.write("Datasets")
+        st.write("#### Datasets")
         datasets_mask = []
         for d in DATASETS:
-            agree = st.checkbox(f"{d['dataset']}[{d['version']}]")
+            agree = st.checkbox(f"{d['dataset']}[{d['version']}]", value=True)
             datasets_mask.append(agree)
 
     if query:
         # Search for videos based on query
-        query_embedding = embedder.embed(query, modality=Modality.TEXT)
+        if '.jpg' in query:
+            st.session_state.modality = Modality.IMAGE
+            show_query = st.image
+        elif '.mp4' in query:
+            st.session_state.modality = Modality.VIDEO
+            show_query = st.video
+        else:
+            st.session_state.modality = Modality.TEXT
+            show_query = st.text
+
+        st.write(f'#### Search results using "{st.session_state.modality}" modality')
+        l, r = st.columns([1, 6])  # noqa
+        with l:
+            show_query(query)
+
+        st.html('<hr>')
+
+        query_embedding = embedder.embed(query, modality=st.session_state.modality)
         candidates = retriever.retrieve(
             query_embedding.detach().numpy(),
             ignore_retrievers=datasets_mask,
             k=CANDIDATES_PER_PAGE
         )
+
+        def update(filename):
+            st.session_state.query = filename
 
         if candidates:
             n_cols = 4
@@ -61,10 +87,16 @@ def render(embedder: LanguageBindEmbedder, retriever: MultipleRetrievers) -> Non
                             raise MediaFileStorageError('Unknown format')
                     except MediaFileStorageError:
                         st.write("X")
-                    st.write(
-                        f"Filename: {filename}\n\n"
-                        f"Score: {score:.4f}"
-                    )
+
+                    l, r = st.columns([6, 1])  # noqa
+                    with l:
+                        st.write(
+                            f"Filename: {filename}\n\n"
+                            f"Score: {score:.4f}"
+                        )
+                    with r:
+                        st.button("🔍", type="primary", key=f'SimBtn{i}', on_click=update, args=(filename,))
+
         else:
             st.write("No videos found for the query:", query)
 
