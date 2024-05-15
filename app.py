@@ -1,7 +1,7 @@
 import numpy as np
 import streamlit as st
 
-from src.config import DATASET_PATH, DATASET, DATASET_TYPE, CANDIDATES_PER_PAGE
+from src.config import DATASET_PATH, DATASET, DATASET_TYPE, CANDIDATES_PER_PAGE, DEVICE, CLIP_MODELS
 from src.embedder import LanguageBindEmbedder, Modality
 from src.retriever import VideoRetriever
 
@@ -46,8 +46,8 @@ def render(embedder: LanguageBindEmbedder, retriever: VideoRetriever) -> None:
 @st.cache_resource()
 def load_embedder() -> LanguageBindEmbedder:
     return LanguageBindEmbedder(
-        models={Modality.VIDEO: 'LanguageBind_Video'},
-        device='cpu'
+        models=CLIP_MODELS,
+        device=DEVICE
     )
 
 
@@ -62,7 +62,7 @@ def load_retriever() -> VideoRetriever:
         for s in (index_path / 'labels.txt').open().read().splitlines()
     ]
 
-    return VideoRetriever(embeddings=index_embeddings, labels=labels, device='cpu')
+    return VideoRetriever(embeddings=index_embeddings, labels=labels, device=DEVICE)
 
 
 if __name__ == "__main__":
