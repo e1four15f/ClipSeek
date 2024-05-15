@@ -49,9 +49,9 @@ def main(
     embeddings = []
     for i, batch in enumerate(tqdm(list(chunked(data_paths, batch_size)))):
         batch_embeddings = embedder.embed(batch, modality=modality).detach().cpu().numpy()  # noqa
-        np.save(part_path / f'{modality}_embeddings.npy.{i}', batch_embeddings)
+        np.save(part_path / f'{modality}_embeddings.{i}', batch_embeddings)
         embeddings.append(batch_embeddings)
-    embeddings = np.stack(embeddings, axis=0)
+    embeddings = np.vstack(embeddings)
     np.save(index_path / f'{modality}_embeddings.npy', embeddings)
     print("Done!")
 
