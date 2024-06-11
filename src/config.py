@@ -24,6 +24,11 @@ DATASETS = [
         'dataset': 'COCO',
         'version': 'val2017',
         'modality': Modality.IMAGE,
+    },
+    {
+        'dataset': 'COCO',
+        'version': 'test2017',
+        'modality': Modality.IMAGE,
     }
 ]
 
