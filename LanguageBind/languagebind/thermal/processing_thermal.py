@@ -1,16 +1,17 @@
 import torch
 from PIL import Image
 from torchvision import transforms
-from transformers import ProcessorMixin, BatchEncoding
-from transformers.image_processing_utils import BatchFeature
+from transformers import ProcessorMixin
 
 OPENAI_DATASET_MEAN = (0.48145466, 0.4578275, 0.40821073)
 OPENAI_DATASET_STD = (0.26862954, 0.26130258, 0.27577711)
+
 
 def make_list_of_images(x):
     if not isinstance(x, list):
         return [x]
     return x
+
 
 def get_thermal_transform(config):
     config = config.vision_config
@@ -19,7 +20,7 @@ def get_thermal_transform(config):
             transforms.ToTensor(),
             transforms.Resize(224, interpolation=transforms.InterpolationMode.BICUBIC),
             transforms.CenterCrop(224),
-            transforms.Normalize(OPENAI_DATASET_MEAN, OPENAI_DATASET_STD)  # assume image
+            transforms.Normalize(OPENAI_DATASET_MEAN, OPENAI_DATASET_STD),  # assume image
         ]
     )
     return transform
@@ -30,9 +31,10 @@ def load_and_transform_thermal(thermal_path, transform):
     thermal_outputs = transform(thermal)
     return thermal_outputs
 
+
 class LanguageBindThermalProcessor(ProcessorMixin):
     attributes = []
-    tokenizer_class = ("LanguageBindThermalTokenizer")
+    tokenizer_class = "LanguageBindThermalTokenizer"
 
     def __init__(self, config, tokenizer=None, **kwargs):
         super().__init__(**kwargs)
@@ -46,8 +48,14 @@ class LanguageBindThermalProcessor(ProcessorMixin):
             raise ValueError("You have to specify either text or images. Both cannot be none.")
 
         if text is not None:
-            encoding = self.tokenizer(text, max_length=context_length, padding='max_length',
-                                      truncation=True, return_tensors=return_tensors, **kwargs)
+            encoding = self.tokenizer(
+                text,
+                max_length=context_length,
+                padding="max_length",
+                truncation=True,
+                return_tensors=return_tensors,
+                **kwargs,
+            )
 
         if images is not None:
             images = make_list_of_images(images)
@@ -67,7 +75,9 @@ class LanguageBindThermalProcessor(ProcessorMixin):
         This method forwards all its arguments to CLIPTokenizerFast's [`~PreTrainedTokenizer.batch_decode`]. Please
         refer to the docstring of this method for more information.
         """
-        return self.tokenizer.batch_decode(*args, skip_special_tokens=skip_special_tokens, **kwargs)
+        return self.tokenizer.batch_decode(
+            *args, skip_special_tokens=skip_special_tokens, **kwargs
+        )
 
     def decode(self, skip_special_tokens=True, *args, **kwargs):
         """

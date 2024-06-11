@@ -3,17 +3,17 @@ from pathlib import Path
 from src.embedder import Modality
 
 # Dataset
-DATASETS_PATH = Path('data')
+DATASETS_PATH = Path("data")
 DATASETS = [
     {
-        'dataset': 'MSRVTT',
-        'version': '5sec',
-        'modality': Modality.VIDEO,
+        "dataset": "MSRVTT",
+        "version": "5sec",
+        "modality": Modality.VIDEO,
     },
     {
-        'dataset': 'MSVD',
-        'version': '5sec',
-        'modality': Modality.VIDEO,
+        "dataset": "MSVD",
+        "version": "5sec",
+        "modality": Modality.VIDEO,
     },
     # {
     #     'dataset': 'MSRVTT',
@@ -21,15 +21,15 @@ DATASETS = [
     #     'modality': Modality.VIDEO,
     # },
     {
-        'dataset': 'COCO',
-        'version': 'val2017',
-        'modality': Modality.IMAGE,
+        "dataset": "COCO",
+        "version": "val2017",
+        "modality": Modality.IMAGE,
     },
     {
-        'dataset': 'COCO',
-        'version': 'test2017',
-        'modality': Modality.IMAGE,
-    }
+        "dataset": "COCO",
+        "version": "test2017",
+        "modality": Modality.IMAGE,
+    },
 ]
 
 # Models
@@ -41,5 +41,5 @@ CLIP_MODELS = {
 
 # System
 CANDIDATES_PER_PAGE = 32
-DEVICE = 'cpu'
+DEVICE = "cpu"
 DEBUG = False

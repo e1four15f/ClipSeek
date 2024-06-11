@@ -4,17 +4,17 @@ import numpy as np
 import streamlit as st
 from streamlit.runtime.media_file_storage import MediaFileStorageError
 
-from src.config import DATASETS_PATH, DATASETS, CANDIDATES_PER_PAGE, DEVICE, CLIP_MODELS, DEBUG
+from src.config import CANDIDATES_PER_PAGE, CLIP_MODELS, DATASETS, DATASETS_PATH, DEBUG, DEVICE
 from src.embedder import LanguageBindEmbedder, Modality
 from src.retriever import MediaRetriever, MultipleRetrievers
 
 
 def main() -> None:
     st.set_page_config(layout="wide")
-    if 'query' not in st.session_state:
+    if "query" not in st.session_state:
         st.session_state.query = "Cat in black suit is having meeting"
 
-    if 'modality' not in st.session_state:
+    if "modality" not in st.session_state:
         st.session_state.modality = Modality.TEXT
 
     embedder = load_embedder()
@@ -50,15 +50,19 @@ def render(embedder: LanguageBindEmbedder, retriever: MultipleRetrievers) -> Non
             st.write("**Modalities**")
             selected_modalities = [
                 st.checkbox(modality, value=True)
-                for modality in [f"{Modality.VIDEO}/{Modality.IMAGE}", Modality.AUDIO, Modality.TEXT]
+                for modality in [
+                    f"{Modality.VIDEO}/{Modality.IMAGE}",
+                    Modality.AUDIO,
+                    Modality.TEXT,
+                ]
             ]
 
     if query:
         # Search for videos based on query
-        if '.jpg' in query:
+        if ".jpg" in query:
             st.session_state.modality = Modality.IMAGE
             show_query = st.image
-        elif '.mp4' in query:
+        elif ".mp4" in query:
             st.session_state.modality = Modality.VIDEO
             show_query = st.video
         else:
@@ -70,13 +74,13 @@ def render(embedder: LanguageBindEmbedder, retriever: MultipleRetrievers) -> Non
         with l:
             show_query(query)
 
-        st.html('<hr>')
+        st.html("<hr>")
 
         query_embedding = embedder.embed(query, modality=st.session_state.modality)
         candidates = retriever.retrieve(
             query_embedding.detach().numpy(),
             ignore_retrievers=selected_datasets,
-            k=CANDIDATES_PER_PAGE
+            k=CANDIDATES_PER_PAGE,
         )
 
         def update(filename: str) -> None:
@@ -93,23 +97,26 @@ def render(embedder: LanguageBindEmbedder, retriever: MultipleRetrievers) -> Non
                 filename, score = candidate
                 with cols[i]:
                     try:
-                        if 'mp4' in filename:
+                        if "mp4" in filename:
                             st.video(filename)
-                        elif 'jpg' in filename:
+                        elif "jpg" in filename:
                             st.image(filename)
                         else:
-                            raise MediaFileStorageError('Unknown format')
+                            raise MediaFileStorageError("Unknown format")
                     except MediaFileStorageError:
                         st.write("X")
 
                     l, r = st.columns([6, 1])  # noqa
                     with l:
-                        st.write(
-                            f"Filename: {filename}\n\n"
-                            f"Score: {score:.4f}"
-                        )
+                        st.write(f"Filename: {filename}\n\n" f"Score: {score:.4f}")
                     with r:
-                        st.button("🔍", type="primary", key=f'SimBtn{i}', on_click=update, args=(filename,))
+                        st.button(
+                            "🔍",
+                            type="primary",
+                            key=f"SimBtn{i}",
+                            on_click=update,
+                            args=(filename,),
+                        )
 
         else:
             st.write("No videos found for the query:", query)
@@ -117,10 +124,7 @@ def render(embedder: LanguageBindEmbedder, retriever: MultipleRetrievers) -> Non
 
 @st.cache_resource()
 def load_embedder() -> LanguageBindEmbedder:
-    return LanguageBindEmbedder(
-        models=CLIP_MODELS,
-        device=DEVICE
-    )
+    return LanguageBindEmbedder(models=CLIP_MODELS, device=DEVICE)
 
 
 @st.cache_resource()
@@ -128,9 +132,9 @@ def load_retriever() -> MultipleRetrievers:
     return MultipleRetrievers(
         retrievers=[
             get_retriever(
-                dataset_path=DATASETS_PATH / d['dataset'],
-                version=d['version'],
-                modality=d['modality'],
+                dataset_path=DATASETS_PATH / d["dataset"],
+                version=d["version"],
+                modality=d["modality"],
                 device=DEVICE,
             )
             for d in DATASETS
@@ -139,11 +143,10 @@ def load_retriever() -> MultipleRetrievers:
 
 
 def get_retriever(dataset_path: Path, version: str, modality: str, device: str) -> MediaRetriever:
-    index_path = dataset_path / 'index' / version
-    index_embeddings = np.load(index_path / f'{modality}_embeddings.npy')
+    index_path = dataset_path / "index" / version
+    index_embeddings = np.load(index_path / f"{modality}_embeddings.npy")
     labels = [
-        str(dataset_path / s)
-        for s in (index_path / 'labels.txt').open().read().splitlines()
+        str(dataset_path / s) for s in (index_path / "labels.txt").open().read().splitlines()
     ]
     return MediaRetriever(embeddings=index_embeddings, labels=labels, device=device)
 

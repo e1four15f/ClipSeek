@@ -1,21 +1,21 @@
 import cv2
 import torch
-from PIL import Image
 from torch import nn
 from torchvision import transforms
-from transformers import ProcessorMixin, BatchEncoding
-from transformers.image_processing_utils import BatchFeature
+from transformers import ProcessorMixin
 
 OPENAI_DATASET_MEAN = (0.48145466, 0.4578275, 0.40821073)
 OPENAI_DATASET_STD = (0.26862954, 0.26130258, 0.27577711)
+
 
 def make_list_of_images(x):
     if not isinstance(x, list):
         return [x]
     return x
 
+
 def opencv_loader(path):
-    return cv2.imread(path, cv2.IMREAD_UNCHANGED).astype('float32')
+    return cv2.imread(path, cv2.IMREAD_UNCHANGED).astype("float32")
 
 
 class DepthNorm(nn.Module):
@@ -35,11 +35,12 @@ class DepthNorm(nn.Module):
         depth_img = depth_img.clip(min=self.min_depth)
         if self.max_depth != 0:
             depth_img = depth_img.clip(max=self.max_depth)
-            depth_img /= self.max_depth   #  0-1
+            depth_img /= self.max_depth  #  0-1
         else:
             depth_img /= depth_img.max()
         depth_img = torch.from_numpy(depth_img).unsqueeze(0).repeat(3, 1, 1)  # assume image
         return depth_img.to(torch.get_default_dtype())
+
 
 def get_depth_transform(config):
     config = config.vision_config
@@ -56,14 +57,16 @@ def get_depth_transform(config):
     )
     return transform
 
+
 def load_and_transform_depth(depth_path, transform):
     depth = opencv_loader(depth_path)
     depth_outputs = transform(depth)
     return depth_outputs
 
+
 class LanguageBindDepthProcessor(ProcessorMixin):
     attributes = []
-    tokenizer_class = ("LanguageBindDepthTokenizer")
+    tokenizer_class = "LanguageBindDepthTokenizer"
 
     def __init__(self, config, tokenizer=None, **kwargs):
         super().__init__(**kwargs)
@@ -77,8 +80,14 @@ class LanguageBindDepthProcessor(ProcessorMixin):
             raise ValueError("You have to specify either text or images. Both cannot be none.")
 
         if text is not None:
-            encoding = self.tokenizer(text, max_length=context_length, padding='max_length',
-                                      truncation=True, return_tensors=return_tensors, **kwargs)
+            encoding = self.tokenizer(
+                text,
+                max_length=context_length,
+                padding="max_length",
+                truncation=True,
+                return_tensors=return_tensors,
+                **kwargs,
+            )
 
         if images is not None:
             images = make_list_of_images(images)
@@ -98,7 +107,9 @@ class LanguageBindDepthProcessor(ProcessorMixin):
         This method forwards all its arguments to CLIPTokenizerFast's [`~PreTrainedTokenizer.batch_decode`]. Please
         refer to the docstring of this method for more information.
         """
-        return self.tokenizer.batch_decode(*args, skip_special_tokens=skip_special_tokens, **kwargs)
+        return self.tokenizer.batch_decode(
+            *args, skip_special_tokens=skip_special_tokens, **kwargs
+        )
 
     def decode(self, skip_special_tokens=True, *args, **kwargs):
         """
