@@ -6,7 +6,7 @@ from streamlit.runtime.media_file_storage import MediaFileStorageError
 
 from src.config import DATASETS_PATH, DATASETS, CANDIDATES_PER_PAGE, DEVICE, CLIP_MODELS, DEBUG
 from src.embedder import LanguageBindEmbedder, Modality
-from src.retriever import VideoRetriever, MultipleRetrievers
+from src.retriever import MediaRetriever, MultipleRetrievers
 
 
 def main() -> None:
@@ -138,14 +138,14 @@ def load_retriever() -> MultipleRetrievers:
     )
 
 
-def get_retriever(dataset_path: Path, version: str, modality: str, device: str) -> VideoRetriever:
+def get_retriever(dataset_path: Path, version: str, modality: str, device: str) -> MediaRetriever:
     index_path = dataset_path / 'index' / version
     index_embeddings = np.load(index_path / f'{modality}_embeddings.npy')
     labels = [
         str(dataset_path / s)
         for s in (index_path / 'labels.txt').open().read().splitlines()
     ]
-    return VideoRetriever(embeddings=index_embeddings, labels=labels, device=device)
+    return MediaRetriever(embeddings=index_embeddings, labels=labels, device=device)
 
 
 if __name__ == "__main__":

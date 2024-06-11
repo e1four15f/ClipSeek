@@ -11,7 +11,7 @@ class IRetriever(ABC):
         pass
 
 
-class VideoRetriever(IRetriever):
+class MediaRetriever(IRetriever):
     def __init__(self, embeddings: np.ndarray, labels: list[str], device: str = 'cpu'):
         self._labels = labels
         self._index = build_index(embeddings, device=device)
@@ -28,7 +28,7 @@ class VideoRetriever(IRetriever):
 
 
 class MultipleRetrievers:
-    def __init__(self, retrievers: list[VideoRetriever]):
+    def __init__(self, retrievers: list[MediaRetriever]):
         self._retrievers = retrievers
 
     def retrieve(self, embedding: np.ndarray, ignore_retrievers: list[int], k: int = 32) -> list[tuple[str, float]]:
