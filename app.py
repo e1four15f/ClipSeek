@@ -4,7 +4,7 @@ import numpy as np
 import streamlit as st
 from streamlit.runtime.media_file_storage import MediaFileStorageError
 
-from src.config import DATASETS_PATH, DATASETS, CANDIDATES_PER_PAGE, DEVICE, CLIP_MODELS
+from src.config import DATASETS_PATH, DATASETS, CANDIDATES_PER_PAGE, DEVICE, CLIP_MODELS, DEBUG
 from src.embedder import LanguageBindEmbedder, Modality
 from src.retriever import VideoRetriever, MultipleRetrievers
 
@@ -25,19 +25,33 @@ def main() -> None:
 
 def render(embedder: LanguageBindEmbedder, retriever: MultipleRetrievers) -> None:
     st.title("Video Search")
-    # st.write(DATASETS)
-    # st.write(st.session_state)
-    search_left, search_right = st.columns([3, 1])
+    if DEBUG:
+        st.title("Debug Info")
+        st.write(embedder, retriever)
+        st.write("Session State")
+        st.write(st.session_state)
 
-    with search_left:
+    search_inputs, search_settings = st.columns([4, 1])
+
+    with search_inputs:
         query = st.text_input("Query:", key="query")
 
-    with search_right:
-        st.write("#### Datasets")
-        datasets_mask = []
-        for d in DATASETS:
-            agree = st.checkbox(f"{d['dataset']}[{d['version']}]", value=True)
-            datasets_mask.append(agree)
+    with search_settings:
+        st.write("#### Settings")
+        search_datasets, search_modalities = st.columns(2)
+        with search_datasets:
+            st.write("**Datasets**")
+            selected_datasets = []
+            for d in DATASETS:
+                is_selected = st.checkbox(f"{d['dataset']}[{d['version']}]", value=True)
+                selected_datasets.append(is_selected)
+
+        with search_modalities:
+            st.write("**Modalities**")
+            selected_modalities = [
+                st.checkbox(modality, value=True)
+                for modality in [f"{Modality.VIDEO}/{Modality.IMAGE}", Modality.AUDIO, Modality.TEXT]
+            ]
 
     if query:
         # Search for videos based on query
@@ -61,11 +75,11 @@ def render(embedder: LanguageBindEmbedder, retriever: MultipleRetrievers) -> Non
         query_embedding = embedder.embed(query, modality=st.session_state.modality)
         candidates = retriever.retrieve(
             query_embedding.detach().numpy(),
-            ignore_retrievers=datasets_mask,
+            ignore_retrievers=selected_datasets,
             k=CANDIDATES_PER_PAGE
         )
 
-        def update(filename):
+        def update(filename: str) -> None:
             st.session_state.query = filename
 
         if candidates:

@@ -42,3 +42,4 @@ CLIP_MODELS = {
 # System
 CANDIDATES_PER_PAGE = 32
 DEVICE = 'cpu'
+DEBUG = False
