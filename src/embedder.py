@@ -15,6 +15,8 @@ class Modality(str, Enum):
     IMAGE = "image"
     DEPTH = "depth"
     TEXT = "language"
+    # Combined modalities
+    HYBRID = "hybrid"
 
 
 class LanguageBindEmbedder:
@@ -38,14 +40,12 @@ class LanguageBindEmbedder:
         self._tokenizer = LanguageBindImageTokenizer.from_pretrained(
             tokenizer_path,
         )
-        self._modality_transform = {
-            c: transform_dict[c](self._model.modality_config[c]) for c in clip_type
-        }
+        self._modality_transform = {c: transform_dict[c](self._model.modality_config[c]) for c in clip_type}
         self._modality_transform[Modality.TEXT] = lambda text: self._tokenizer(
             text, max_length=77, padding="max_length", truncation=True, return_tensors="pt"
         )
 
-    @lru_cache  # noqa
+    # @lru_cache  # noqa TODO single dispatch
     def embed(self, data: Union[str, list[str], torch.Tensor], modality: Modality) -> torch.Tensor:
         inputs = {modality: data}
         if not isinstance(data, torch.Tensor):

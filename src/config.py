@@ -5,41 +5,44 @@ from src.embedder import Modality
 # Dataset
 DATASETS_PATH = Path("data")
 DATASETS = [
-    {
-        "dataset": "MSRVTT",
-        "version": "5sec",
-        "modality": Modality.VIDEO,
-    },
+    # {
+    #     "dataset": "MSRVTT",
+    #     "version": "5sec",
+    #     "modalities": [Modality.VIDEO],#, Modality.AUDIO],
+    # },
     {
         "dataset": "MSVD",
         "version": "5sec",
-        "modality": Modality.VIDEO,
+        "modalities": [Modality.VIDEO],
     },
-    # {
-    #     'dataset': 'MSRVTT',
-    #     'version': 'all',
-    #     'modality': Modality.VIDEO,
-    # },
+    {
+        'dataset': 'MSRVTT',
+        'version': 'all',
+        'modalities': [Modality.VIDEO, Modality.AUDIO],
+    },
     {
         "dataset": "COCO",
         "version": "val2017",
-        "modality": Modality.IMAGE,
+        "modalities": [Modality.IMAGE],
     },
     {
         "dataset": "COCO",
         "version": "test2017",
-        "modality": Modality.IMAGE,
+        "modalities": [Modality.IMAGE],
     },
 ]
 
 # Models
 CLIP_MODELS = {
     Modality.VIDEO: "LanguageBind_Video",
-    # Modality.AUDIO: "LanguageBind_Audio",
+    Modality.AUDIO: "LanguageBind_Audio",
     Modality.IMAGE: "LanguageBind_Image",
 }
+EMBEDDINGS_DIM = 768
 
 # System
+MILVUS_URL = "http://localhost:19530"
+MILVUS_DB_NAME = "MultimodalMediaSearch"
 CANDIDATES_PER_PAGE = 32
 DEVICE = "cpu"
 DEBUG = False

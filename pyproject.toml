@@ -44,6 +44,7 @@ pytorchvideo = "^0.1.5"
 soundfile = "^0.12.1"
 streamlit = "^1.33.0"
 faiss-cpu = "^1.8.0"
+pymilvus = "~2.4"  # keep synchronized with actual Milvus version in docker-compose.yml
 
 [tool.poetry.group.dev.dependencies]
 ruff = "^0.4.2"
@@ -61,7 +62,7 @@ ignore = [
     "ANN204",  # Missing return type annotation for special method `__init__`
     "ANN101",  # Missing type annotation for `self` in method
 ]
-line-length = 99
+line-length = 120
 lint.select = [
     "A", # flake8-builtins
     "ARG", # flake8-unused-arguments

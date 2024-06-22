@@ -13,6 +13,7 @@ MODALITY_PATTERN = {
     # TODO (v.karmazin): avi, png and other formats
     Modality.VIDEO: "*.mp4",
     Modality.IMAGE: "*.jpg",
+    Modality.AUDIO: "*.wav",
 }
 
 
@@ -73,9 +74,7 @@ if __name__ == "__main__":
         ),
         help="JSON string of models by modality",
     )
-    parser.add_argument(
-        "--data-path", type=str, default="data/<dataset>", help="Path to the dataset directory"
-    )
+    parser.add_argument("--data-path", type=str, default="data/<dataset>", help="Path to the dataset directory")
     parser.add_argument(
         "--media-path",
         type=str,
@@ -89,12 +88,8 @@ if __name__ == "__main__":
         default=Modality.VIDEO,
         help="Modality to use",
     )  # noqa
-    parser.add_argument(
-        "--device", type=str, default="cuda", help="Device to use (e.g., 'cuda' or 'cpu')"
-    )
-    parser.add_argument(
-        "--batch-size", type=int, default=32, help="Batch size for model inference"
-    )
+    parser.add_argument("--device", type=str, default="cuda", help="Device to use (e.g., 'cuda' or 'cpu')")
+    parser.add_argument("--batch-size", type=int, default=32, help="Batch size for model inference")
 
     args = parser.parse_args()
     main(

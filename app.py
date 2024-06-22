@@ -6,7 +6,7 @@ from streamlit.runtime.media_file_storage import MediaFileStorageError
 
 from src.config import CANDIDATES_PER_PAGE, CLIP_MODELS, DATASETS, DATASETS_PATH, DEBUG, DEVICE
 from src.embedder import LanguageBindEmbedder, Modality
-from src.retriever import MediaRetriever, MultipleRetrievers
+from src.retriever import FaissMediaRetriever, MilvusMediaRetriever, MultipleRetrievers
 
 
 def main() -> None:
@@ -38,7 +38,7 @@ def render(embedder: LanguageBindEmbedder, retriever: MultipleRetrievers) -> Non
 
     with search_settings:
         st.write("#### Settings")
-        search_datasets, search_modalities = st.columns(2)
+        search_datasets, search_representation = st.columns(2)
         with search_datasets:
             st.write("**Datasets**")
             selected_datasets = []
@@ -46,16 +46,19 @@ def render(embedder: LanguageBindEmbedder, retriever: MultipleRetrievers) -> Non
                 is_selected = st.checkbox(f"{d['dataset']}[{d['version']}]", value=True)
                 selected_datasets.append(is_selected)
 
-        with search_modalities:
-            st.write("**Modalities**")
-            selected_modalities = [
-                st.checkbox(modality, value=True)
+        with search_representation:
+            st.write("**Representation**")
+            modalities = {
+                modality: st.checkbox(modality, value=modality == Modality.HYBRID)
                 for modality in [
-                    f"{Modality.VIDEO}/{Modality.IMAGE}",
+                    Modality.HYBRID,
+                    Modality.VIDEO,
+                    Modality.IMAGE,
                     Modality.AUDIO,
-                    Modality.TEXT,
+                    # Modality.TEXT, TODO bm25
                 ]
-            ]
+            }
+            selected_modalities = [modality for modality, mask in modalities.items() if mask]
 
     if query:
         # Search for videos based on query
@@ -80,6 +83,7 @@ def render(embedder: LanguageBindEmbedder, retriever: MultipleRetrievers) -> Non
         candidates = retriever.retrieve(
             query_embedding.detach().numpy(),
             ignore_retrievers=selected_datasets,
+            modalities=selected_modalities,
             k=CANDIDATES_PER_PAGE,
         )
 
@@ -94,13 +98,15 @@ def render(embedder: LanguageBindEmbedder, retriever: MultipleRetrievers) -> Non
             cols = [column for row in cols_per_row for column in row]
 
             for i, candidate in enumerate(candidates):
-                filename, score = candidate
+                filename, score, modality = candidate
                 with cols[i]:
                     try:
-                        if "mp4" in filename:
+                        if modality == Modality.VIDEO or "mp4" in filename:
                             st.video(filename)
-                        elif "jpg" in filename:
+                        elif modality == Modality.IMAGE or "jpg" in filename:
                             st.image(filename)
+                        elif modality == Modality.AUDIO:
+                            st.audio(filename)
                         else:
                             raise MediaFileStorageError("Unknown format")
                     except MediaFileStorageError:
@@ -108,7 +114,7 @@ def render(embedder: LanguageBindEmbedder, retriever: MultipleRetrievers) -> Non
 
                     l, r = st.columns([6, 1])  # noqa
                     with l:
-                        st.write(f"Filename: {filename}\n\n" f"Score: {score:.4f}")
+                        st.write(f"Filename: {filename}\n\n" f"Score: {score:.4f}\n\n" f"Modality: {modality}")
                     with r:
                         st.button(
                             "🔍",
@@ -127,14 +133,30 @@ def load_embedder() -> LanguageBindEmbedder:
     return LanguageBindEmbedder(models=CLIP_MODELS, device=DEVICE)
 
 
+# @st.cache_resource()
+# def load_retriever() -> MultipleRetrievers:
+#     return MultipleRetrievers(
+#         retrievers=[
+#             get_retriever(
+#                 dataset_path=DATASETS_PATH / d["dataset"],
+#                 version=d["version"],
+#                 modality=d["modality"],
+#                 device=DEVICE,
+#             )
+#             for d in DATASETS
+#         ]
+#     )
+
+
 @st.cache_resource()
 def load_retriever() -> MultipleRetrievers:
     return MultipleRetrievers(
         retrievers=[
-            get_retriever(
+            get_milvus_retriever(
+                dataset_name=f'{d["dataset"]}_{d["version"]}',
                 dataset_path=DATASETS_PATH / d["dataset"],
                 version=d["version"],
-                modality=d["modality"],
+                modalities=d["modalities"],
                 device=DEVICE,
             )
             for d in DATASETS
@@ -142,13 +164,28 @@ def load_retriever() -> MultipleRetrievers:
     )
 
 
-def get_retriever(dataset_path: Path, version: str, modality: str, device: str) -> MediaRetriever:
+def get_faiss_retriever(dataset_path: Path, version: str, modality: str, device: str) -> FaissMediaRetriever:
     index_path = dataset_path / "index" / version
     index_embeddings = np.load(index_path / f"{modality}_embeddings.npy")
-    labels = [
-        str(dataset_path / s) for s in (index_path / "labels.txt").open().read().splitlines()
-    ]
-    return MediaRetriever(embeddings=index_embeddings, labels=labels, device=device)
+    labels = [str(dataset_path / s) for s in (index_path / "labels.txt").open().read().splitlines()]
+    return FaissMediaRetriever(embeddings=index_embeddings, labels=labels, device=device)
+
+
+def get_milvus_retriever(
+    dataset_name: str, dataset_path: Path, version: str, modalities: tuple[str], device: str
+) -> MilvusMediaRetriever:
+    index_path = dataset_path / "index" / version
+    index_embeddings = {modality: np.load(index_path / f"{modality}_embeddings.npy") for modality in modalities}
+    if len(modalities) > 1:
+        index_embeddings[Modality.HYBRID] = np.mean(list(index_embeddings.values()), axis=0)
+
+    labels = [str(dataset_path / s) for s in (index_path / "labels.txt").open().read().splitlines()]
+    return MilvusMediaRetriever(
+        index_name=dataset_name,
+        modality_embeddings=index_embeddings,  # noqa
+        labels=labels,
+        device=device
+    )
 
 
 if __name__ == "__main__":

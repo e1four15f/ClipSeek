@@ -20,8 +20,6 @@ export PYTHON_KEYRING_BACKEND=keyring.backends.null.Keyring
 
 The warning indicate that `transformers` library cannot use downloaded LanguageBind weights. This will affect resulting embeddings.
 
-
-
 Answer
 
 The `perf==0.10.0` not suitable for the project. It must be a version after specific commit for unknown reason.
