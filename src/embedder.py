@@ -1,5 +1,5 @@
+from abc import ABC, abstractmethod
 from enum import Enum
-from functools import lru_cache
 from typing import Any, Optional, Union
 
 import torch
@@ -19,7 +19,13 @@ class Modality(str, Enum):
     HYBRID = "hybrid"
 
 
-class LanguageBindEmbedder:
+class IEmbedder(ABC):
+    @abstractmethod
+    def embed(self, data: Union[str, list[str], torch.Tensor], modality: Modality) -> torch.Tensor:
+        pass
+
+
+class LanguageBindEmbedder(IEmbedder):
     def __init__(
         self,
         models: Optional[dict[Modality, str]] = None,
@@ -64,3 +70,14 @@ class LanguageBindEmbedder:
         for modality, data in inputs.items():
             inputs[modality] = to_device(self._modality_transform[modality](data), self._device)
         return inputs
+
+
+class RandomEmbedder(IEmbedder):
+    def __init__(self, embeddings_dim: int):
+        self._embeddings_dim = embeddings_dim
+
+    def embed(self, data: Union[str, list[str], torch.Tensor], modality: Modality) -> torch.Tensor:  # noqa
+        if isinstance(data, str):
+            # for single input data return embeddings without batch_size dim
+            return torch.rand(self._embeddings_dim)
+        return torch.rand(len(data), self._embeddings_dim)

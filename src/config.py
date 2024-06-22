@@ -11,14 +11,15 @@ DATASETS = [
     #     "modalities": [Modality.VIDEO],#, Modality.AUDIO],
     # },
     {
+        # maybe path here?
         "dataset": "MSVD",
         "version": "5sec",
         "modalities": [Modality.VIDEO],
     },
     {
-        'dataset': 'MSRVTT',
-        'version': 'all',
-        'modalities': [Modality.VIDEO, Modality.AUDIO],
+        "dataset": "MSRVTT",
+        "version": "all",
+        "modalities": [Modality.VIDEO, Modality.AUDIO],
     },
     {
         "dataset": "COCO",
@@ -33,6 +34,7 @@ DATASETS = [
 ]
 
 # Models
+USE_DUMMY_MODEL = True
 CLIP_MODELS = {
     Modality.VIDEO: "LanguageBind_Video",
     Modality.AUDIO: "LanguageBind_Audio",

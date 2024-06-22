@@ -4,8 +4,8 @@ import numpy as np
 import streamlit as st
 from streamlit.runtime.media_file_storage import MediaFileStorageError
 
-from src.config import CANDIDATES_PER_PAGE, CLIP_MODELS, DATASETS, DATASETS_PATH, DEBUG, DEVICE
-from src.embedder import LanguageBindEmbedder, Modality
+from src import config as cfg
+from src.embedder import IEmbedder, LanguageBindEmbedder, Modality, RandomEmbedder
 from src.retriever import FaissMediaRetriever, MilvusMediaRetriever, MultipleRetrievers
 
 
@@ -23,9 +23,9 @@ def main() -> None:
     render(embedder=embedder, retriever=retriever)
 
 
-def render(embedder: LanguageBindEmbedder, retriever: MultipleRetrievers) -> None:
+def render(embedder: IEmbedder, retriever: MultipleRetrievers) -> None:
     st.title("Video Search")
-    if DEBUG:
+    if cfg.DEBUG:
         st.title("Debug Info")
         st.write(embedder, retriever)
         st.write("Session State")
@@ -42,7 +42,7 @@ def render(embedder: LanguageBindEmbedder, retriever: MultipleRetrievers) -> Non
         with search_datasets:
             st.write("**Datasets**")
             selected_datasets = []
-            for d in DATASETS:
+            for d in cfg.DATASETS:
                 is_selected = st.checkbox(f"{d['dataset']}[{d['version']}]", value=True)
                 selected_datasets.append(is_selected)
 
@@ -55,7 +55,7 @@ def render(embedder: LanguageBindEmbedder, retriever: MultipleRetrievers) -> Non
                     Modality.VIDEO,
                     Modality.IMAGE,
                     Modality.AUDIO,
-                    # Modality.TEXT, TODO bm25
+                    # Modality.TEXT, TODO bm25 embeddings also?
                 ]
             }
             selected_modalities = [modality for modality, mask in modalities.items() if mask]
@@ -84,7 +84,7 @@ def render(embedder: LanguageBindEmbedder, retriever: MultipleRetrievers) -> Non
             query_embedding.detach().numpy(),
             ignore_retrievers=selected_datasets,
             modalities=selected_modalities,
-            k=CANDIDATES_PER_PAGE,
+            k=cfg.CANDIDATES_PER_PAGE,
         )
 
         def update(filename: str) -> None:
@@ -129,8 +129,10 @@ def render(embedder: LanguageBindEmbedder, retriever: MultipleRetrievers) -> Non
 
 
 @st.cache_resource()
-def load_embedder() -> LanguageBindEmbedder:
-    return LanguageBindEmbedder(models=CLIP_MODELS, device=DEVICE)
+def load_embedder() -> IEmbedder:
+    if cfg.USE_DUMMY_MODEL:
+        return RandomEmbedder(embeddings_dim=cfg.EMBEDDINGS_DIM)
+    return LanguageBindEmbedder(models=cfg.CLIP_MODELS, device=cfg.DEVICE)
 
 
 # @st.cache_resource()
@@ -154,12 +156,12 @@ def load_retriever() -> MultipleRetrievers:
         retrievers=[
             get_milvus_retriever(
                 dataset_name=f'{d["dataset"]}_{d["version"]}',
-                dataset_path=DATASETS_PATH / d["dataset"],
+                dataset_path=cfg.DATASETS_PATH / d["dataset"],
                 version=d["version"],
                 modalities=d["modalities"],
-                device=DEVICE,
+                device=cfg.DEVICE,
             )
-            for d in DATASETS
+            for d in cfg.DATASETS
         ]
     )
 
@@ -181,10 +183,13 @@ def get_milvus_retriever(
 
     labels = [str(dataset_path / s) for s in (index_path / "labels.txt").open().read().splitlines()]
     return MilvusMediaRetriever(
+        url=cfg.MILVUS_URL,
+        database_name=cfg.MILVUS_DB_NAME,
         index_name=dataset_name,
         modality_embeddings=index_embeddings,  # noqa
+        embeddings_dim=cfg.EMBEDDINGS_DIM,
         labels=labels,
-        device=device
+        device=device,
     )
 
 

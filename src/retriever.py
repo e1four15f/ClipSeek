@@ -7,7 +7,6 @@ from more_itertools import chunked
 from pymilvus import Collection, CollectionSchema, DataType, FieldSchema, connections
 from pymilvus.orm import db, utility
 
-from src.config import EMBEDDINGS_DIM, MILVUS_DB_NAME, MILVUS_URL
 from src.embedder import Modality
 
 
@@ -35,10 +34,19 @@ class FaissMediaRetriever(IRetriever):
 
 class MilvusMediaRetriever(IRetriever):
     def __init__(
-        self, index_name: str, modality_embeddings: dict[Modality, np.ndarray], labels: list[str], device: str = "cpu"
+        self,
+        url: str,
+        database_name: str,
+        index_name: str,
+        modality_embeddings: dict[Modality, np.ndarray],
+        embeddings_dim: int,
+        labels: list[str],
+        device: str = "cpu",
     ):
-        create_milvus_connection(url=MILVUS_URL, database_name=MILVUS_DB_NAME)
-        self._collection = build_milvus_collection(index_name, modality_embeddings=modality_embeddings, labels=labels)
+        create_milvus_connection(url=url, database_name=database_name)
+        self._collection = build_milvus_collection(
+            index_name, modality_embeddings=modality_embeddings, embeddings_dim=embeddings_dim, labels=labels
+        )
         self._device = device
         self._available_modalities = set(modality_embeddings.keys())
 
@@ -102,7 +110,7 @@ def create_milvus_connection(url: str, database_name: str = "default") -> None:
 
 
 def build_milvus_collection(
-    index_name: str, modality_embeddings: dict[Modality, np.ndarray], labels: list[str]
+    index_name: str, modality_embeddings: dict[Modality, np.ndarray], embeddings_dim: int, labels: list[str]
 ) -> Collection:
     if utility.has_collection(index_name):
         collection = Collection(index_name)
@@ -114,7 +122,7 @@ def build_milvus_collection(
         FieldSchema(name="id", dtype=DataType.INT64, is_primary=True, auto_id=True),
         FieldSchema(name="path", dtype=DataType.VARCHAR, max_length=4096),
         FieldSchema(name="modality", dtype=DataType.VARCHAR, max_length=32),
-        FieldSchema(name="embedding", dtype=DataType.FLOAT_VECTOR, dim=EMBEDDINGS_DIM),
+        FieldSchema(name="embedding", dtype=DataType.FLOAT_VECTOR, dim=embeddings_dim),
     ]
     collection = Collection(name=index_name, schema=CollectionSchema(fields, enable_dynamic_field=False))
     index_params = {
