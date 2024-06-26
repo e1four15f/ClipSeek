@@ -4,11 +4,19 @@ var buttons = document.getElementsByClassName('open-modal');
 var close = modal.getElementsByClassName('close')[0];
 
 Array.from(buttons).forEach(function(button) {
-button.onclick = function() {
-      var content = button.getAttribute('data-content');
-      modalBodyContent.textContent = content;
-      modal.style.display = 'block';
-    };
+  button.onclick = function(event) {
+    var content = button.getAttribute('data-content');
+    modalBodyContent.textContent = content;
+    modal.style.display = 'block';
+
+    var eventY = event.clientY;
+    var viewportHeight = window.innerHeight;
+    var percentY = (eventY / viewportHeight) * 100;
+
+    var modalContent = modal.querySelector('.modal-content');
+    modalContent.style.top = percentY + '%';
+    modalContent.style.transform = 'translate(-50%, -50%)';
+  };
 });
 
 close.onclick = function() {
@@ -157,3 +165,11 @@ let pipeline = [initializeProps_Handler, dataUpdate_Handler, log_Handler]
 // Finally, initialize component passing in pipeline
 
 initialize(pipeline)
+
+
+
+
+
+window.addEventListener('scroll', () => {
+  console.log(`X: ${window.scrollX}, Y: ${window.scrollY}`);
+});

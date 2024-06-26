@@ -40,7 +40,7 @@ img {
   bottom: 0;
   left: 0;
   overflow: auto;
-  background: radial-gradient(circle, rgba(0,0,0,0.6) 0%, rgba(255,255,255,0.6) 30%);
+  background: rgba(255,255,255,0.6);
   border-radius: 20px;
   z-index: 99999;
   animation-name: show;
@@ -48,14 +48,14 @@ img {
   backdrop-filter: blur(1px);
 }
 
-
 .modal-content {
-  position: relative;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
   background-color: #fff;
-  margin: 15% auto;
-  border: 1px solid #888;
   width: 80%;
-  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+  box-shadow: 0 0 60px 60px rgba(0, 0, 0, 0.2);
 }
 
 @keyframes show {
@@ -107,4 +107,10 @@ img {
 .close:focus {
   background-color: #DADFE9;
   cursor: pointer;
+}
+
+#empty-pad {
+  height: 800px;
+  width: 100%;
+  background: transparent;
 }
