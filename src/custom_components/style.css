@@ -6,7 +6,7 @@
 // orange: #FF4C4B
 */
 
-.container {
+#container {
   display: flex;
   justify-content: space-between;
 }
@@ -32,7 +32,7 @@ img {
   cursor: pointer;
 }
 
-.modal {
+#modal {
   display: none;
   position: fixed;
   top: 0;
@@ -48,16 +48,6 @@ img {
   backdrop-filter: blur(1px);
 }
 
-.modal-content {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  background-color: #fff;
-  width: 80%;
-  box-shadow: 0 0 60px 60px rgba(0, 0, 0, 0.2);
-}
-
 @keyframes show {
   0% {
     display: none;
@@ -69,16 +59,26 @@ img {
   }
 }
 
-.modal-header {
+#modal-window {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: #fff;
+  width: 80%;
+  box-shadow: 0 0 30px 30px rgba(0, 0, 0, 0.2);
+}
+
+#modal-header {
   padding: 12px;
   background-color: #F1F2F6;
 }
 
-.modal-body {
+#modal-body {
   padding: 12px;
 }
 
-.modal-footer {
+#modal-footer {
   position: relative;
   background-color: #fefefe;
   margin: auto;
@@ -112,5 +112,6 @@ img {
 #empty-pad {
   height: 800px;
   width: 100%;
-  background: transparent;
+  background: rgba(255,76,75, 0.1);
+  cursor: pointer;
 }

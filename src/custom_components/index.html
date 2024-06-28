@@ -6,46 +6,12 @@
 </head>
 
 <body>
-  <div class="container">
-    <div class="column">
-        <div class="open-modal" data-content="Content for modal 1"><img src="000000000019.jpg"></div>
-        <div class="open-modal" data-content="Content for modal 1"><img src="000000000001.jpg"></div>
-        <div class="open-modal" data-content="Content for modal 1"><img src="000000000016.jpg"></div>
-        <div class="open-modal" data-content="Content for modal 1"><img src="000000000019.jpg"></div>
-        <div class="open-modal" data-content="Content for modal 1"><img src="000000000057.jpg"></div>
-        <div class="open-modal" data-content="Content for modal 1"><img src="000000000063.jpg"></div>
-        <div class="open-modal" data-content="Content for modal 1"><img src="000000000069.jpg"></div>
-        <div class="open-modal" data-content="Content for modal 1"><img src="000000000080.jpg"></div>
-        <div class="open-modal" data-content="Content for modal 1"><img src="000000000090.jpg"></div>
-      </div>
-      <div class="column">
-        <div class="open-modal" data-content="Content for modal 1"><img src="000000000106.jpg"></div>
-        <div class="open-modal" data-content="Content for modal 1"><img src="000000000108.jpg"></div>
-        <div class="open-modal" data-content="Content for modal 1"><img src="000000000128.jpg"></div>
-        <div class="open-modal" data-content="Content for modal 1"><img src="000000000155.jpg"></div>
-        <div class="open-modal" data-content="Content for modal 1"><img src="000000000161.jpg"></div>
-        <div class="open-modal" data-content="Content for modal 1"><img src="000000000171.jpg"></div>
-        <div class="open-modal" data-content="Content for modal 1"><img src="000000000178.jpg"></div>
-        <div class="open-modal" data-content="Content for modal 1"><img src="000000000180.jpg"></div>
-        <div class="open-modal" data-content="Content for modal 1"><img src="000000000183.jpg"></div>
-    </div>
-      <div class="column">
-        <div class="open-modal" data-content="Content for modal 1"><img src="000000000188.jpg"></div>
-        <div class="open-modal" data-content="Content for modal 1"><img src="000000000191.jpg"></div>
-        <div class="open-modal" data-content="Content for modal 1"><img src="000000000202.jpg"></div>
-        <div class="open-modal" data-content="Content for modal 1"><img src="000000000019.jpg"></div>
-        <div class="open-modal" data-content="Content for modal 1"><img src="000000000001.jpg"></div>
-        <div class="open-modal" data-content="Content for modal 1"><img src="000000000069.jpg"></div>
-        <div class="open-modal" data-content="Content for modal 1"><img src="000000000191.jpg"></div>
-        <div class="open-modal" data-content="Content for modal 1"><img src="000000000090.jpg"></div>
-        <div class="open-modal" data-content="Content for modal 1"><img src="000000000001.jpg"></div>
-    </div>
-  </div>
+  <div id="container"></div>
   <div id="empty-pad"></div>
-  <div id="demo-modal" class="modal">
-    <div class="modal-content">
-      <div class="modal-header">
-        <span class='close'>
+  <div id="modal">
+    <div id="modal-window">
+      <div id="modal-header">
+        <span id="modal-close" class='close'>
           <svg class="close-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="currentColor" xmlns="http://www.w3.org/2000/svg" color="inherit">
             <path fill="none" d="M0 0h24v24H0V0z"></path>
             <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z"></path>
@@ -53,14 +19,14 @@
         </span>
         <h2>Modal Header</h2>
       </div>
-      <div class="modal-body">
-        <p id="modal-body-content">Some text in the Modal Body</p>
+      <div id="modal-body">
+        <p>Modal Body</p>
       </div>
-      <div class="modal-footer">
+      <div id="modal-footer">
         <h3>Modal Footer</h3>
       </div>
     </div>
   </div>
 </body>
-<script src="script.js"></script>
+<script type="module" src="script.js"></script>
 </html>

@@ -47,4 +47,7 @@ MILVUS_URL = "http://localhost:19530"
 MILVUS_DB_NAME = "MultimodalMediaSearch"
 CANDIDATES_PER_PAGE = 32
 DEVICE = "cpu"
+
+# UI
 DEBUG = False
+N_RESULT_COLUMNS = 3

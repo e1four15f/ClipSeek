@@ -1,34 +1,3 @@
-var modal = document.getElementById('demo-modal');
-var modalBodyContent = document.getElementById('modal-body-content');
-var buttons = document.getElementsByClassName('open-modal');
-var close = modal.getElementsByClassName('close')[0];
-
-Array.from(buttons).forEach(function(button) {
-  button.onclick = function(event) {
-    var content = button.getAttribute('data-content');
-    modalBodyContent.textContent = content;
-    modal.style.display = 'block';
-
-    var eventY = event.clientY;
-    var viewportHeight = window.innerHeight;
-    var percentY = (eventY / viewportHeight) * 100;
-
-    var modalContent = modal.querySelector('.modal-content');
-    modalContent.style.top = percentY + '%';
-    modalContent.style.transform = 'translate(-50%, -50%)';
-  };
-});
-
-close.onclick = function() {
-  modal.style.display = 'none';
-};
-
-window.onclick = function(event) {
-  if (event.target == modal) {
-    modal.style.display = 'none';
-  }
-};
-
 // ----------------------------------------------------
 // Use these functions as is to perform required Streamlit
 // component lifecycle actions:
@@ -62,7 +31,6 @@ function _sendMessage(type, data) {
 }
 
 function initialize(pipeline) {
-
   // Hook Streamlit's message events into a simple dispatcher of pipeline handlers
   window.addEventListener("message", (event) => {
     if (event.data.type == RENDER) {
@@ -84,8 +52,7 @@ function initialize(pipeline) {
   })
 
   // Optionally, if auto-height computation fails, you can manually set it
-  // (uncomment below)
-  //setFrameHeight(200)
+  // setFrameHeight(200)
 }
 
 function setFrameHeight(height) {
@@ -99,69 +66,79 @@ function notifyHost(data) {
 
 // ----------------------------------------------------
 // Your custom functionality for the component goes here:
+function renderMedia(props) {
+  const images = props.media;
+  const n_cols = props.n_cols;
 
-function toggle(button, group) {
-  buttons = document.getElementsByClassName(group)
-  console.log(buttons)
-  for (let i = 0; i < buttons.length; i++) {
-    console.log(buttons.item(i))
-  }
+  // Clearing container and create columns
+  var container = document.getElementById('container');
+  container.innerHTML = '';
 
-  for (let i = 0; i < buttons.length; i++) {
-    if (button.id == String(i) & button.className.includes("off")) {
-      button.className = group + " on"
-    } else if (button.id == String(i) & button.className.includes("on")) {
-      button.className = group + " off"
-    } else {
-      buttons.item(i).className = group + " off"
+  var columns = Array.from({ length: n_cols }, () => {
+    var column = document.createElement('div');
+    column.className = 'column';
+    container.appendChild(column);
+    return column;
+  });
+
+  // Distribute images into columns
+  images.forEach((image, index) => {
+    var imgDiv = document.createElement('div');
+    imgDiv.className = 'open-modal';
+    imgDiv.setAttribute('index', index);
+    imgDiv.setAttribute('data-content', image.dataContent);
+    var img = document.createElement('img');
+    img.src = image.src;
+    imgDiv.appendChild(img);
+    columns[index % columns.length].appendChild(imgDiv);
+  });
+
+  // Create and append the modal
+  const buttons = document.getElementsByClassName('open-modal');
+  const modal = document.getElementById('modal');
+  Array.from(buttons).forEach((button) => {
+    button.onclick = function(event) {
+      // Display element
+      var modal = document.getElementById('modal');
+      modal.style.display = 'block';
+
+      // Update content
+      var modalBody = document.getElementById('modal-body');
+      var content = button.getAttribute('data-content');
+      modalBody.textContent = content;
+
+      // Move modal window to scroll position
+      var modalWindow = document.getElementById('modal-window');
+      var eventY = event.clientY;
+      var viewportHeight = window.innerHeight;
+      var percentY = (eventY / viewportHeight) * 100;
+      modalWindow.style.top = percentY + '%';
+      modalWindow.style.transform = 'translate(-50%, -50%)';
+    };
+  });
+
+  const close = document.getElementById('modal-close');
+  close.onclick = function() {
+    modal.style.display = 'none';
+  };
+
+  window.onclick = function(event) {
+    if (event.target == modal) {
+      modal.style.display = 'none';
     }
-  }
-
-  buttons = document.getElementsByClassName(group)
-  actions = []
-  for (let i = 0; i < buttons.length; i++) {
-    btn = buttons.item(i)
-    actions.push({ "action": btn.value, "value": btn.className.includes("on") })
-  }
-
-  states = {}
-  states['choice'] = {
-    "name": group,
-    "state": {
-      "action": button.value,
-      "value": button.className.includes("on")
-    }
-  }
-  states["options"] = { "name": group, "states": actions }
-
-  notifyHost({
-    value: states,
-    dataType: "json",
-  })
+  };
 }
 
-// ----------------------------------------------------
-// Here you can customize a pipeline of handlers for
-// inbound properties from the Streamlit client app
 
-// Set initial value sent from Streamlit!
-function initializeProps_Handler(props) {
-  let header1 = document.getElementById("group_1_header")
-
-  let header2 = document.getElementById("group_2_header")
-}
-// Access values sent from Streamlit!
-function dataUpdate_Handler(props) {
-  let msgLabel = document.getElementById("message_label")
-}
-// Simply log received data dictionary
-function log_Handler(props) {
+function logHandler(props) {
   console.log("Received from Streamlit: " + JSON.stringify(props))
 }
 
-let pipeline = [initializeProps_Handler, dataUpdate_Handler, log_Handler]
-
 // ----------------------------------------------------
 // Finally, initialize component passing in pipeline
-
-initialize(pipeline)
+initialize(
+  [
+    logHandler,
+    renderMedia,
+  ]
+)
