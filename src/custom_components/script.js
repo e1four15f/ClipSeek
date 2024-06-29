@@ -46,7 +46,7 @@ function initialize(pipeline) {
 
   // Component should be mounted by Streamlit in an iframe, so try to autoset the iframe height.
   window.addEventListener("load", () => {
-    window.setTimeout(function () {
+    window.setTimeout(() => {
       setFrameHeight(document.documentElement.clientHeight)
     }, 0)
   })
@@ -69,6 +69,7 @@ function notifyHost(data) {
 function renderMedia(props) {
   const images = props.media;
   const n_cols = props.n_cols;
+  const resources_url = props.resources_url
 
   // Clearing container and create columns
   var container = document.getElementById('container');
@@ -88,7 +89,7 @@ function renderMedia(props) {
     imgDiv.setAttribute('index', index);
     imgDiv.setAttribute('data-content', image.dataContent);
     var img = document.createElement('img');
-    img.src = image.src;
+    img.src = resources_url + '/' + image.src;
     imgDiv.appendChild(img);
     columns[index % columns.length].appendChild(imgDiv);
   });

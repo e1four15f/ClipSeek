@@ -63,13 +63,15 @@ img {
   position: fixed;
   top: 50%;
   left: 50%;
+  border-radius: 10px;
   transform: translate(-50%, -50%);
   background-color: #fff;
   width: 80%;
-  box-shadow: 0 0 30px 30px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 0 5px 5px rgba(0, 0, 0, 0.1);
 }
 
 #modal-header {
+  border-radius: 10px 10px 0 0;
   padding: 12px;
   background-color: #F1F2F6;
 }
@@ -82,6 +84,7 @@ img {
   position: relative;
   background-color: #fefefe;
   margin: auto;
+  border-radius: 0 0 10px 10px;
   padding: 12px;
 }
 

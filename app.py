@@ -1,4 +1,5 @@
 from pathlib import Path
+from urllib.parse import urljoin
 
 import numpy as np
 import streamlit as st
@@ -94,6 +95,7 @@ def render(embedder: IEmbedder, retriever: MultipleRetrievers) -> None:
                     for filename, score, modality in candidates
                 ],
                 "n_cols": cfg.N_RESULT_COLUMNS,
+                "resources_url": urljoin(cfg.BACKEND_URL, '/resources')
             }
             print("Creating scroller component")
             value = component_scroller(key="scroller", **props)

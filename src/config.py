@@ -48,6 +48,9 @@ MILVUS_DB_NAME = "MultimodalMediaSearch"
 CANDIDATES_PER_PAGE = 32
 DEVICE = "cpu"
 
+# Backend
+BACKEND_URL = "http://localhost:8500"
+
 # UI
 DEBUG = False
 N_RESULT_COLUMNS = 3
