@@ -83,20 +83,20 @@ def render(embedder: IEmbedder, retriever: MultipleRetrievers) -> None:
             selected_modalities=selected_modalities,
             selected_datasets=selected_datasets,
         )
-        
+
         def update(filename: str) -> None:
             st.session_state.query = filename
 
         if candidates:
             props = {
-                'media': [
-                    {'src': filename, 'dataContent': {'Modality': modality, 'Score': score}}
+                "media": [
+                    {"src": filename, "dataContent": {"Modality": modality, "Score": score}}
                     for filename, score, modality in candidates
                 ],
-                'n_cols': cfg.N_RESULT_COLUMNS,
+                "n_cols": cfg.N_RESULT_COLUMNS,
             }
             print("Creating scroller component")
-            value = component_scroller(key='scroller', **props)
+            value = component_scroller(key="scroller", **props)
 
         #     n_cols = 4
         #     n_rows = len(candidates) // int(n_cols)
@@ -120,46 +120,46 @@ def render(embedder: IEmbedder, retriever: MultipleRetrievers) -> None:
         #             # Format the modal HTML with the candidate data
         #             modal_html = modal_template.format(index=i, filename=filename, media=media_html)
 
-                    # Render the HTML component
-                    # components.html(modal_html, height=400, width=300)
+        # Render the HTML component
+        # components.html(modal_html, height=400, width=300)
 
-                #     modal = Modal(
-                #         "",
-                #         key=f"media-modal-{i}",
-                #         # Optional
-                #         padding=-200,  # default value
-                #         max_width=744,  # default value
-                #     )
-                #     open_modal = st.button("Open", key=f"OpenBtn{i}")
-                #     if open_modal:
-                #         modal.open()
-                #     try:
-                #         if modal.is_open():
-                #             with modal.container():
-                #                 if modality == Modality.VIDEO or "mp4" in filename:
-                #                     st.video(filename)
-                #                 elif modality == Modality.IMAGE or "jpg" in filename:
-                #                     st.image(filename)
-                #                 elif modality == Modality.AUDIO:
-                #                     st.audio(filename)
-                #                 else:
-                #                     raise MediaFileStorageError("Unknown format")
-                #         else:
-                #             st.write("Thumbnail")
-                #     except MediaFileStorageError:
-                #         st.write("X")
-                #
-                #     l, r = st.columns([6, 1])  # noqa
-                #     with l:
-                #         st.write(f"Filename: {filename}\n\n" f"Score: {score:.4f}\n\n" f"Modality: {modality}")
-                #     with r:
-                #         st.button(
-                #             "🔍",
-                #             type="primary",
-                #             key=f"SimBtn{i}",
-                #             on_click=update,
-                #             args=(filename,),
-                #         )
+        #     modal = Modal(
+        #         "",
+        #         key=f"media-modal-{i}",
+        #         # Optional
+        #         padding=-200,  # default value
+        #         max_width=744,  # default value
+        #     )
+        #     open_modal = st.button("Open", key=f"OpenBtn{i}")
+        #     if open_modal:
+        #         modal.open()
+        #     try:
+        #         if modal.is_open():
+        #             with modal.container():
+        #                 if modality == Modality.VIDEO or "mp4" in filename:
+        #                     st.video(filename)
+        #                 elif modality == Modality.IMAGE or "jpg" in filename:
+        #                     st.image(filename)
+        #                 elif modality == Modality.AUDIO:
+        #                     st.audio(filename)
+        #                 else:
+        #                     raise MediaFileStorageError("Unknown format")
+        #         else:
+        #             st.write("Thumbnail")
+        #     except MediaFileStorageError:
+        #         st.write("X")
+        #
+        #     l, r = st.columns([6, 1])  # noqa
+        #     with l:
+        #         st.write(f"Filename: {filename}\n\n" f"Score: {score:.4f}\n\n" f"Modality: {modality}")
+        #     with r:
+        #         st.button(
+        #             "🔍",
+        #             type="primary",
+        #             key=f"SimBtn{i}",
+        #             on_click=update,
+        #             args=(filename,),
+        #         )
 
         else:
             st.write("No videos found for the query:", query)
