@@ -67,7 +67,7 @@ function notifyHost(data) {
 // ----------------------------------------------------
 // Your custom functionality for the component goes here:
 function renderMedia(props) {
-  const images = props.media;
+  const medias = props.media;
   const n_cols = props.n_cols;
   const resources_url = props.resources_url
 
@@ -82,16 +82,35 @@ function renderMedia(props) {
     return column;
   });
 
-  // Distribute images into columns
-  images.forEach((image, index) => {
-    var imgDiv = document.createElement('div');
-    imgDiv.className = 'open-modal';
-    imgDiv.setAttribute('index', index);
-    imgDiv.setAttribute('data-content', image.dataContent);
-    var img = document.createElement('img');
-    img.src = resources_url + '/' + image.src;
-    imgDiv.appendChild(img);
-    columns[index % columns.length].appendChild(imgDiv);
+  // Distribute media into columns
+  medias.forEach((media, index) => {
+    var mediaDiv = document.createElement('div');
+    mediaDiv.className = 'open-modal';
+    mediaDiv.setAttribute('index', index);
+    mediaDiv.mediaData = media;
+
+    var mediaType = _detectMediaType(media.src);
+    var mediaElement;
+    if (mediaType === 'image') {
+      mediaElement = document.createElement('img');
+    } else if (mediaType === 'audio') {
+      mediaElement = document.createElement('audio');
+    } else if (mediaType === 'video') {
+      mediaElement = document.createElement('video');
+    } else {
+      mediaElement = document.createElement('p');
+      mediaElement.innerHTML = 'X'; // Display an X for unknown media types
+    }
+    mediaElement.src = resources_url + '/' + media.src;
+
+    // Add visible info: Score
+    var infoDiv = document.createElement('div');
+    infoDiv.className = 'info';
+    infoDiv.innerText = Number((media.dataContent.Score).toFixed(4));
+
+    mediaDiv.appendChild(mediaElement);
+    mediaDiv.appendChild(infoDiv);
+    columns[index % columns.length].appendChild(mediaDiv);
   });
 
   // Create and append the modal
@@ -103,33 +122,79 @@ function renderMedia(props) {
       var modal = document.getElementById('modal');
       modal.style.display = 'block';
 
-      // Update content
+      // Retrieve media data
+      var media = button.mediaData;
+
+      // Update header
+      var modalHeader = document.getElementById('modal-header').getElementsByTagName('h2')[0];
+      modalHeader.textContent = `Filename: ${media.src.split('/').pop()}`;
+
+      // Update body
       var modalBody = document.getElementById('modal-body');
-      var content = button.getAttribute('data-content');
-      modalBody.textContent = content;
+      modalBody.innerHTML = '';
+
+      var mediaType = _detectMediaType(media.src);
+      var mediaElement;
+      if (mediaType === 'image') {
+        mediaElement = document.createElement('img');
+      } else if (mediaType === 'audio') {
+        mediaElement = document.createElement('audio');
+        mediaElement.controls = true;
+      } else if (mediaType === 'video') {
+        mediaElement = document.createElement('video');
+        mediaElement.controls = true;
+      } else {
+        mediaElement = document.createElement('p');
+        mediaElement.innerHTML = 'X'; // Display an X for unknown media types
+      }
+      mediaElement.src = resources_url + '/' + media.src;
+      modalBody.appendChild(mediaElement);
+
+      var infoDiv = document.createElement('div');
+      infoDiv.className = 'info';
+      infoDiv.innerHTML = `
+        <p>Score: ${media.dataContent.Score.toFixed(4)}</p>
+        <p>Type: ${mediaType}</p>
+        <p>Filename: ${media.src.split('/').pop()}</p>
+      `;
+      modalBody.appendChild(infoDiv);
 
       // Move modal window to scroll position
       var modalWindow = document.getElementById('modal-window');
       var eventY = event.clientY;
-      var viewportHeight = window.innerHeight;
-      var percentY = (eventY / viewportHeight) * 100;
-      modalWindow.style.top = percentY + '%';
-      modalWindow.style.transform = 'translate(-50%, -50%)';
+
+      modalWindow.style.top = eventY + 'px';
+      modalWindow.style.left = '50%';
+      modalWindow.style.transform = 'translateX(-50%)';
     };
   });
 
   const close = document.getElementById('modal-close');
   close.onclick = function() {
     modal.style.display = 'none';
+    document.getElementById('modal-body').innerHTML = '';
   };
 
   window.onclick = function(event) {
     if (event.target == modal) {
       modal.style.display = 'none';
+      document.getElementById('modal-body').innerHTML = '';
     }
   };
 }
 
+function _detectMediaType(url) {
+  const extension = url.split('.').pop().toLowerCase().split('?')[0].split('#')[0];
+  if (['jpg', 'jpeg', 'png', 'gif'].includes(extension)) {
+    return 'image';
+  } else if (['mp3', 'wav', 'ogg'].includes(extension)) {
+    return 'audio';
+  } else if (['mp4', 'avi', 'mov', 'wmv'].includes(extension)) {
+    return 'video';
+  } else {
+    return 'unknown';
+  }
+}
 
 function logHandler(props) {
   console.log("Received from Streamlit: " + JSON.stringify(props))

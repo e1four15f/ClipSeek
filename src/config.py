@@ -34,7 +34,7 @@ DATASETS = [
 ]
 
 # Models
-USE_DUMMY_MODEL = True
+USE_DUMMY_MODEL = False
 CLIP_MODELS = {
     Modality.VIDEO: "LanguageBind_Video",
     Modality.AUDIO: "LanguageBind_Audio",
