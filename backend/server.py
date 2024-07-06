@@ -1,38 +1,41 @@
-import os
-
-from fastapi import FastAPI, HTTPException
-from fastapi.responses import FileResponse
+from fastapi import APIRouter, FastAPI
+from fastapi.datastructures import Default
+from fastapi.responses import ORJSONResponse
 from pydantic.v1 import BaseSettings
+
+from backend.handler.base import IResourcesHandler, ISearchHandler, SearchResponse
 
 
 class AppSettings(BaseSettings):
-    data_path: str = '/Users/v.karmazin/repos/diploma/'  # TODO data and paths
+    data_path: str = "/Users/v.karmazin/repos/diploma/"  # TODO data and paths
 
 
 class AppServer:
-    def __init__(self, settings: AppSettings) -> None:
+    def __init__(
+        self,
+        search_handler: ISearchHandler,
+        resources_handler: IResourcesHandler,
+        settings: AppSettings,
+    ) -> None:
+        self._search_handler = search_handler
+        self._resources_handler = resources_handler
         self._settings = settings
-        self._app = FastAPI()
-        self._add_routes()
-
-    def _add_routes(self) -> None:
-        self._app.get("/resources/{file_path:path}")(self._get_resource)
-
-    def _get_resource(self, file_path: str) -> FileResponse:
-        full_path = os.path.join(self._settings.data_path, file_path)
-        if os.path.exists(full_path):
-            return FileResponse(full_path)
-        raise HTTPException(status_code=404, detail="File not found")
 
     def create_application(self) -> FastAPI:
-        return self._app
-
-
-def get_app() -> FastAPI:
-    return AppServer(settings=AppSettings()).create_application()
-
-
-if __name__ == "__main__":
-    import uvicorn
-
-    uvicorn.run(get_app(), host="localhost", port=8500)
+        app = FastAPI()
+        router = APIRouter(default_response_class=Default(ORJSONResponse))
+        router.add_api_route(
+            "/api/v1/search/text",
+            self._search_handler.search_by_text,
+            methods=["POST"],
+            tags=["Search"],
+            response_model=SearchResponse,
+        )
+        router.add_api_route(
+            "/resources/{file_path:path}",
+            self._resources_handler.get_resource,
+            methods=["GET"],
+            tags=["File-Proxy"],
+        )
+        app.include_router(router)
+        return app

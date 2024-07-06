@@ -1,13 +1,11 @@
-from pathlib import Path
 from urllib.parse import urljoin
 
-import numpy as np
+import requests
 import streamlit as st
 
-from src import config as cfg
+import config as cfg
+from backend.entity.embedder import Modality
 from src.custom_components import component_scroller
-from src.embedder import IEmbedder, LanguageBindEmbedder, Modality, RandomEmbedder
-from src.retriever import FaissMediaRetriever, MilvusMediaRetriever, MultipleRetrievers
 
 
 def main() -> None:
@@ -17,19 +15,14 @@ def main() -> None:
 
     if "modality" not in st.session_state:
         st.session_state.modality = Modality.TEXT
-
-    embedder = load_embedder()
-    retriever = load_retriever()
-
-    render(embedder=embedder, retriever=retriever)
+    render()
 
 
-def render(embedder: IEmbedder, retriever: MultipleRetrievers) -> None:
+def render() -> None:
     with st.sidebar:
         st.title("Video Search")
         if cfg.DEBUG:
             st.title("Debug Info")
-            st.write(embedder, retriever)
             st.write("Session State")
             st.write(st.session_state)
 
@@ -78,8 +71,6 @@ def render(embedder: IEmbedder, retriever: MultipleRetrievers) -> None:
         # st.html("<hr>")
 
         candidates = retrieve_candidates(
-            embedder=embedder,
-            retriever=retriever,
             query=query,
             selected_modalities=selected_modalities,
             selected_datasets=selected_datasets,
@@ -95,7 +86,7 @@ def render(embedder: IEmbedder, retriever: MultipleRetrievers) -> None:
                     for filename, score, modality in candidates
                 ],
                 "n_cols": cfg.N_RESULT_COLUMNS,
-                "resources_url": urljoin(cfg.BACKEND_URL, '/resources')
+                "resources_url": urljoin(cfg.BACKEND_URL, "/resources"),
             }
             print("Creating scroller component")
             value = component_scroller(key="scroller", **props)
@@ -167,89 +158,26 @@ def render(embedder: IEmbedder, retriever: MultipleRetrievers) -> None:
             st.write("No videos found for the query:", query)
 
 
+@st.cache_data()
 def retrieve_candidates(
-    embedder: IEmbedder,
-    retriever: MultipleRetrievers,
     query: str,
     selected_modalities: list[str],
     selected_datasets: list[int],
-) -> list[tuple[str, float]]:
-    @st.cache_data()
-    def _cached_retrieve(query: str, modalities: list[str], ignore_retrievers: list[int]) -> list[tuple[str, float]]:
-        query_embedding = embedder.embed(query, modality=st.session_state.modality)
-        return retriever.retrieve(
-            query_embedding.detach().numpy(),
-            ignore_retrievers=ignore_retrievers,
-            modalities=modalities,
-            k=cfg.CANDIDATES_PER_PAGE,
-        )
-
-    return _cached_retrieve(query=query, modalities=selected_modalities, ignore_retrievers=selected_datasets)
-
-
-@st.cache_resource()
-def load_embedder() -> IEmbedder:
-    if cfg.USE_DUMMY_MODEL:
-        return RandomEmbedder(embeddings_dim=cfg.EMBEDDINGS_DIM)
-    return LanguageBindEmbedder(models=cfg.CLIP_MODELS, device=cfg.DEVICE)
-
-
-# @st.cache_resource()
-# def load_retriever() -> MultipleRetrievers:
-#     return MultipleRetrievers(
-#         retrievers=[
-#             get_retriever(
-#                 dataset_path=DATASETS_PATH / d["dataset"],
-#                 version=d["version"],
-#                 modality=d["modality"],
-#                 device=DEVICE,
-#             )
-#             for d in DATASETS
-#         ]
-#     )
-
-
-@st.cache_resource()
-def load_retriever() -> MultipleRetrievers:
-    return MultipleRetrievers(
-        retrievers=[
-            get_milvus_retriever(
-                dataset_name=f'{d["dataset"]}_{d["version"]}',
-                dataset_path=cfg.DATASETS_PATH / d["dataset"],
-                version=d["version"],
-                modalities=d["modalities"],
-                device=cfg.DEVICE,
-            )
-            for d in cfg.DATASETS
-        ]
+) -> list[tuple[str, float, str]]:
+    request = {
+        "query": query,
+        "modalities": selected_modalities,
+        "datasets": selected_datasets,
+    }
+    response = requests.post(
+        urljoin(cfg.BACKEND_URL, "api/v1/search/text"),
+        json=request,
+        timeout=10,
     )
+    response.raise_for_status()
 
-
-def get_faiss_retriever(dataset_path: Path, version: str, modality: str, device: str) -> FaissMediaRetriever:
-    index_path = dataset_path / "index" / version
-    index_embeddings = np.load(index_path / f"{modality}_embeddings.npy")
-    labels = [str(dataset_path / s) for s in (index_path / "labels.txt").open().read().splitlines()]
-    return FaissMediaRetriever(embeddings=index_embeddings, labels=labels, device=device)
-
-
-def get_milvus_retriever(
-    dataset_name: str, dataset_path: Path, version: str, modalities: tuple[str], device: str
-) -> MilvusMediaRetriever:
-    index_path = dataset_path / "index" / version
-    index_embeddings = {modality: np.load(index_path / f"{modality}_embeddings.npy") for modality in modalities}
-    if len(modalities) > 1:
-        index_embeddings[Modality.HYBRID] = np.mean(list(index_embeddings.values()), axis=0)
-
-    labels = [str(dataset_path / s) for s in (index_path / "labels.txt").open().read().splitlines()]
-    return MilvusMediaRetriever(
-        url=cfg.MILVUS_URL,
-        database_name=cfg.MILVUS_DB_NAME,
-        index_name=dataset_name,
-        modality_embeddings=index_embeddings,  # noqa
-        embeddings_dim=cfg.EMBEDDINGS_DIM,
-        labels=labels,
-        device=device,
-    )
+    data = response.json()["data"]
+    return [(candidate["path"], candidate["score"], candidate["modality"]) for candidate in data]
 
 
 if __name__ == "__main__":

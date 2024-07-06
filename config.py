@@ -1,44 +1,42 @@
 from pathlib import Path
 
-from src.embedder import Modality
-
 # Dataset
-DATASETS_PATH = Path("data")
+DATASETS_PATH = Path("../data")
 DATASETS = [
     # {
     #     "dataset": "MSRVTT",
     #     "version": "5sec",
-    #     "modalities": [Modality.VIDEO],#, Modality.AUDIO],
+    #     "modalities": ["video"],#, "audio"],
     # },
     {
         # maybe path here?
         "dataset": "MSVD",
         "version": "5sec",
-        "modalities": [Modality.VIDEO],
+        "modalities": ["video"],
     },
     {
         "dataset": "MSRVTT",
         "version": "all",
-        "modalities": [Modality.VIDEO, Modality.AUDIO],
+        "modalities": ["video", "audio"],
     },
     {
         "dataset": "COCO",
         "version": "val2017",
-        "modalities": [Modality.IMAGE],
+        "modalities": ["image"],
     },
     {
         "dataset": "COCO",
         "version": "test2017",
-        "modalities": [Modality.IMAGE],
+        "modalities": ["image"],
     },
 ]
 
 # Models
 USE_DUMMY_MODEL = False
 CLIP_MODELS = {
-    Modality.VIDEO: "LanguageBind_Video",
-    Modality.AUDIO: "LanguageBind_Audio",
-    Modality.IMAGE: "LanguageBind_Image",
+    "video": "LanguageBind_Video",
+    "audio": "LanguageBind_Audio",
+    "image": "LanguageBind_Image",
 }
 EMBEDDINGS_DIM = 768
 

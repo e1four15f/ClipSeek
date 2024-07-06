@@ -7,12 +7,12 @@ from more_itertools import chunked
 from pymilvus import Collection, CollectionSchema, DataType, FieldSchema, connections
 from pymilvus.orm import db, utility
 
-from src.embedder import Modality
+from backend.entity.embedder import Modality
 
 
 class IRetriever(ABC):
     @abstractmethod
-    def retrieve(self, embedding: np.ndarray, modalities: list[Modality], k: int = 32) -> list[tuple[str, float]]:
+    def retrieve(self, embedding: np.ndarray, modalities: list[Modality], k: int = 32) -> list[tuple[str, float, str]]:
         pass
 
 
@@ -22,13 +22,14 @@ class FaissMediaRetriever(IRetriever):
         self._index = build_faiss_index(embeddings, device=device)
         self._device = device
 
-    def retrieve(self, embedding: np.ndarray, modalities: list[Modality], k: int = 32) -> list[tuple[str, float]]:
+    def retrieve(self, embedding: np.ndarray, modalities: list[Modality], k: int = 32) -> list[tuple[str, float, str]]:
         embedding = embedding.reshape(1, -1).astype(np.float32)
         if self._device != "cpu":
             embedding = torch.tensor(embedding).to(self._device)
 
         faiss.normalize_L2(embedding)
         distances, indices = self._index.search(embedding, k)  # noqa
+        # TODO back compitability with milvus, add modality
         return [(self._labels[i], 1 - distances[0][j]) for j, i in enumerate(indices[0])]
 
 
@@ -50,7 +51,7 @@ class MilvusMediaRetriever(IRetriever):
         self._device = device
         self._available_modalities = set(modality_embeddings.keys())
 
-    def retrieve(self, embedding: np.ndarray, modalities: list[Modality], k: int = 32) -> list[tuple[str, float]]:
+    def retrieve(self, embedding: np.ndarray, modalities: list[Modality], k: int = 32) -> list[tuple[str, float, str]]:
         embedding = embedding.reshape(1, -1).astype(np.float32)
         if self._device != "cpu":
             embedding = torch.tensor(embedding).to(self._device)
@@ -79,7 +80,7 @@ class MultipleRetrievers:
 
     def retrieve(
         self, embedding: np.ndarray, modalities: list[str], ignore_retrievers: list[int], k: int = 32
-    ) -> list[tuple[str, float]]:
+    ) -> list[tuple[str, float, str]]:
         results = []
         for retriever, is_enabled in zip(self._retrievers, ignore_retrievers):
             if is_enabled:
