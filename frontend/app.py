@@ -51,25 +51,28 @@ def render() -> None:
             }
             selected_modalities = [modality for modality, mask in modalities.items() if mask]
 
+        if query:
+            # Search for videos based on query
+            if ".jpg" in query:
+                st.session_state.modality = Modality.IMAGE
+                show_query = st.image
+            elif ".mp4" in query:
+                st.session_state.modality = Modality.VIDEO
+                show_query = st.video
+            else:
+                st.session_state.modality = Modality.TEXT
+                show_query = st.text
+
+            st.html("<hr>")
+
+            st.write(f'#### Search results using "{st.session_state.modality}" modality')
+            l, r = st.columns([1, 6])
+            with l:
+                st.write('Query:')
+            with r:
+                show_query(query)
+
     if query:
-        # Search for videos based on query
-        if ".jpg" in query:
-            st.session_state.modality = Modality.IMAGE
-            show_query = st.image
-        elif ".mp4" in query:
-            st.session_state.modality = Modality.VIDEO
-            show_query = st.video
-        else:
-            st.session_state.modality = Modality.TEXT
-            show_query = st.text
-
-        # st.write(f'#### Search results using "{st.session_state.modality}" modality')
-        # l, r = st.columns([1, 6])  # noqa
-        # with l:
-        #     show_query(query)
-        #
-        # st.html("<hr>")
-
         candidates = retrieve_candidates(
             query=query,
             selected_modalities=selected_modalities,
