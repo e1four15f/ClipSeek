@@ -5,7 +5,7 @@ import streamlit as st
 
 import config as cfg
 from backend.entity.embedder import Modality
-from src.custom_components import component_scroller
+from frontend.custom_components import component_scroller
 
 
 def main() -> None:
