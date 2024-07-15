@@ -35,7 +35,8 @@ def render() -> None:
             selected_datasets = []
             for d in cfg.DATASETS:
                 is_selected = st.checkbox(f"{d['dataset']}[{d['version']}]", value=True)
-                selected_datasets.append(is_selected)
+                if is_selected:
+                    selected_datasets.append({"dataset": d["dataset"], "version": d["version"]})
 
         with search_representation:
             st.write("**Representation**")
@@ -68,15 +69,15 @@ def render() -> None:
             st.write(f'#### Search results using "{st.session_state.modality}" modality')
             l, r = st.columns([1, 6])
             with l:
-                st.write('Query:')
+                st.write("Query:")
             with r:
                 show_query(query)
 
     if query:
         candidates = retrieve_candidates(
             query=query,
-            selected_modalities=selected_modalities,
-            selected_datasets=selected_datasets,
+            modalities=selected_modalities,
+            collections=selected_datasets,
         )
 
         def update(filename: str) -> None:
@@ -164,14 +165,15 @@ def render() -> None:
 @st.cache_data()
 def retrieve_candidates(
     query: str,
-    selected_modalities: list[str],
-    selected_datasets: list[int],
+    modalities: list[str],
+    collections: list[dict],
 ) -> list[tuple[str, float, str]]:
     request = {
         "query": query,
-        "modalities": selected_modalities,
-        "datasets": selected_datasets,
+        "modalities": modalities,
+        "collections": collections,
     }
+    print(request)
     response = requests.post(
         urljoin(cfg.BACKEND_URL, "api/v1/search/text"),
         json=request,

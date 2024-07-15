@@ -32,7 +32,7 @@ DATASETS = [
 ]
 
 # Models
-USE_DUMMY_MODEL = False
+USE_DUMMY_MODEL = True
 CLIP_MODELS = {
     "video": "LanguageBind_Video",
     "audio": "LanguageBind_Audio",
