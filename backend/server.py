@@ -29,7 +29,7 @@ class AppServer:
         app = FastAPI()
         router = APIRouter(default_response_class=Default(ORJSONResponse))
         router.add_api_route(
-            "/api/v1/search/text",
+            "/api/v1/search/by_text",
             self._search_handler.search_by_text,
             methods=["POST"],
             tags=["Search"],

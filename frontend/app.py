@@ -175,7 +175,7 @@ def retrieve_candidates(
     }
     print(request)
     response = requests.post(
-        urljoin(cfg.BACKEND_URL, "api/v1/search/text"),
+        urljoin(cfg.BACKEND_URL, "api/v1/search/by_text"),
         json=request,
         timeout=10,
     )
