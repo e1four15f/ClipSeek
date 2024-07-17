@@ -44,15 +44,8 @@ function initialize(pipeline) {
 
   _sendMessage(COMPONENT_READY, { apiVersion: 1 });
 
-  // Component should be mounted by Streamlit in an iframe, so try to autoset the iframe height.
-  window.addEventListener("load", () => {
-    window.setTimeout(() => {
-      setFrameHeight(document.documentElement.clientHeight)
-    }, 0)
-  })
-
-  // Optionally, if auto-height computation fails, you can manually set it
-  // setFrameHeight(200)
+  // Set the height in advance, dynamic update will result in streamlit rendering.
+  setFrameHeight(20000000000000)
 }
 
 function setFrameHeight(height) {
@@ -66,30 +59,77 @@ function notifyHost(data) {
 
 // ----------------------------------------------------
 // Your custom functionality for the component goes here:
-function renderMedia(props) {
-  const medias = props.media;
-  const n_cols = props.n_cols;
-  const resources_url = props.resources_url
+var RESOURCES_URL;
+var N_COLS;
+var SESSION_ID;
 
-  // Clearing container and create columns
-  var container = document.getElementById('container');
-  container.innerHTML = '';
+function saveScrollerSettings(props) {
+  RESOURCES_URL = props.resources_url;
+  N_COLS = props.n_cols;
+  SESSION_ID = props.session_id;
+}
 
-  var columns = Array.from({ length: n_cols }, () => {
+function initializeScroller(props) {
+  // Clearing scroller
+  var scroller = document.getElementById('scroller');
+  scroller.innerHTML = '';
+
+  // Creating columns
+  var content = document.createElement('div');
+  content.id = 'scroller-content';
+  scroller.appendChild(content);
+
+  var columns = Array.from({ length: N_COLS }, () => {
     var column = document.createElement('div');
     column.className = 'column';
-    container.appendChild(column);
+    content.appendChild(column);
     return column;
   });
 
   // Distribute media into columns
+  _addScrollerContent(props.media)
+  _applyModalFunctionality();
+
+  // Create and add empty-pad button
+  var emptyPad = document.createElement('div');
+  emptyPad.id = 'empty-pad';
+  emptyPad.textContent = 'More';
+  scroller.appendChild(emptyPad);
+
+  // Add scroll event listener
+  document.getElementById('empty-pad').addEventListener('click', () => {
+    fetch('http://localhost:8500/api/v1/search/continue', {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ session_id: SESSION_ID })
+    })
+    .then(response => {
+      return response.json();
+    })
+    .then(content => {
+      _addScrollerContent(content['data'])
+      _applyModalFunctionality();
+    })
+    .catch(error => {
+      console.error('Remote request error:', error);
+    });
+  });
+}
+
+function _addScrollerContent(medias) {
+  var scroller = document.getElementById('scroller');
+  var columns = scroller.getElementsByClassName('column');
+
   medias.forEach((media, index) => {
     var mediaDiv = document.createElement('div');
     mediaDiv.className = 'open-modal';
     mediaDiv.setAttribute('index', index);
     mediaDiv.mediaData = media;
 
-    var mediaType = _detectMediaType(media.src);
+    var mediaType = _detectMediaType(media.path);
     var mediaElement;
     if (mediaType === 'image') {
       mediaElement = document.createElement('img');
@@ -101,19 +141,20 @@ function renderMedia(props) {
       mediaElement = document.createElement('p');
       mediaElement.innerHTML = 'X'; // Display an X for unknown media types
     }
-    mediaElement.src = resources_url + '/' + media.src;
+    mediaElement.src = RESOURCES_URL + '/' + media.path;
 
     // Add visible info: Score
     var infoDiv = document.createElement('div');
     infoDiv.className = 'info';
-    infoDiv.innerText = Number((media.dataContent.Score).toFixed(4));
+    infoDiv.innerText = Number((media.score).toFixed(4));
 
     mediaDiv.appendChild(mediaElement);
     mediaDiv.appendChild(infoDiv);
     columns[index % columns.length].appendChild(mediaDiv);
   });
+}
 
-  // Create and append the modal
+function _applyModalFunctionality() {
   const buttons = document.getElementsByClassName('open-modal');
   const modal = document.getElementById('modal');
   Array.from(buttons).forEach((button) => {
@@ -127,13 +168,13 @@ function renderMedia(props) {
 
       // Update header
       var modalHeader = document.getElementById('modal-header').getElementsByTagName('h2')[0];
-      modalHeader.textContent = `Filename: ${media.src.split('/').pop()}`;
+      modalHeader.textContent = `Filename: ${media.path.split('/').pop()}`;
 
       // Update body
       var modalBody = document.getElementById('modal-body');
       modalBody.innerHTML = '';
 
-      var mediaType = _detectMediaType(media.src);
+      var mediaType = _detectMediaType(media.path);
       var mediaElement;
       if (mediaType === 'image') {
         mediaElement = document.createElement('img');
@@ -147,15 +188,15 @@ function renderMedia(props) {
         mediaElement = document.createElement('p');
         mediaElement.innerHTML = 'X'; // Display an X for unknown media types
       }
-      mediaElement.src = resources_url + '/' + media.src;
+      mediaElement.src = RESOURCES_URL + '/' + media.path;
       modalBody.appendChild(mediaElement);
 
       var infoDiv = document.createElement('div');
       infoDiv.className = 'info';
       infoDiv.innerHTML = `
-        <p>Score: ${media.dataContent.Score.toFixed(4)}</p>
+        <p>Score: ${media.score.toFixed(4)}</p>
         <p>Type: ${mediaType}</p>
-        <p>Filename: ${media.src.split('/').pop()}</p>
+        <p>Filename: ${media.path.split('/').pop()}</p>
       `;
       modalBody.appendChild(infoDiv);
 
@@ -205,6 +246,7 @@ function logHandler(props) {
 initialize(
   [
     logHandler,
-    renderMedia,
+    saveScrollerSettings,
+    initializeScroller,
   ]
 )

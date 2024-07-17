@@ -1,5 +1,6 @@
 from fastapi import APIRouter, FastAPI
 from fastapi.datastructures import Default
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import ORJSONResponse
 from pydantic.v1 import BaseSettings
 
@@ -13,6 +14,8 @@ class AppSettings(BaseSettings):
 
 
 class AppServer:
+    _ORIGINS = ["*"]
+
     def __init__(
         self,
         search_handler: ISearchHandler,
@@ -27,6 +30,13 @@ class AppServer:
 
     def create_application(self) -> FastAPI:
         app = FastAPI()
+        app.add_middleware(
+            CORSMiddleware,
+            allow_origins=self._ORIGINS,
+            allow_credentials=True,
+            allow_methods=["*"],
+            allow_headers=["*"],
+        )
         router = APIRouter(default_response_class=Default(ORJSONResponse))
         router.add_api_route(
             "/api/v1/search/by_text",

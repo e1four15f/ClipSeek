@@ -6,7 +6,7 @@
 // orange: #FF4C4B
 */
 
-#container {
+#scroller-content {
   display: flex;
   justify-content: space-between;
 }
