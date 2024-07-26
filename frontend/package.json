@@ -1,0 +1,24 @@
+{
+	"name": "real-frontend-2",
+	"version": "0.0.1",
+	"private": true,
+	"scripts": {
+		"dev": "vite dev",
+		"build": "vite build",
+		"preview": "vite preview"
+	},
+	"devDependencies": {
+		"@sveltejs/adapter-auto": "^3.0.0",
+		"@sveltejs/kit": "^2.0.0",
+		"@sveltejs/vite-plugin-svelte": "^3.0.0",
+		"autoprefixer": "^10.4.19",
+		"flowbite": "^2.4.1",
+		"flowbite-svelte": "^0.46.15",
+		"postcss": "^8.4.38",
+		"svelte": "^4.2.7",
+		"svelte-splitpanes": "^8.0.5",
+		"tailwindcss": "^3.4.4",
+		"vite": "^5.0.3"
+	},
+	"type": "module"
+}
