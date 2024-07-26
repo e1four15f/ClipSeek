@@ -9,7 +9,7 @@
     export const error = logWithConsole('error');
 
     function logWithConsole(level) {
-        return (message, timeout = 10000) => {
+        return (message, timeout = 5000) => {
             console[level](message);
             return addLog(level, message, timeout);
         };
