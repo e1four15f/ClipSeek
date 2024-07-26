@@ -1,3 +1,5 @@
+import logging
+
 from fastapi import APIRouter, FastAPI
 from fastapi.datastructures import Default
 from fastapi.middleware.cors import CORSMiddleware
@@ -7,6 +9,8 @@ from pydantic.v1 import BaseSettings
 from backend.handler.info import IInfoHandler
 from backend.handler.resources import IResourcesHandler
 from backend.handler.search.v1 import ISearchHandler, SearchResponse
+
+logger = logging.getLogger(__name__)
 
 
 class AppSettings(BaseSettings):
@@ -29,6 +33,7 @@ class AppServer:
         self._settings = settings
 
     def create_application(self) -> FastAPI:
+        logger.info('Creating application...')
         app = FastAPI()
         app.add_middleware(
             CORSMiddleware,
@@ -65,4 +70,5 @@ class AppServer:
             tags=["File-Proxy"],
         )
         app.include_router(router)
+        logger.info('Starting app...')
         return app

@@ -1,4 +1,7 @@
+import logging
+
 from fastapi import FastAPI
+import transformers
 
 import config as cfg
 from backend.entity.factory import build_embedder, build_searcher
@@ -6,6 +9,9 @@ from backend.handler.info import InfoHandler
 from backend.handler.resources import ResourcesHandler
 from backend.handler.search.v1 import SearchHandler
 from backend.server import AppServer, AppSettings
+
+transformers.logging.set_verbosity_info()
+logging.basicConfig(level=logging.INFO)
 
 
 def get_app() -> FastAPI:
