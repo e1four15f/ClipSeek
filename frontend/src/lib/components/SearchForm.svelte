@@ -10,7 +10,11 @@
 </script>
 
 <!-- Check https://flowbite-svelte.com/docs/forms/textarea#Comment_box for Image/Video/Audio as inputs -->
-<form on:submit|preventDefault={(event) => dispatch('search', { query, selectedDatasets, selectedModalities })}>
+<form 
+    on:submit|preventDefault={(event) => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        dispatch('search', { query, selectedDatasets, selectedModalities });
+    }}>
     <Label for="query" class="mb-2">Query:</Label>
     <Textarea 
         id="query" 
@@ -20,6 +24,12 @@
         on:input={(e) => { 
             e.target.style.height = 'auto'; 
             e.target.style.height = e.target.scrollHeight + 'px'; 
+        }}
+        on:keydown={(e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                e.target.closest('form').dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
+            }
         }}
         required 
         rows="1" 
