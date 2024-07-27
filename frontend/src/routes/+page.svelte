@@ -1,4 +1,5 @@
 <script>
+    import { onMount } from 'svelte';
     import { Pane, Splitpanes } from 'svelte-splitpanes';
     import Gallery from '$lib/components/Gallery.svelte';
     import SearchForm from '$lib/components/SearchForm.svelte';
@@ -10,6 +11,19 @@
     let results = [];
     let sessionId = null;
     const baseUrl = "http://localhost:8500/resources/";  // TODO config? Const? 
+
+    onMount(() => {
+        handleSearch({
+            detail: {
+                query: "Cat in black suit is having meeting",
+                selectedDatasets: [ "video" ],
+                selectedModalities: [ 
+                    { "dataset": "MSRVTT", "version": "all" }, 
+                    { "dataset": "MSVD", "version": "5sec" } 
+                ]
+            }
+        })
+    });
   
     async function handleSearch(event) {
         const { query, selectedDatasets, selectedModalities } = event.detail;

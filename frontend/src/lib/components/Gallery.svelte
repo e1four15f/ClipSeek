@@ -8,6 +8,7 @@
 </script>
 
 <div class="flex flex-col items-center">
+    <!-- TODO Masonary Grid -->
     <Gallery class="gap-4 grid-cols-2 md:grid-cols-4">
         {#each items as item}
         <div class="ring-4 ring-red-600 dark:ring-red-400 p-1">

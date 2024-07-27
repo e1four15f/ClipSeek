@@ -1,4 +1,4 @@
-export async function searchByText(query, selectedDatasets, selectedModalities) {
+export async function searchByText(query, selectedDatasets, selectedModalities, timeout = 5000) {
     const url = 'http://localhost:8500/api/v1/search/by_text';
     const body = JSON.stringify({
         query,
@@ -13,6 +13,7 @@ export async function searchByText(query, selectedDatasets, selectedModalities) 
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: body,
+        signal: AbortSignal.timeout(timeout),
     });
   
     if (!response.ok) {
@@ -23,7 +24,7 @@ export async function searchByText(query, selectedDatasets, selectedModalities) 
     return data;
 }
   
-export async function continueSearch(sessionId) {
+export async function continueSearch(sessionId, timeout = 5000) {
     const url = 'http://localhost:8500/api/v1/search/continue';
     const body = JSON.stringify({ session_id: sessionId });
     console.debug('Sending request to', url, 'body', body);
@@ -31,6 +32,7 @@ export async function continueSearch(sessionId) {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: body,
+        signal: AbortSignal.timeout(timeout),
     });
 
     if (!response.ok) {
