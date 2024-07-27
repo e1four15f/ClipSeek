@@ -1,6 +1,5 @@
 <script>
     import { onMount } from 'svelte';
-    import { Pane, Splitpanes } from 'svelte-splitpanes';
     import Gallery from '$lib/components/Gallery.svelte';
     import SearchForm from '$lib/components/SearchForm.svelte';
     import Logger from '$lib/components/Logger.svelte';
@@ -57,20 +56,20 @@
     }
 </script>
 
-<div>
-    <Logger bind:this={logger}/>
-
-    <Splitpanes dblClickSplitter={false}>
-        <Pane size={25} snapSize={10}>
-            <div id="sidemenu" class="p-5">
-                <h1>Video Search</h1>
-                <SearchForm on:search={handleSearch} />
-            </div>
-        </Pane>
-        <Pane>
-            <div id="content" class="p-10">
-                <Gallery items={results} on:continue={handleContinueSearch} />
-            </div>
-        </Pane>
-    </Splitpanes>
+<Logger bind:this={logger}/>
+<div id="main" class="flex">
+    <div id="sidemenu" class="p-5 fixed top-0 left-0 h-full w-1/4">
+        <h1>Video Search</h1>
+        <SearchForm on:search={handleSearch} />
+    </div>
+    <div id="content" class="p-10 ml-[25%] w-[75%]">
+        <Gallery items={results} on:continue={handleContinueSearch} />
+    </div>
 </div>
+
+<style>
+    #sidemenu {
+        @apply bg-gray-100;  
+        /* TODO what is style what in classes? What is the best for readability? */
+    }
+</style>
