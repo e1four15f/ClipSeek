@@ -1,6 +1,7 @@
 <script>
     import { createEventDispatcher } from 'svelte';
     import { Gallery, Button } from 'flowbite-svelte';
+    import MediaView from '$lib/components/MediaView.svelte';
 
     const dispatch = createEventDispatcher();
 
@@ -11,9 +12,7 @@
     <!-- TODO Masonary Grid -->
     <Gallery class="gap-4 grid-cols-4">
         {#each items as item}
-        <div class="ring-4 ring-red-600 p-1">
-            <video src={item.src} alt={item.alt} class="h-auto max-w-full" />
-        </div>
+        <MediaView {item} />
         {/each}
     </Gallery>
     {#if items.length}
