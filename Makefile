@@ -2,7 +2,7 @@ VENV = .venv
 CODE = backend frontend scripts
 
 run:
-	@$(VENV)/bin/python -m streamlit run frontend/app.py --server.enableCORS=true
+	@$(VENV)/bin/python -m streamlit run old_frontend/app.py --server.enableCORS=true
 
 
 lint:
