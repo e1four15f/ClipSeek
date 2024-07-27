@@ -4,6 +4,7 @@
     import SearchForm from '$lib/components/SearchForm.svelte';
     import Logger from '$lib/components/Logger.svelte';
     import { searchByText, continueSearch } from '$lib/api.js';
+    import { Heading } from 'flowbite-svelte';
 
     let logger;
 
@@ -59,7 +60,7 @@
 <Logger bind:this={logger}/>
 <div id="main" class="flex">
     <div id="sidemenu" class="p-5 fixed top-0 left-0 h-full w-1/4">
-        <h1>Video Search</h1>
+        <Heading tag="h2" class="mb-4">Video Search</Heading>
         <SearchForm on:search={handleSearch} />
     </div>
     <div id="content" class="p-10 ml-[25%] w-[75%]">
