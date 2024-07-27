@@ -12,5 +12,5 @@
 </div>
 
 <Modal bind:open={showModal} size="xl" outsideclose>
-    <video src={item.src} controls class="h-auto w-full"></video>
+    <video src={item.src} autoplay controls class="h-auto w-full"></video>
 </Modal>

@@ -1,10 +1,8 @@
 <script>
     import { onMount } from 'svelte';
-    import Gallery from '$lib/components/Gallery.svelte';
-    import SearchForm from '$lib/components/SearchForm.svelte';
-    import Logger from '$lib/components/Logger.svelte';
-    import { searchByText, continueSearch } from '$lib/api.js';
     import { Heading } from 'flowbite-svelte';
+    import { Gallery, SearchForm, Logger } from '$lib/components';
+    import { searchByText, continueSearch } from '$lib/api.js';
 
     let logger;
 

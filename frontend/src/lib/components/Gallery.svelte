@@ -1,7 +1,7 @@
 <script>
     import { createEventDispatcher } from 'svelte';
     import { Gallery, Button } from 'flowbite-svelte';
-    import MediaView from '$lib/components/MediaView.svelte';
+    import { MediaView } from '$lib/components';
 
     const dispatch = createEventDispatcher();
 
