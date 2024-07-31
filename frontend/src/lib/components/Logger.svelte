@@ -36,9 +36,9 @@
         class={`toast ${log.level.toLowerCase()} relative`} 
         position="top-right" 
         align={false}>
-        <div class="text-xs mt-1">{log.timestamp}</div>
+        <!-- <div class="text-xs mt-1">{log.timestamp}</div> -->
         <span class="font-bold">{log.level.toUpperCase()}</span>
-        <hr class={`my-2 border-t ${log.level.toLowerCase()}`}>
+        <!-- <hr class={`my-2 border-t ${log.level.toLowerCase()}`}> -->
         <div class="text-sm">{log.message}</div>      
     </Toast>
     {/each}
