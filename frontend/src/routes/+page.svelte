@@ -32,7 +32,7 @@
                 src: baseUrl + item.path.replace("../", ""),  // TODO
             }));
             sessionId = response.session_id;
-            logger.info('WAAAAAAZZZAAAAAA creatureSilly');
+            logger.info('Search');
         } catch (error) {
             logger.error(error);
         }
@@ -48,7 +48,7 @@
                     src: baseUrl + item.path.replace("../", ""),  // TODO
                 })),
             ];
-            logger.info('WAAAAAAZZZAAAAAA creatureSilly');
+            logger.info('Continue');
         } catch (error) {
             logger.error(error);
         }
