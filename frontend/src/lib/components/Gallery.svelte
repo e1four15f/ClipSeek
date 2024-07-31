@@ -4,15 +4,22 @@
     import { MediaView } from '$lib/components';
 
     const dispatch = createEventDispatcher();
+    const n_cols = 4;
 
     export let items = [];
+    $: itemsPerColumn = Array.from({ length: n_cols }, (_, i) => 
+        items.filter((_, index) => index % n_cols === i)
+    );
 </script>
 
 <div class="flex flex-col items-center">
-    <!-- TODO Masonary Grid -->
-    <Gallery class="gap-4 grid-cols-4">
-        {#each items as item}
-        <MediaView {item} />
+    <Gallery class="gap-4 grid-cols-{n_cols}">
+        {#each itemsPerColumn as columnItems}
+        <Gallery>
+            {#each columnItems as item}
+            <MediaView {item} />
+            {/each}
+        </Gallery>
         {/each}
     </Gallery>
     {#if items.length}
