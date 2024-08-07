@@ -1,37 +1,13 @@
 <script>
-    import { onMount, createEventDispatcher } from 'svelte';
+    import { createEventDispatcher } from 'svelte';
     import { P, Heading, Label, Button, Textarea, Checkbox } from 'flowbite-svelte';
-    import { getIndexesInfo } from '$lib/api.js';
   
     const dispatch = createEventDispatcher();
 
-    let query = "Cat in black suit is having meeting";
-    let datasets = [];
-    let modalities = ["hybrid", "video", "image", "audio"];
+    export let query = "";
+    export let datasets = [];
+    export let modalities = [];
 
-    onMount(() => {
-        async function fetchDatasets() {
-            try {
-                const response = await getIndexesInfo();
-                datasets = response.map(d => ({
-                    "dataset": d.dataset,
-                    "version": d.version,
-                    "label": `${d.dataset}[${d.version}]`,
-                    "checked": false,
-                }));
-                modalities = modalities.map(m => ({
-                    "value": m,
-                    "checked": false,
-                }))
-                datasets.sort((a, b) => a.label.localeCompare(b.label));
-            } catch (error) {
-                console.error('Error fetching datasets:', error);
-            }
-        }
-        fetchDatasets();
-
-        return () => {};
-    });
     // Check https://flowbite-svelte.com/docs/forms/textarea#Comment_box for Image/Video/Audio as inputs
 </script>
 

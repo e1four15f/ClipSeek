@@ -2,25 +2,29 @@
     import { onMount } from 'svelte';
     import { Heading } from 'flowbite-svelte';
     import { Gallery, SearchForm, Logger } from '$lib/components';
-    import { searchByText, continueSearch } from '$lib/api.js';
+    import { searchByText, continueSearch, getIndexesInfo } from '$lib/api.js';
 
     let logger;
 
     let results = [];
     let sessionId = null;
+    let query = "Cat in black suit is having meeting";
+    let datasets = [];
+    let modalities = ["hybrid", "video", "image", "audio"];
     const baseUrl = "http://localhost:8500/resources/";  // TODO config? Const? 
 
     onMount(() => {
+        fetchFormData();
         handleSearch({
             detail: {
-                query: "Cat in black suit is having meeting",
+                query: query,
                 selectedDatasets: [ 
                     { "dataset": "MSRVTT", "version": "all" }, 
                     { "dataset": "MSVD", "version": "5sec" } 
                 ],
                 selectedModalities: [ "video" ]
             }
-        })
+        });
     });
   
     async function handleSearch(event) {
@@ -54,13 +58,32 @@
             logger.error(error);
         }
     }
+
+    async function fetchFormData() {
+        try {
+            const response = await getIndexesInfo();
+            datasets = response.map(d => ({
+                "dataset": d.dataset,
+                "version": d.version,
+                "label": `${d.dataset}[${d.version}]`,
+                "checked": false,
+            }));
+            modalities = modalities.map(m => ({
+                "value": m,
+                "checked": false,
+            }))
+            datasets.sort((a, b) => a.label.localeCompare(b.label));
+        } catch (error) {
+            logger.error(error);
+        }
+    }
 </script>
 
 <Logger bind:this={logger}/>
 <div id="main" class="flex">
     <div id="sidemenu" class="p-5 fixed top-0 left-0 h-full w-1/4">
         <Heading tag="h2" class="mb-4">Video Search</Heading>
-        <SearchForm on:search={handleSearch} />
+        <SearchForm query={query} datasets={datasets} modalities={modalities} on:search={handleSearch} />
     </div>
     <div id="content" class="p-10 ml-[25%] w-[75%]">
         <Gallery items={results} on:continue={handleContinueSearch} />
