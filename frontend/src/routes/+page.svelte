@@ -34,6 +34,7 @@
             sessionId = response.session_id;
             logger.info('Search');
         } catch (error) {
+            results = [];
             logger.error(error);
         }
     }

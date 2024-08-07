@@ -7,19 +7,23 @@
 
     let query = "Cat in black suit is having meeting";
     let datasets = [];
-    let selectedModalities = [];
+    let modalities = ["hybrid", "video", "image", "audio"];
 
     onMount(() => {
         async function fetchDatasets() {
             try {
                 const response = await getIndexesInfo();
-                datasets = response.map(item => ({
-                    "dataset": item.dataset,
-                    "version": item.version,
-                    "label": `${item.dataset}[${item.version}]`,
+                datasets = response.map(d => ({
+                    "dataset": d.dataset,
+                    "version": d.version,
+                    "label": `${d.dataset}[${d.version}]`,
                     "checked": false,
                 }));
-                datasets.sort((a, b) => a.value - b.value);
+                modalities = modalities.map(m => ({
+                    "value": m,
+                    "checked": false,
+                }))
+                datasets.sort((a, b) => a.label.localeCompare(b.label));
             } catch (error) {
                 console.error('Error fetching datasets:', error);
             }
@@ -35,9 +39,10 @@
     on:submit|preventDefault={(event) => {
         window.scrollTo({ top: 0, behavior: 'smooth' });
         const selectedDatasets = datasets.filter(d => d.checked).map(d => ({"dataset": d.dataset, "version": d.version}));
+        const selectedModalities = modalities.filter(m => m.checked).map(m => m.value)
         dispatch('search', { query, selectedDatasets, selectedModalities });
     }}>
-    <Label for="query" class="mb-2">Query: {selectedModalities}</Label>
+    <Label for="query" class="mb-2">Query:</Label>
     <Textarea 
         id="query" 
         name="query" 
@@ -67,7 +72,7 @@
             <ul class="w-48">
                 {#each datasets as dataset, index}
                 <li>
-                    <Checkbox name="dataset" id={`checkbox-${index}`} class="p-2" value={index} bind:checked={dataset.checked}>
+                    <Checkbox name="dataset" id={`checkbox-dataset-${index}`} class="p-2" value={index} bind:checked={dataset.checked}>
                         {`${dataset.dataset}[${dataset.version}]`}
                     </Checkbox>
                 </li>
@@ -78,10 +83,13 @@
         <div id="modality-settings">
             <P class="mb-4 font-semibold text-gray-900">Representation</P>
             <ul class="w-48">
-                <li><Checkbox name="modality" value="Hybrid" class="p-2" bind:group={selectedModalities}>Hybrid</Checkbox></li>
-                <li><Checkbox name="modality" value="Video" class="p-2" bind:group={selectedModalities}>Video</Checkbox></li>
-                <li><Checkbox name="modality" value="Image" class="p-2" bind:group={selectedModalities}>Image</Checkbox></li>
-                <li><Checkbox name="modality" value="Audio" class="p-2" bind:group={selectedModalities}>Audio</Checkbox></li>
+                {#each modalities as modality, index}
+                <li>
+                    <Checkbox name="modality" id={`checkbox-modality-${index}`} class="p-2" value={index} bind:checked={modality.checked}>
+                        {modality.value}
+                    </Checkbox>
+                </li>
+                {/each}
             </ul>
         </div>
     </div>

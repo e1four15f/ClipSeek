@@ -2,7 +2,7 @@ export async function searchByText(query, selectedDatasets, selectedModalities, 
     const url = 'http://localhost:8500/api/v1/search/by_text';
     const body = JSON.stringify({
         query,
-        modalities: [ "video" ], // TODO selectedModalities,
+        modalities: selectedModalities,
         collections: selectedDatasets,
     });
     console.debug('Sending request to', url, 'body', body);
