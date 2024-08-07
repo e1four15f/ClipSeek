@@ -14,11 +14,11 @@
         handleSearch({
             detail: {
                 query: "Cat in black suit is having meeting",
-                selectedDatasets: [ "video" ],
-                selectedModalities: [ 
+                selectedDatasets: [ 
                     { "dataset": "MSRVTT", "version": "all" }, 
                     { "dataset": "MSVD", "version": "5sec" } 
-                ]
+                ],
+                selectedModalities: [ "video" ]
             }
         })
     });

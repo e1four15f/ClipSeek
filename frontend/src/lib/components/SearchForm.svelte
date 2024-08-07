@@ -1,21 +1,43 @@
 <script>
-    import { createEventDispatcher } from 'svelte';
+    import { onMount, createEventDispatcher } from 'svelte';
     import { P, Heading, Label, Button, Textarea, Checkbox } from 'flowbite-svelte';
+    import { getIndexesInfo } from '$lib/api.js';
   
     const dispatch = createEventDispatcher();
 
     let query = "Cat in black suit is having meeting";
-    let selectedDatasets = [];
+    let datasets = [];
     let selectedModalities = [];
+
+    onMount(() => {
+        async function fetchDatasets() {
+            try {
+                const response = await getIndexesInfo();
+                datasets = response.map(item => ({
+                    "dataset": item.dataset,
+                    "version": item.version,
+                    "label": `${item.dataset}[${item.version}]`,
+                    "checked": false,
+                }));
+                datasets.sort((a, b) => a.value - b.value);
+            } catch (error) {
+                console.error('Error fetching datasets:', error);
+            }
+        }
+        fetchDatasets();
+
+        return () => {};
+    });
+    // Check https://flowbite-svelte.com/docs/forms/textarea#Comment_box for Image/Video/Audio as inputs
 </script>
 
-<!-- Check https://flowbite-svelte.com/docs/forms/textarea#Comment_box for Image/Video/Audio as inputs -->
 <form 
     on:submit|preventDefault={(event) => {
         window.scrollTo({ top: 0, behavior: 'smooth' });
+        const selectedDatasets = datasets.filter(d => d.checked).map(d => ({"dataset": d.dataset, "version": d.version}));
         dispatch('search', { query, selectedDatasets, selectedModalities });
     }}>
-    <Label for="query" class="mb-2">Query:</Label>
+    <Label for="query" class="mb-2">Query: {selectedModalities}</Label>
     <Textarea 
         id="query" 
         name="query" 
@@ -33,8 +55,7 @@
         }}
         required 
         rows="1" 
-        cols="50">
-    </Textarea>
+        cols="50"/>
     <div class="flex justify-end">
         <Button type="submit">Search</Button>
     </div>
@@ -44,10 +65,13 @@
         <div id="dataset-settings">
             <P class="mb-4 font-semibold text-gray-900">Dataset</P>
             <ul class="w-48">
-                <li><Checkbox name="dataset" value="MSVD" class="p-2" bind:group={selectedDatasets}>MSVD</Checkbox></li>
-                <li><Checkbox name="dataset" value="MSRVTT" class="p-2" bind:group={selectedDatasets}>MSRVTT</Checkbox></li>
-                <li><Checkbox name="dataset" value="COCO[val2017]" class="p-2" bind:group={selectedDatasets}>COCO[val2017]</Checkbox></li>
-                <li><Checkbox name="dataset" value="COCO[test2017]" class="p-2" bind:group={selectedDatasets}>COCO[test2017]</Checkbox></li>
+                {#each datasets as dataset, index}
+                <li>
+                    <Checkbox name="dataset" id={`checkbox-${index}`} class="p-2" value={index} bind:checked={dataset.checked}>
+                        {`${dataset.dataset}[${dataset.version}]`}
+                    </Checkbox>
+                </li>
+                {/each}
             </ul>
         </div>
 
