@@ -1,21 +1,25 @@
 <script>
     import { onMount } from 'svelte';
-    import { Heading } from 'flowbite-svelte';
+    import { fade } from 'svelte/transition';
+    import { Heading, P } from 'flowbite-svelte';
+    import { Pulse } from 'svelte-loading-spinners';
     import { Gallery, SearchForm, Logger } from '$lib/components';
     import { searchByText, continueSearch, getIndexesInfo } from '$lib/api.js';
 
-    let logger;
+    const baseUrl = "http://localhost:8500/resources/";  // TODO config? Const? 
 
-    let results = [];
-    let sessionId = null;
+    let logger;
+    let isLoaded = false;
+    
     let query = "Cat in black suit is having meeting";
     let datasets = [];
     let modalities = ["hybrid", "video", "image", "audio"];
-    const baseUrl = "http://localhost:8500/resources/";  // TODO config? Const? 
+    let results = [];
+    let sessionId = null;
 
-    onMount(() => {
-        fetchFormData();
-        handleSearch({
+    onMount(async () => {
+        await fetchFormData();
+        await handleSearch({
             detail: {
                 query: query,
                 selectedDatasets: [ 
@@ -25,6 +29,7 @@
                 selectedModalities: [ "video" ]
             }
         });
+        isLoaded = true;
     });
   
     async function handleSearch(event) {
@@ -80,6 +85,13 @@
 </script>
 
 <Logger bind:this={logger}/>
+{#if !isLoaded}
+<div class="flex flex-col items-center justify-center h-screen text-center" out:fade={{ duration: 500 }}>
+    <Heading tag="h2" class="mb-4">Video Search</Heading>
+    <Pulse size="60" color="#FF3E00" unit="px" duration="1s" />
+    <P class="mt-4">Loading</P>
+</div>
+{:else}
 <div id="main" class="flex">
     <div id="sidemenu" class="p-5 fixed top-0 left-0 h-full w-1/4">
         <Heading tag="h2" class="mb-4">Video Search</Heading>
@@ -89,6 +101,7 @@
         <Gallery items={results} on:continue={handleContinueSearch} />
     </div>
 </div>
+{/if}
 
 <style>
     #sidemenu {

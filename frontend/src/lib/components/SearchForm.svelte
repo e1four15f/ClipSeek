@@ -13,7 +13,7 @@
 
 <form 
     on:submit|preventDefault={(event) => {
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+        window.scrollTo({ top: 0 });
         const selectedDatasets = datasets.filter(d => d.checked).map(d => ({"dataset": d.dataset, "version": d.version}));
         const selectedModalities = modalities.filter(m => m.checked).map(m => m.value)
         dispatch('search', { query, selectedDatasets, selectedModalities });
