@@ -1,6 +1,7 @@
 <script>
     import { createEventDispatcher } from 'svelte';
     import { P, Heading, Label, Button, Textarea, Checkbox } from 'flowbite-svelte';
+    import { getModalityIcon } from '$lib/utils.js';
   
     const dispatch = createEventDispatcher();
 
@@ -62,6 +63,7 @@
                 {#each modalities as modality, index}
                 <li>
                     <Checkbox name="modality" id={`checkbox-modality-${index}`} class="p-2" value={index} bind:checked={modality.checked}>
+                        <svelte:component this={getModalityIcon(modality.value)} class="w-4 h-4 mr-1 text-black" />
                         {modality.value}
                     </Checkbox>
                 </li>

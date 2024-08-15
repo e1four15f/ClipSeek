@@ -4,7 +4,7 @@
     import { MediaView } from '$lib/components';
 
     const dispatch = createEventDispatcher();
-    const n_cols = 3;
+    const n_cols = 4;
 
     export let items = [];
     $: itemsPerColumn = Array.from({ length: n_cols }, (_, i) => 

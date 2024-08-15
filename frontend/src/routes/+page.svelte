@@ -37,8 +37,8 @@
         try {
             const response = await searchByText(query, selectedDatasets, selectedModalities);
             results = response.data.map((item) => ({
-                alt: item.modality,
                 src: baseUrl + item.path.replace("../", ""),  // TODO
+                modality: item.modality,
                 score: item.score,
             }));
             sessionId = response.session_id;
@@ -55,8 +55,8 @@
             results = [
                 ...results,
                 ...response.data.map((item) => ({
-                    alt: item.modality,
                     src: baseUrl + item.path.replace("../", ""),  // TODO
+                    modality: item.modality,
                     score: item.score,
                 })),
             ];
