@@ -36,7 +36,7 @@ class AppServer:
         logger.info('Creating application...')
         app = FastAPI()
         app.add_middleware(
-            CORSMiddleware,
+            CORSMiddleware,  # noqa
             allow_origins=self._ORIGINS,
             allow_credentials=True,
             allow_methods=["*"],

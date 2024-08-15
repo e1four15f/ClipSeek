@@ -63,7 +63,7 @@ class MilvusSearchIteratorFactory(ISearchIteratorFactory):
             param={"metric_type": "COSINE"},
             batch_size=batch_size,
             limit=2**10,
-            partition_names=modalities,
+            partition_names=request_modalities,
             output_fields=["path", "modality"],
         )
 
