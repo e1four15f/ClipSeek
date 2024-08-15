@@ -1,16 +1,31 @@
 <script>
     import { Button, Modal } from 'flowbite-svelte';
-    
+
     export let item;
 
     let showModal = false;
+
+    const isVideo = (src) => src.match(/\.(mp4|webm|ogg)$/i);
+    const isAudio = (src) => src.match(/\.(mp3|wav|ogg)$/i);
+    const isImage = (src) => src.match(/\.(jpeg|jpg|png|gif|webp)$/i);
 </script>
 
-<div style="cursor: pointer" on:click={() => (showModal = true)}>
-    <!-- Thumbnail or webp or gif? -->
-    <video src={item.src} class="h-auto w-full" />
-</div>
+<button style="cursor: pointer" on:click={() => (showModal = true)} aria-label="Open media">
+    {#if isVideo(item.src)}
+        <video src={item.src} class="h-auto w-full" />
+    {:else if isImage(item.src)}
+        <img src={item.src} class="h-auto w-full" />
+    {/if}
+</button>
 
 <Modal bind:open={showModal} size="xl" outsideclose>
-    <video src={item.src} autoplay controls class="h-auto w-full"></video>
+    <div class="h-auto w-full">
+    {#if isVideo(item.src)}
+        <video src={item.src} autoplay controls />
+    {:else if isAudio(item.src)}
+        <audio src={item.src} autoplay controls />
+    {:else if isImage(item.src)}
+        <img src={item.src} alt={item.src} />
+    {/if}
+    </div>
 </Modal>
