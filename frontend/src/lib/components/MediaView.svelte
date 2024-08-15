@@ -10,7 +10,10 @@
     const isImage = (src) => src.match(/\.(jpeg|jpg|png|gif|webp)$/i);
 </script>
 
-<button style="cursor: pointer" on:click={() => (showModal = true)} aria-label="Open media">
+<button class="relative cursor-pointer w-full" on:click={() => (showModal = true)} aria-label="Open media">
+    <div class="absolute top-1 left-1 bg-black bg-opacity-70 text-white text-xs rounded px-2 py-1 z-10">
+        {item.score.toFixed(4)}
+    </div>
     {#if isVideo(item.src)}
         <video src={item.src} class="h-auto w-full" />
     {:else if isImage(item.src)}

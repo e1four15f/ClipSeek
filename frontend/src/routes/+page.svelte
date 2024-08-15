@@ -39,6 +39,7 @@
             results = response.data.map((item) => ({
                 alt: item.modality,
                 src: baseUrl + item.path.replace("../", ""),  // TODO
+                score: item.score,
             }));
             sessionId = response.session_id;
             logger.info('Search');
@@ -56,6 +57,7 @@
                 ...response.data.map((item) => ({
                     alt: item.modality,
                     src: baseUrl + item.path.replace("../", ""),  // TODO
+                    score: item.score,
                 })),
             ];
             logger.info('Continue');
