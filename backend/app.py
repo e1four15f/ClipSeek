@@ -1,7 +1,7 @@
 import logging
 
-from fastapi import FastAPI
 import transformers
+from fastapi import FastAPI
 
 import config as cfg
 from backend.entity.factory import build_embedder, build_searcher

@@ -33,7 +33,7 @@ class AppServer:
         self._settings = settings
 
     def create_application(self) -> FastAPI:
-        logger.info('Creating application...')
+        logger.info("Creating application...")
         app = FastAPI()
         app.add_middleware(
             CORSMiddleware,  # noqa
@@ -77,5 +77,5 @@ class AppServer:
             tags=["File-Proxy"],
         )
         app.include_router(router)
-        logger.info('Starting app...')
+        logger.info("Starting app...")
         return app

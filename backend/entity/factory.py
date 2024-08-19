@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 
 @cache
 def build_embedder() -> IEmbedder:
-    logger.info('Initializing Embedder...')
+    logger.info("Initializing Embedder...")
     if cfg.USE_DUMMY_MODEL:
         return RandomEmbedder(embeddings_dim=cfg.EMBEDDINGS_DIM)
     return LanguageBindEmbedder(models=cfg.CLIP_MODELS, device=cfg.DEVICE)
@@ -38,7 +38,7 @@ def build_embedder() -> IEmbedder:
 
 @cache
 def build_searcher() -> BatchSearcher:
-    logger.info('Initializing Searcher...')
+    logger.info("Initializing Searcher...")
     create_milvus_connection(
         url=cfg.MILVUS_URL,
         database_name=cfg.MILVUS_DB_NAME,
@@ -59,7 +59,7 @@ def build_searcher() -> BatchSearcher:
 
 
 def _get_faiss_retriever(dataset_path: Path, version: str, modality: str, device: str) -> FaissSearchIteratorFactory:
-    logger.info('Initializing FAISS retriever for dataset=%s version=%s...', dataset_path, version)
+    logger.info("Initializing FAISS retriever for dataset=%s version=%s...", dataset_path, version)
     index_path = dataset_path / "index" / version
     index_embeddings = np.load(index_path / f"{modality}_embeddings.npy")
     labels = [str(dataset_path / s) for s in (index_path / "labels.txt").open().read().splitlines()]
@@ -69,7 +69,7 @@ def _get_faiss_retriever(dataset_path: Path, version: str, modality: str, device
 def _get_milvus_retriever(
     dataset_name: str, dataset_path: Path, version: str, modalities: tuple[str], device: str
 ) -> MilvusSearchIteratorFactory:
-    logger.info('Initializing Milvus retriever for dataset=%s version=%s...', dataset_name, version)
+    logger.info("Initializing Milvus retriever for dataset=%s version=%s...", dataset_name, version)
     index_path = dataset_path / "index" / version
     index_embeddings = {modality: np.load(index_path / f"{modality}_embeddings.npy") for modality in modalities}
     if len(modalities) > 1:
