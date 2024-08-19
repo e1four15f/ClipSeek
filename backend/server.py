@@ -51,6 +51,13 @@ class AppServer:
             response_model=SearchResponse,
         )
         router.add_api_route(
+            "/api/v1/search/by_file",
+            self._search_handler.search_by_file,
+            methods=["POST"],
+            tags=["Search"],
+            response_model=SearchResponse,
+        )
+        router.add_api_route(
             "/api/v1/search/continue",
             self._search_handler.continue_search,
             methods=["POST"],
