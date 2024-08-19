@@ -11,7 +11,7 @@
     let logger;
     let isLoaded = false;
     
-    let query = "Cat in black suit is having meeting";
+    let text = "Cat in black suit is having meeting";
     let datasets = [];
     let modalities = ["hybrid", "video", "image", "audio"];
     let results = [];
@@ -21,7 +21,7 @@
         await fetchFormData();
         await handleSearch({
             detail: {
-                query: query,
+                text: text,
                 selectedDatasets: [ 
                     { "dataset": "MSRVTT", "version": "all" }, 
                     { "dataset": "MSVD", "version": "5sec" } 
@@ -33,9 +33,9 @@
     });
   
     async function handleSearch(event) {
-        const { query, selectedDatasets, selectedModalities } = event.detail;
+        const { text, selectedDatasets, selectedModalities } = event.detail;
         try {
-            const response = await searchByText(query, selectedDatasets, selectedModalities);
+            const response = await searchByText(text, selectedDatasets, selectedModalities);
             results = response.data.map((item) => ({
                 src: baseUrl + item.path.replace("../", ""),  // TODO
                 modality: item.modality,
@@ -97,7 +97,7 @@
 <div id="main" class="flex">
     <div id="sidemenu" class="p-5 fixed top-0 left-0 h-full w-1/4">
         <Heading tag="h2" class="mb-4">Video Search</Heading>
-        <SearchForm query={query} datasets={datasets} modalities={modalities} on:search={handleSearch} />
+        <SearchForm text={text} datasets={datasets} modalities={modalities} on:search={handleSearch} />
     </div>
     <div id="content" class="p-10 ml-[25%] w-[75%]">
         <Gallery items={results} on:continue={handleContinueSearch} />

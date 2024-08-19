@@ -1,15 +1,20 @@
-export async function searchByText(query, selectedDatasets, selectedModalities, timeout = 5000) {
+export async function searchByText(text, selectedDatasets, selectedModalities, timeout = 5000) {
     const url = 'http://localhost:8500/api/v1/search/by_text';
-    const body = JSON.stringify({
-        query,
-        modalities: selectedModalities,
-        collections: selectedDatasets,
-    });
-    console.debug('Sending request to', url, 'body', body);
+    const body = new URLSearchParams();
+    body.append('text', text);
+    body.append(
+        'config', 
+        JSON.stringify({
+            modalities: selectedModalities,
+            collections: selectedDatasets
+        })
+    );
+
+    console.debug('Sending request to', url, 'body', body.toString());
     const response = await fetch(url, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: body,
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: body.toString(),
         signal: AbortSignal.timeout(timeout),
     });
     
@@ -21,6 +26,36 @@ export async function searchByText(query, selectedDatasets, selectedModalities, 
       throw new Error('Failed to fetch search data!');
     }
   
+    const data = await response.json();
+    return data;
+}
+
+export async function searchByFile(file, selectedDatasets, selectedModalities, timeout = 5000) {
+    const url = 'http://localhost:8500/api/v1/search/by_file';
+    const body = new FormData();
+    body.append('file', file);
+    body.append('config', JSON.stringify({
+        modalities: selectedModalities,
+        collections: selectedDatasets
+    }));
+
+    console.debug('Sending request to', url, 'body:', body);
+
+    const response = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: body,
+        signal: AbortSignal.timeout(timeout),
+    });
+
+    if (response.status == 404) {
+        throw new Error('Not found!');
+    }
+
+    if (!response.ok) {
+      throw new Error('Failed to fetch search data!');
+    }
+
     const data = await response.json();
     return data;
 }

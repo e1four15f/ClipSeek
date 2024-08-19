@@ -5,7 +5,7 @@
   
     const dispatch = createEventDispatcher();
 
-    export let query = "";
+    export let text = "";
     export let datasets = [];
     export let modalities = [];
 
@@ -17,14 +17,14 @@
         window.scrollTo({ top: 0 });
         const selectedDatasets = datasets.filter(d => d.checked).map(d => ({"dataset": d.dataset, "version": d.version}));
         const selectedModalities = modalities.filter(m => m.checked).map(m => m.value)
-        dispatch('search', { query, selectedDatasets, selectedModalities });
+        dispatch('search', { text, selectedDatasets, selectedModalities });
     }}>
     <Label for="query" class="mb-2">Query:</Label>
     <Textarea 
         id="query" 
         name="query" 
         placeholder="Your query"
-        bind:value={query} 
+        bind:value={text} 
         on:input={(e) => { 
             e.target.style.height = 'auto'; 
             e.target.style.height = e.target.scrollHeight + 'px'; 
