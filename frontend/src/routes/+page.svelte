@@ -4,7 +4,7 @@
     import { Heading, P } from 'flowbite-svelte';
     import { Pulse } from 'svelte-loading-spinners';
     import { Gallery, SearchForm, Logger } from '$lib/components';
-    import { searchByText, continueSearch, getIndexesInfo } from '$lib/api.js';
+    import { searchByText, searchByFile, continueSearch, getIndexesInfo } from '$lib/api.js';
 
     const baseUrl = "http://localhost:8500/resources/";  // TODO config? Const? 
 
@@ -33,16 +33,18 @@
     });
   
     async function handleSearch(event) {
-        const { text, selectedDatasets, selectedModalities } = event.detail;
+        const { text, file, selectedDatasets, selectedModalities } = event.detail;
+        const input = file == null ? text : file;
+        const searchFunc = file == null ? searchByText : searchByFile;
         try {
-            const response = await searchByText(text, selectedDatasets, selectedModalities);
+            const response = await searchFunc(input, selectedDatasets, selectedModalities);
             results = response.data.map((item) => ({
                 src: baseUrl + item.path.replace("../", ""),  // TODO
                 modality: item.modality,
                 score: item.score,
             }));
             sessionId = response.session_id;
-            logger.info('Search');
+            logger.info(`Search: ${file == null ? text : file.name}`);
         } catch (error) {
             results = [];
             logger.error(error);

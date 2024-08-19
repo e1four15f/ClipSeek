@@ -1,15 +1,14 @@
 <script>
     import { createEventDispatcher } from 'svelte';
-    import { P, Heading, Label, Button, Textarea, Checkbox } from 'flowbite-svelte';
+    import { P, Heading, Label, Button, Textarea, Checkbox, Dropzone } from 'flowbite-svelte';
     import { getModalityIcon } from '$lib/utils.js';
   
     const dispatch = createEventDispatcher();
 
     export let text = "";
+    export let file = null;
     export let datasets = [];
     export let modalities = [];
-
-    // Check https://flowbite-svelte.com/docs/forms/textarea#Comment_box for Image/Video/Audio as inputs
 </script>
 
 <form 
@@ -17,9 +16,9 @@
         window.scrollTo({ top: 0 });
         const selectedDatasets = datasets.filter(d => d.checked).map(d => ({"dataset": d.dataset, "version": d.version}));
         const selectedModalities = modalities.filter(m => m.checked).map(m => m.value)
-        dispatch('search', { text, selectedDatasets, selectedModalities });
+        dispatch('search', { text, file, selectedDatasets, selectedModalities });
     }}>
-    <Label for="query" class="mb-2">Query:</Label>
+    <Label for="query" class="mb-2">Query or File:</Label>
     <Textarea 
         id="query" 
         name="query" 
@@ -38,9 +37,46 @@
         required 
         rows="1" 
         cols="50"/>
+    <Dropzone 
+        id="dropzone"
+        name="dropzone"
+        class="relative w-full h-auto p-2 mb-2 border border-dashed border-gray-300 rounded-md"
+        bind:file 
+        on:drop={(event) => {
+            event.preventDefault();
+            if (event.dataTransfer.items && event.dataTransfer.items[0].kind === 'file') {
+                file = event.dataTransfer.items[0].getAsFile();
+            } else if (event.dataTransfer.files.length > 0) {
+                file = event.dataTransfer.files[0];
+            }
+        }}
+        on:change={(event) => {
+            file = event.target.files[0];
+        }}
+        on:dragover={(event) => {
+            event.preventDefault();
+        }}
+        maxFiles=1
+        acceptedFileTypes="image/*, video/*, audio/*">
+        {#if file == null}
+        <p class="mb-2 text-sm text-gray-500 dark:text-gray-400"><span class="font-semibold">Click to upload</span></p>
+        <p class="text-xs text-gray-500 dark:text-gray-400">Video, image or audio file</p>
+        {:else}
+        <p class="mb-2 text-sm text-gray-500 dark:text-gray-400"><span class="font-semibold">Selected file</span></p>
+        <p class="text-xs text-gray-500 dark:text-gray-400">{file.name}</p>
+        {/if}
+    </Dropzone>
     <div class="flex justify-end">
-        <Button type="submit">Search</Button>
+        <Button 
+            class="m-1"
+            outline
+            on:click={(event) => {
+                file = null;
+            }} 
+        >Clear</Button>
+        <Button type="submit" class="m-1">Search</Button>
     </div>
+    
     <hr class="my-8"/>
     <Heading tag="h4" class="mb-4">Settings</Heading>
     <div class="flex flex-wrap gap-5">

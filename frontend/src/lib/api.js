@@ -1,4 +1,4 @@
-export async function searchByText(text, selectedDatasets, selectedModalities, timeout = 5000) {
+export async function searchByText(text, selectedDatasets, selectedModalities, timeout = 10000) {
     const url = 'http://localhost:8500/api/v1/search/by_text';
     const body = new URLSearchParams();
     body.append('text', text);
@@ -10,7 +10,7 @@ export async function searchByText(text, selectedDatasets, selectedModalities, t
         })
     );
 
-    console.debug('Sending request to', url, 'body', body.toString());
+    console.debug('Sending request to', url, 'body', body);
     const response = await fetch(url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -30,7 +30,7 @@ export async function searchByText(text, selectedDatasets, selectedModalities, t
     return data;
 }
 
-export async function searchByFile(file, selectedDatasets, selectedModalities, timeout = 5000) {
+export async function searchByFile(file, selectedDatasets, selectedModalities, timeout = 10000) {
     const url = 'http://localhost:8500/api/v1/search/by_file';
     const body = new FormData();
     body.append('file', file);
@@ -43,7 +43,6 @@ export async function searchByFile(file, selectedDatasets, selectedModalities, t
 
     const response = await fetch(url, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
         body: body,
         signal: AbortSignal.timeout(timeout),
     });
@@ -60,7 +59,7 @@ export async function searchByFile(file, selectedDatasets, selectedModalities, t
     return data;
 }
   
-export async function continueSearch(sessionId, timeout = 5000) {
+export async function continueSearch(sessionId, timeout = 10000) {
     const url = 'http://localhost:8500/api/v1/search/continue';
     const body = JSON.stringify({ session_id: sessionId });
     console.debug('Sending request to', url, 'body', body);
@@ -79,7 +78,7 @@ export async function continueSearch(sessionId, timeout = 5000) {
     return data;
 }
 
-export async function getIndexesInfo(timeout = 5000) {
+export async function getIndexesInfo(timeout = 10000) {
     const url = 'http://localhost:8500/indexes/info';
     console.debug('Sending request to', url);
     const response = await fetch(url, {
