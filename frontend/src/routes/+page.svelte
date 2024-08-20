@@ -1,7 +1,8 @@
 <script>
   import { onMount } from "svelte";
   import { fade } from "svelte/transition";
-  import { Heading, P } from "flowbite-svelte";
+  import { Button, Heading, P } from "flowbite-svelte";
+  import { CaretUpSolid } from "flowbite-svelte-icons";
   import { Pulse } from "svelte-loading-spinners";
   import { Gallery, SearchForm, Logger } from "$lib/components";
   import {
@@ -15,6 +16,7 @@
 
   let logger;
   let isLoaded = false;
+  let isScrolled = false;
 
   let text = "Cat in black suit is having meeting";
   let datasets = [];
@@ -35,6 +37,9 @@
       },
     });
     isLoaded = true;
+    window.addEventListener("scroll", () => {
+      isScrolled = window.scrollY > 200;
+    });
   });
 
   async function handleSearch(event) {
@@ -117,6 +122,14 @@
       <Heading tag="h2" class="mb-4">Video Search</Heading>
       <SearchForm {text} {datasets} {modalities} on:search={handleSearch} />
     </div>
+    {#if isScrolled}
+      <Button
+        class="fixed bottom-10 right-10 z-10 rounded-full bg-opacity-95 px-10 py-3 text-white shadow-lg"
+        on:click={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+      >
+        <CaretUpSolid /> Scroll to Top
+      </Button>
+    {/if}
     <div id="content" class="ml-[25%] w-[75%] p-10">
       <Gallery items={results} on:continue={handleContinueSearch} />
     </div>
