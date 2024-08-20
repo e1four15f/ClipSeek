@@ -1,38 +1,49 @@
 <script>
-    import { Button, Modal } from 'flowbite-svelte';
-    import { getModalityIcon } from '$lib/utils.js';
+  import { Button, Modal } from "flowbite-svelte";
+  import { getModalityIcon } from "$lib/utils.js";
 
-    export let item;
+  export let item;
 
-    let showModal = false;
+  let showModal = false;
 
-    const isVideo = (src) => src.match(/\.(mp4|webm|ogg)$/i);
-    const isAudio = (src) => src.match(/\.(mp3|wav|ogg)$/i);
-    const isImage = (src) => src.match(/\.(jpeg|jpg|png|gif|webp)$/i);
+  const isVideo = (src) => src.match(/\.(mp4|webm|ogg)$/i);
+  const isAudio = (src) => src.match(/\.(mp3|wav|ogg)$/i);
+  const isImage = (src) => src.match(/\.(jpeg|jpg|png|gif|webp)$/i);
 </script>
 
-<button class="relative cursor-pointer w-full" on:click={() => (showModal = true)} aria-label="Open media">
-    <div class="flex absolute top-1 left-1 bg-black bg-opacity-70 text-white text-xs rounded px-2 py-1 z-10">
-        <svelte:component this={getModalityIcon(item.modality)} class="w-4 h-4 mr-1 text-white" />
-        {item.score.toFixed(4)}
-    </div>
-    <div class="h-auto w-full object-cover rounded transition duration-300 ease-in-out hover:outline hover:outline-4 hover:outline-red-500 hover:outline-offset-[-2px]">
+<button
+  class="relative w-full cursor-pointer"
+  on:click={() => (showModal = true)}
+  aria-label="Open media"
+>
+  <div
+    class="absolute left-1 top-1 z-10 flex rounded bg-black bg-opacity-70 px-2 py-1 text-xs text-white"
+  >
+    <svelte:component
+      this={getModalityIcon(item.modality)}
+      class="mr-1 h-4 w-4 text-white"
+    />
+    {item.score.toFixed(4)}
+  </div>
+  <div
+    class="h-auto w-full rounded object-cover transition duration-300 ease-in-out hover:outline hover:outline-4 hover:outline-offset-[-2px] hover:outline-red-500"
+  >
     {#if isVideo(item.src)}
-        <video src={item.src} class="w-full rounded"/>
+      <video src={item.src} class="w-full rounded" />
     {:else if isImage(item.src)}
-        <img src={item.src} class="w-full rounded" />
+      <img src={item.src} class="w-full rounded" />
     {/if}
-    </div>
+  </div>
 </button>
 
 <Modal bind:open={showModal} size="xl" outsideclose>
-    <div class="h-auto w-full">
+  <div class="h-auto w-full">
     {#if isVideo(item.src)}
-        <video src={item.src} autoplay controls class="w-75 h-auto" />
+      <video src={item.src} autoplay controls class="w-75 h-auto" />
     {:else if isAudio(item.src)}
-        <audio src={item.src} autoplay controls class="w-75" />
+      <audio src={item.src} autoplay controls class="w-75" />
     {:else if isImage(item.src)}
-        <img src={item.src} alt={item.src} class="w-75 h-auto" />
+      <img src={item.src} alt={item.src} class="w-75 h-auto" />
     {/if}
-    </div>
+  </div>
 </Modal>

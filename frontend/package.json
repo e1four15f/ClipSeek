@@ -1,26 +1,30 @@
 {
-	"name": "real-frontend-2",
-	"version": "0.0.1",
-	"private": true,
-	"scripts": {
-		"dev": "vite dev",
-		"build": "vite build",
-		"preview": "vite preview"
-	},
-	"devDependencies": {
-		"@sveltejs/adapter-auto": "^3.0.0",
-		"@sveltejs/kit": "^2.0.0",
-		"@sveltejs/vite-plugin-svelte": "^3.0.0",
-		"autoprefixer": "^10.4.19",
-		"flowbite": "^2.4.1",
-		"flowbite-svelte": "^0.46.15",
-		"flowbite-svelte-icons": "^1.6.1",
-		"postcss": "^8.4.38",
-		"svelte": "^4.2.7",
-		"svelte-loading-spinners": "^0.3.6",
-		"tailwindcss": "^3.4.4",
-		"uuid": "^10.0.0",
-		"vite": "^5.0.3"
-	},
-	"type": "module"
+  "name": "fronten",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "dev": "vite dev",
+    "build": "vite build",
+    "preview": "vite preview",
+    "format": "prettier --write ."
+  },
+  "devDependencies": {
+    "@sveltejs/adapter-auto": "^3.0.0",
+    "@sveltejs/kit": "^2.0.0",
+    "@sveltejs/vite-plugin-svelte": "^3.0.0",
+    "autoprefixer": "^10.4.19",
+    "flowbite": "^2.4.1",
+    "flowbite-svelte": "^0.46.15",
+    "flowbite-svelte-icons": "^1.6.1",
+    "postcss": "^8.4.38",
+    "prettier": "^3.3.3",
+    "prettier-plugin-svelte": "^3.2.6",
+    "prettier-plugin-tailwindcss": "^0.6.6",
+    "svelte": "^4.2.7",
+    "svelte-loading-spinners": "^0.3.6",
+    "tailwindcss": "^3.4.4",
+    "uuid": "^10.0.0",
+    "vite": "^5.0.3"
+  },
+  "type": "module"
 }
