@@ -104,7 +104,7 @@
 <Logger bind:this={logger} />
 {#if !isLoaded}
   <div
-    class="flex h-screen flex-col items-center justify-center text-center"
+    class="relative -mt-40 flex h-screen flex-col items-center justify-center text-center"
     out:fade={{ duration: 500 }}
   >
     <Heading tag="h2" class="mb-4">Video Search</Heading>
