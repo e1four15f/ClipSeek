@@ -41,7 +41,7 @@ def main(  # noqa: PLR0913
     data_paths = [str(s) for s in sorted(media_path.rglob(f"**/{MODALITY_PATTERN[modality]}"))]
     print(f'Found "{len(data_paths)}" files')
 
-    index_path = dataset_path / "index" / media_path.relative_to(dataset_path)
+    index_path = dataset_path / "index" / media_path.relative_to(dataset_path)  # TODO I have changed the data structure
     part_path = index_path / "parts"
     part_path.mkdir(parents=True, exist_ok=True)
     labels_path = index_path / "labels.txt"
@@ -74,11 +74,11 @@ if __name__ == "__main__":
         ),
         help="JSON string of models by modality",
     )
-    parser.add_argument("--data-path", type=str, default="data/<dataset>", help="Path to the dataset directory")
+    parser.add_argument("--data-path", type=str, default="data/<dataset>", help="Path to the data index directory")
     parser.add_argument(
         "--media-path",
         type=str,
-        default="data/<dataset>/videos/all",
+        default="raw_data/<dataset>/videos/all",
         help="Path to the dataset raw media directory",
     )
     parser.add_argument(

@@ -1,30 +1,41 @@
+# Dataset
 from pathlib import Path
 
-# Dataset
-DATASETS_PATH = Path("../data")
+# TODO annoying ../../../
+INDEX_PATH = Path("../data")
 DATASETS = [
     # {
-    #     "dataset": "MSRVTT",
-    #     "version": "5sec",
-    #     "modalities": ["video"],#, "audio"],
+    #     "data_path": # path to raw data
+    #     "dataset": # internal dataset name
+    #     "version": # internal dataset version
+    #     "modalities": # list of modalities to extract
     # },
     {
-        # maybe path here?
+        "data_path": "../../data/MSVD/5sec",
         "dataset": "MSVD",
         "version": "5sec",
         "modalities": ["video"],
     },
     {
+        "data_path": "../../data/MSRVTT/all",
         "dataset": "MSRVTT",
         "version": "all",
         "modalities": ["video", "audio"],
     },
     {
+        "data_path": "../../data/MSRVTT/test",
+        "dataset": "MSRVTT",
+        "version": "test",
+        "modalities": ["video"],
+    },
+    {
+        "data_path": "../../data/COCO/val2017",
         "dataset": "COCO",
         "version": "val2017",
         "modalities": ["image"],
     },
     {
+        "data_path": "../../data/COCO/test2017",
         "dataset": "COCO",
         "version": "test2017",
         "modalities": ["image"],

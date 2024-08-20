@@ -6,7 +6,7 @@
     import { Gallery, SearchForm, Logger } from '$lib/components';
     import { searchByText, searchByFile, continueSearch, getIndexesInfo } from '$lib/api.js';
 
-    const baseUrl = "http://localhost:8500/resources/";  // TODO config? Const? 
+    const baseUrl = "http://localhost:8500/resources";  // TODO config? Const? 
 
     let logger;
     let isLoaded = false;
@@ -39,7 +39,9 @@
         try {
             const response = await searchFunc(input, selectedDatasets, selectedModalities);
             results = response.data.map((item) => ({
-                src: baseUrl + item.path.replace("../", ""),  // TODO
+                src: `${baseUrl}/${item.dataset}/${item.version}/${item.path}`,
+                dataset: item.dataset,
+                version: item.version,
                 modality: item.modality,
                 score: item.score,
             }));
@@ -57,7 +59,9 @@
             results = [
                 ...results,
                 ...response.data.map((item) => ({
-                    src: baseUrl + item.path.replace("../", ""),  // TODO
+                    src: `${baseUrl}/${item.dataset}/${item.version}/${item.path}`,
+                    dataset: item.dataset,
+                    version: item.version,
                     modality: item.modality,
                     score: item.score,
                 })),
