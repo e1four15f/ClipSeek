@@ -34,6 +34,11 @@
       <img src={item.src} class="w-full rounded" />
     {/if}
   </div>
+  <div
+    class="absolute bottom-1 right-1 z-10 flex rounded bg-black bg-opacity-70 px-2 py-1 text-xs text-white"
+  >
+    {item.dataset}
+  </div>
 </button>
 
 <Modal bind:open={showModal} size="xl" outsideclose>

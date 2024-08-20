@@ -124,7 +124,7 @@
     </div>
     {#if isScrolled}
       <Button
-        class="fixed bottom-10 right-10 z-10 rounded-full bg-opacity-95 px-10 py-3 text-white shadow-lg"
+        class="fixed bottom-10 right-10 z-20 rounded-full bg-opacity-95 px-10 py-3 text-white shadow-lg"
         on:click={() => window.scrollTo({ top: 0, behavior: "smooth" })}
       >
         <CaretUpSolid /> Scroll to Top
