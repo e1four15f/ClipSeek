@@ -1,3 +1,4 @@
+import json
 import logging
 from functools import cache
 
@@ -63,7 +64,9 @@ def _get_milvus_retriever(
     if len(modalities) > 1:
         index_embeddings[Modality.HYBRID] = np.mean(list(index_embeddings.values()), axis=0)
 
-    labels = (index_path / "labels.txt").open().read().splitlines()
+    with open(index_path / "labels.jsonlines") as f:
+        labels = [json.loads(line) for line in f]
+
     return MilvusSearchIteratorFactory(
         index_name=f"{dataset}__{version}",
         modality_embeddings=index_embeddings,  # noqa

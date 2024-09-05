@@ -4,6 +4,7 @@ from more_itertools import chunked
 from pymilvus import Collection, CollectionSchema, DataType, FieldSchema, connections
 from pymilvus.orm import db, utility
 
+from src.aliases import Label
 from src.entity.embedder import Modality
 
 # TODO not utils please
@@ -30,17 +31,18 @@ def create_milvus_connection(url: str, database_name: str = "default") -> None:
 
 
 def build_milvus_collection(
-    index_name: str, modality_embeddings: dict[Modality, np.ndarray], embeddings_dim: int, labels: list[str]
+    index_name: str, modality_embeddings: dict[Modality, np.ndarray], embeddings_dim: int, labels: list[Label]
 ) -> Collection:
     if utility.has_collection(index_name):
         collection = Collection(index_name)
         collection.load()
         return collection
 
-    # TODO SPAN
     fields = [
         FieldSchema(name="id", dtype=DataType.INT64, is_primary=True, auto_id=True),
         FieldSchema(name="path", dtype=DataType.VARCHAR, max_length=4096),
+        FieldSchema(name="start", dtype=DataType.INT64),
+        FieldSchema(name="end", dtype=DataType.INT64),
         FieldSchema(name="modality", dtype=DataType.VARCHAR, max_length=32),
         FieldSchema(name="embedding", dtype=DataType.FLOAT_VECTOR, dim=embeddings_dim),
     ]
@@ -56,7 +58,13 @@ def build_milvus_collection(
     for modality, embeddings in modality_embeddings.items():
         collection.create_partition(partition_name=modality)
         entities = (
-            {"path": label, "embedding": embedding, "modality": modality}
+            {
+                "path": label["path"],
+                "start": label["span"][0],
+                "end": label["span"][1],
+                "embedding": embedding,
+                "modality": modality,
+            }
             for embedding, label in zip(embeddings, labels)
         )
         for batch in chunked(entities, 10_000):  # setting limit fix gRPC resource exhausted error

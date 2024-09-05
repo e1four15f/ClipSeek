@@ -14,18 +14,18 @@ numpy = "^1.26.4"
 pandas = "^2.2.2"
 torch = [
     { version = "^1.13.1", source = "pypi", platform = "darwin" },
-    { version = "^1.13.1", source = "pytorch", platform = "linux" },
-    { version = "^1.13.1", source = "pytorch", platform = "win32" },
+#    { version = "^1.13.1", source = "pytorch", platform = "linux" },
+#    { version = "^1.13.1", source = "pytorch", platform = "win32" },
 ]
 torchvision = [
     { version = "^0.14.1", source = "pypi", platform = "darwin" },
-    { version = "^0.14.1", source = "pytorch", platform = "linux" },
-    { version = "^0.14.1", source = "pytorch", platform = "win32" },
+#    { version = "^0.14.1", source = "pytorch", platform = "linux" },
+#    { version = "^0.14.1", source = "pytorch", platform = "win32" },
 ]
 torchaudio = [
     { version = "^0.13.1", source = "pypi", platform = "darwin" },
-    { version = "^0.13.1", source = "pytorch", platform = "linux" },
-    { version = "^0.13.1", source = "pytorch", platform = "win32" },
+#    { version = "^0.13.1", source = "pytorch", platform = "linux" },
+#    { version = "^0.13.1", source = "pytorch", platform = "win32" },
 ]
 transformers = "4.30.2"
 einops = "^0.8.0"

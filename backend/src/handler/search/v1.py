@@ -46,7 +46,7 @@ class SearchResult(BaseModel):
     path: str = Field(..., description="Relative path to the result file")
     score: float = Field(..., description="Similarity score")
     modality: str = Field(..., description="The modality of the result")
-    # TODO span
+    span: tuple[int, int] = Field(..., description="Start and end seconds of the clip")
     # TODO extra or extra in resources route?
 
 
@@ -141,7 +141,8 @@ class SearchHandler(ISearchHandler):
                     path=path,
                     score=score,
                     modality=modality,
+                    span=span,
                 )
-                for ((path, score, modality), (dataset, version)) in candidates
+                for ((path, score, modality, span), (dataset, version)) in candidates
             ],
         )

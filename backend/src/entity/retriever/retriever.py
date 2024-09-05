@@ -5,7 +5,7 @@ import faiss
 import numpy as np
 import torch
 
-from src.aliases import Candidate
+from src.aliases import Candidate, Label
 from src.entity.embedder import Modality
 from src.entity.retriever.utils import build_faiss_index, build_milvus_collection
 
@@ -42,7 +42,7 @@ class MilvusSearchIteratorFactory(ISearchIteratorFactory):
         index_name: str,
         modality_embeddings: dict[Modality, np.ndarray],
         embeddings_dim: int,
-        labels: list[str],
+        labels: list[Label],
     ):
         self._collection = build_milvus_collection(
             index_name, modality_embeddings=modality_embeddings, embeddings_dim=embeddings_dim, labels=labels
@@ -64,7 +64,7 @@ class MilvusSearchIteratorFactory(ISearchIteratorFactory):
             batch_size=batch_size,
             limit=2**10,
             partition_names=request_modalities,
-            output_fields=["path", "modality"],
+            output_fields=["path", "modality", "start", "end"],
         )
 
         def _iterator() -> Iterator[list[Candidate]]:
@@ -73,7 +73,7 @@ class MilvusSearchIteratorFactory(ISearchIteratorFactory):
                     hits = search_iterator.next()
                     if not hits:
                         break
-                    yield [(hit.path, 1 - hit.distance, hit.modality) for hit in hits]
+                    yield [(hit.path, 1 - hit.distance, hit.modality, (hit.start, hit.end)) for hit in hits]
             finally:
                 search_iterator.close()
 
