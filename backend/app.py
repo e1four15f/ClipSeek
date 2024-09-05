@@ -4,11 +4,11 @@ import transformers
 from fastapi import FastAPI
 
 import config as cfg
-from backend.entity.factory import build_embedder, build_searcher
-from backend.handler.info import InfoHandler
-from backend.handler.resources import ResourcesHandler
-from backend.handler.search.v1 import SearchHandler
-from backend.server import AppServer
+from src.entity.factory import build_embedder, build_searcher
+from src.handler.info import InfoHandler
+from src.handler.resources import ResourcesHandler
+from src.handler.search.v1 import SearchHandler
+from src.server import AppServer
 
 transformers.logging.set_verbosity_info()
 logging.basicConfig(level=logging.INFO)

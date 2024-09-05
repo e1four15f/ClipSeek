@@ -1,4 +1,4 @@
-from backend.entity.embedder import Modality
+from src.entity.embedder import Modality
 
 Version = str
 Dataset = str

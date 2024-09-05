@@ -7,9 +7,9 @@ import numpy as np
 from fastapi import File, Form, HTTPException, UploadFile
 from pydantic import BaseModel, Field, model_validator
 
-from backend.aliases import CandidateWithCollection
-from backend.entity.embedder import IEmbedder, Modality
-from backend.entity.searcher import BatchSearcher
+from src.aliases import CandidateWithCollection
+from src.entity.embedder import IEmbedder, Modality
+from src.entity.searcher import BatchSearcher
 
 
 class SearchConfiguration(BaseModel):

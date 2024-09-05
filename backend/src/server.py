@@ -5,9 +5,9 @@ from fastapi.datastructures import Default
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import ORJSONResponse
 
-from backend.handler.info import IInfoHandler
-from backend.handler.resources import IResourcesHandler
-from backend.handler.search.v1 import ISearchHandler, SearchResponse
+from src.handler.info import IInfoHandler
+from src.handler.resources import IResourcesHandler
+from src.handler.search.v1 import ISearchHandler, SearchResponse
 
 logger = logging.getLogger(__name__)
 
@@ -64,8 +64,14 @@ class AppServer:
             tags=["Indexes"],
         )
         router.add_api_route(
-            "/resources/{dataset:str}/{version:str}/{file_path:path}",
+            "/resources/{dataset:str}/{version:str}/{file_path:path}/raw",
             self._resources_handler.get_resource,
+            methods=["GET"],
+            tags=["File-Proxy"],
+        )
+        router.add_api_route(
+            "/resources/{dataset:str}/{version:str}/{file_path:path}/clip",
+            self._resources_handler.get_clip,
             methods=["GET"],
             tags=["File-Proxy"],
         )

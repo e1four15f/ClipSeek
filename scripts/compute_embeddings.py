@@ -6,7 +6,7 @@ import numpy as np
 from more_itertools import chunked
 from tqdm.auto import tqdm
 
-from backend.entity.embedder import LanguageBindEmbedder, Modality
+from src.entity.embedder import LanguageBindEmbedder, Modality
 
 EMBEDDINGS_DIM = 768
 MODALITY_PATTERN = {

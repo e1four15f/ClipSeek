@@ -4,7 +4,7 @@ import requests
 import streamlit as st
 
 import config as cfg
-from backend.entity.embedder import Modality
+from src.entity.embedder import Modality
 from old_frontend.scroller import component_scroller
 
 

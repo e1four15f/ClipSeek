@@ -1,6 +1,7 @@
 ### Project
 # Datasets
 data/**
+backend/.tmp/**
 !/data/DATASETS.md
 
 ### JetBrains template

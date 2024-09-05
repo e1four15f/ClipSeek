@@ -3,9 +3,9 @@ from collections.abc import Generator, Iterator
 
 import numpy as np
 
-from backend.aliases import Candidate, CandidateWithCollection, Collection
-from backend.entity.embedder import Modality
-from backend.entity.retriever.retriever import ISearchIteratorFactory
+from src.aliases import Candidate, CandidateWithCollection, Collection
+from src.entity.embedder import Modality
+from src.entity.retriever.retriever import ISearchIteratorFactory
 
 
 class BatchSearcher:

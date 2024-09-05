@@ -5,9 +5,9 @@ import faiss
 import numpy as np
 import torch
 
-from backend.aliases import Candidate
-from backend.entity.embedder import Modality
-from backend.entity.retriever.utils import build_faiss_index, build_milvus_collection
+from src.aliases import Candidate
+from src.entity.embedder import Modality
+from src.entity.retriever.utils import build_faiss_index, build_milvus_collection
 
 
 class ISearchIteratorFactory(ABC):

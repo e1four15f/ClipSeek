@@ -4,7 +4,7 @@ from more_itertools import chunked
 from pymilvus import Collection, CollectionSchema, DataType, FieldSchema, connections
 from pymilvus.orm import db, utility
 
-from backend.entity.embedder import Modality
+from src.entity.embedder import Modality
 
 # TODO not utils please
 

@@ -4,10 +4,10 @@ from functools import cache
 import numpy as np
 
 import config as cfg
-from backend.entity.embedder import IEmbedder, LanguageBindEmbedder, Modality, RandomEmbedder
-from backend.entity.retriever.retriever import FaissSearchIteratorFactory, MilvusSearchIteratorFactory
-from backend.entity.retriever.utils import create_milvus_connection
-from backend.entity.searcher import BatchSearcher
+from src.entity.embedder import IEmbedder, LanguageBindEmbedder, Modality, RandomEmbedder
+from src.entity.retriever.retriever import FaissSearchIteratorFactory, MilvusSearchIteratorFactory
+from src.entity.retriever.utils import create_milvus_connection
+from src.entity.searcher import BatchSearcher
 
 logger = logging.getLogger(__name__)
 

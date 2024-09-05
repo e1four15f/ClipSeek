@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "diploma"
+name = "backend"
 version = "0.1.0"
 description = ""
 authors = ["v.karmazin"]
@@ -16,36 +16,13 @@ priority = "explicit"
 
 [tool.poetry.dependencies]
 python = "^3.9.8"
-more-itertools = "^10.2.0"
-tqdm = "^4.66.2"
-numpy = "^1.26.4"
-pandas = "^2.2.2"
-torch = [
-    { version = "^1.13.1", source = "pypi", platform = "darwin" },
-    { version = "^1.13.1", source = "pytorch", platform = "linux" },
-    { version = "^1.13.1", source = "pytorch", platform = "win32" },
-]
-torchvision = [
-    { version = "^0.14.1", source = "pypi", platform = "darwin" },
-    { version = "^0.14.1", source = "pytorch", platform = "linux" },
-    { version = "^0.14.1", source = "pytorch", platform = "win32" },
-]
-torchaudio = [
-    { version = "^0.13.1", source = "pypi", platform = "darwin" },
-    { version = "^0.13.1", source = "pytorch", platform = "linux" },
-    { version = "^0.13.1", source = "pytorch", platform = "win32" },
-]
-transformers = "4.30.2"
-einops = "^0.8.0"
-peft = { git = "https://github.com/huggingface/peft", rev = "08cb3dde577747f6ca6638c884fd66fd16cf2e9d" } # 0.10.0 does not fit
-opencv-python = "^4.9.0.80"
-eva-decord = "^0.6.1"  # decord = "^0.6.0" does not have bindings for macos
-pytorchvideo = "^0.1.5"
-soundfile = "^0.12.1"
 streamlit = "^1.33.0"
 faiss-cpu = "^1.8.0"
 pymilvus = "~2.4"  # keep synchronized with actual Milvus version in docker-compose.yml
 fastapi = "^0.111.0"
+moviepy = "^1.0.3"
+ffmpeg-python = "^0.2.0"
+languagebind = {path = "../LanguageBind"}
 
 [tool.poetry.group.dev.dependencies]
 ruff = "^0.4.2"

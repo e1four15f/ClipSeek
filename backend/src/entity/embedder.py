@@ -3,9 +3,8 @@ from enum import Enum
 from typing import Any, Optional, Union
 
 import torch
-
-from LanguageBind.languagebind import LanguageBind, to_device, transform_dict
-from LanguageBind.languagebind.image.tokenization_image import LanguageBindImageTokenizer
+from languagebind import LanguageBind, to_device, transform_dict
+from languagebind.image.tokenization_image import LanguageBindImageTokenizer
 
 
 class Modality(str, Enum):
