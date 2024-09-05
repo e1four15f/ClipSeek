@@ -13,9 +13,11 @@ from src.entity.searcher import BatchSearcher
 
 
 class SearchConfiguration(BaseModel):
-    modalities: list[Modality] = Field(..., examples=[["video"]])
+    modalities: list[str] = Field(..., description="List of modalities to use for searching", examples=[["video"]])
     collections: list[dict[str, str]] = Field(
-        ..., examples=[[{"dataset": "MSRVTT", "version": "all"}, {"dataset": "MSVD", "version": "5sec"}]]
+        ...,
+        description="List of dataset and version mappings",
+        examples=[[{"dataset": "MSRVTT", "version": "all"}, {"dataset": "MSVD", "version": "5sec"}]],
     )
 
     @model_validator(mode="before")
@@ -28,28 +30,30 @@ class SearchConfiguration(BaseModel):
         return values
 
 
-RequestText = Annotated[str, Form(examples=["Cat in black suit is having meeting"])]
-RequestFile = Annotated[UploadFile, File()]
+RequestText = Annotated[
+    str, Form(description="Text query for search", examples=["Cat in black suit is having meeting"])
+]
+RequestFile = Annotated[UploadFile, File(description="File to search for similar")]
 
 
 class ContinueSearchRequest(BaseModel):
-    session_id: str
+    session_id: str = Field(..., description="The session ID for continuing the search")
 
 
 class SearchResult(BaseModel):
-    dataset: str
-    version: str
-    path: str
-    score: float
-    modality: str
+    dataset: str = Field(..., description="The dataset name")
+    version: str = Field(..., description="The dataset version")
+    path: str = Field(..., description="Relative path to the result file")
+    score: float = Field(..., description="Similarity score")
+    modality: str = Field(..., description="The modality of the result")
     # TODO span
     # TODO extra or extra in resources route?
 
 
 class SearchResponse(BaseModel):
-    session_id: str
-    hits: int
-    data: list[SearchResult]
+    session_id: str = Field(..., description="The session ID of the search")
+    hits: int = Field(..., description="The number of search hits")
+    data: list[SearchResult] = Field(..., description="The list of search results")
 
 
 class ISearchHandler(ABC):

@@ -2,7 +2,7 @@ VENV = .venv
 CODE = . ../scripts
 
 run:
-	@$(VENV)/bin/python -m streamlit run old_frontend/app.py --server.enableCORS=true
+	@$(VENV)/bin/python app.py
 
 
 PYTHONPATH=. python scripts/index_dataset.py \

@@ -64,8 +64,8 @@ class AppServer:
             tags=["Indexes"],
         )
         router.add_api_route(
-            "/resources/{dataset:str}/{version:str}/{file_path:path}/raw",
-            self._resources_handler.get_resource,
+            "/resources/{dataset:str}/{version:str}/{file_path:path}/video",
+            self._resources_handler.get_video,
             methods=["GET"],
             tags=["File-Proxy"],
         )

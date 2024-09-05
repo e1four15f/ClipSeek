@@ -4,7 +4,7 @@ import random
 import subprocess
 from abc import ABC, abstractmethod
 
-from fastapi import HTTPException, Query
+from fastapi import HTTPException, Path, Query
 from fastapi.responses import StreamingResponse
 from starlette.responses import FileResponse
 
@@ -13,12 +13,12 @@ from src.aliases import Collection, Dataset, Version
 
 class IResourcesHandler(ABC):
     @abstractmethod
-    async def get_resource(self, dataset: Dataset, version: Version, file_path: str) -> FileResponse:
+    async def get_video(self, dataset: Dataset, version: Version, file_path: str) -> FileResponse:
         pass
 
     @abstractmethod
     async def get_clip(
-        self, dataset: Dataset, version: Version, file_path: str, span: tuple[int, int]
+        self, dataset: Dataset, version: Version, file_path: str, start: int, end: int
     ) -> StreamingResponse:
         pass
 
@@ -27,7 +27,12 @@ class ResourcesHandler(IResourcesHandler):
     def __init__(self, dataset_paths: dict[Collection, str]) -> None:
         self._dataset_paths = dataset_paths
 
-    async def get_resource(self, dataset: Dataset, version: Version, file_path: str) -> FileResponse:
+    async def get_video(
+        self,
+        dataset: str = Path(..., description="The dataset name or identifier"),
+        version: str = Path(..., description="The version of the dataset"),
+        file_path: str = Path(..., description="The path of the file within the dataset"),
+    ) -> FileResponse:
         full_path = os.path.join(self._dataset_paths[(dataset, version)], file_path)
         if not os.path.exists(full_path):
             raise HTTPException(status_code=404, detail="File not found")
@@ -35,9 +40,9 @@ class ResourcesHandler(IResourcesHandler):
 
     async def get_clip(
         self,
-        dataset: Dataset,
-        version: Version,
-        file_path: str,
+        dataset: str = Path(..., description="The dataset name or identifier"),
+        version: str = Path(..., description="The version of the dataset"),
+        file_path: str = Path(..., description="The path of the file within the dataset"),
         start: int = Query(..., description="Clip start time in seconds"),
         end: int = Query(..., description="Clip end time in seconds"),
     ) -> FileResponse:
