@@ -3,6 +3,10 @@
   import { getModalityIcon } from "$lib/utils.js";
 
   export let item;
+  const baseUrl = "http://localhost:8500/resources";
+  $: thumbnailUrl = `${baseUrl}/thumbnail/${item.dataset}/${item.version}/${item.path}`;
+  $: clipUrl = `${baseUrl}/clip/${item.dataset}/${item.version}/${item.path}?start=${item.span[0]}&end=${item.span[1]}`;
+  $: rawUrl = `${baseUrl}/raw/${item.dataset}/${item.version}/${item.path}`;
 
   let showModal = false;
 
@@ -28,11 +32,7 @@
   <div
     class="h-auto w-full rounded object-cover transition duration-300 ease-in-out hover:outline hover:outline-4 hover:outline-offset-[-2px] hover:outline-red-500"
   >
-    {#if isVideo(item.src)}
-      <video src={item.src} class="w-full rounded" />
-    {:else if isImage(item.src)}
-      <img src={item.src} class="w-full rounded" />
-    {/if}
+    <img src={thumbnailUrl} class="w-full rounded" />
   </div>
   <div
     class="absolute bottom-1 right-1 z-10 flex rounded bg-black bg-opacity-70 px-2 py-1 text-xs text-white"
@@ -43,12 +43,13 @@
 
 <Modal bind:open={showModal} size="xl" outsideclose>
   <div class="h-auto w-full">
-    {#if isVideo(item.src)}
-      <video src={item.src} autoplay controls class="w-75 h-auto" />
-    {:else if isAudio(item.src)}
-      <audio src={item.src} autoplay controls class="w-75" />
-    {:else if isImage(item.src)}
-      <img src={item.src} alt={item.src} class="w-75 h-auto" />
+    {#if isVideo(item.path)}
+      <video src={clipUrl} autoplay controls class="w-75 h-auto" />
+      <video src={rawUrl} controls class="w-75 h-auto" />
+    {:else if isAudio(item.path)}
+      <audio src={rawUrl} autoplay controls class="w-75" />
+    {:else if isImage(item.path)}
+      <img src={rawUrl} alt={item.src} class="w-75 h-auto" />
     {/if}
   </div>
 </Modal>

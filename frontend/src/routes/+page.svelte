@@ -12,8 +12,6 @@
     getIndexesInfo,
   } from "$lib/api.js";
 
-  const baseUrl = "http://localhost:8500/resources"; // TODO config? Const?
-
   let logger;
   let isLoaded = false;
   let isScrolled = false;
@@ -52,13 +50,7 @@
         selectedDatasets,
         selectedModalities,
       );
-      results = response.data.map((item) => ({
-        src: `${baseUrl}/${item.dataset}/${item.version}/${item.path}`,
-        dataset: item.dataset,
-        version: item.version,
-        modality: item.modality,
-        score: item.score,
-      }));
+      results = response.data;
       sessionId = response.session_id;
       logger.info(`Search: ${file == null ? text : file.name}`);
     } catch (error) {
@@ -70,16 +62,7 @@
   async function handleContinueSearch() {
     try {
       const response = await continueSearch(sessionId);
-      results = [
-        ...results,
-        ...response.data.map((item) => ({
-          src: `${baseUrl}/${item.dataset}/${item.version}/${item.path}`,
-          dataset: item.dataset,
-          version: item.version,
-          modality: item.modality,
-          score: item.score,
-        })),
-      ];
+      results = [...results, ...response.data];
       logger.info("Continue");
     } catch (error) {
       logger.error(error);

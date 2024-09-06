@@ -20,7 +20,7 @@
     if (isLoading) return;
 
     const bottom =
-      window.innerHeight + window.scrollY + 500 >= document.body.offsetHeight;
+      window.innerHeight + window.scrollY + 300 >= document.body.offsetHeight;
     if (bottom) {
       isLoading = true;
       dispatch("continue");
