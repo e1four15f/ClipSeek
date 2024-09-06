@@ -64,14 +64,20 @@ class AppServer:
             tags=["Indexes"],
         )
         router.add_api_route(
-            "/resources/{dataset:str}/{version:str}/{file_path:path}/video",
-            self._resources_handler.get_video,
+            "/resources/raw/{dataset:str}/{version:str}/{file_path:path}",
+            self._resources_handler.get_raw,
             methods=["GET"],
             tags=["File-Proxy"],
         )
         router.add_api_route(
-            "/resources/{dataset:str}/{version:str}/{file_path:path}/clip",
+            "/resources/clip/{dataset:str}/{version:str}/{file_path:path}",
             self._resources_handler.get_clip,
+            methods=["GET"],
+            tags=["File-Proxy"],
+        )
+        router.add_api_route(
+            "/resources/thumbnail/{dataset:str}/{version:str}/{file_path:path}",
+            self._resources_handler.get_thumbnail,
             methods=["GET"],
             tags=["File-Proxy"],
         )
