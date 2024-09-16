@@ -10,6 +10,7 @@
     Dropzone,
     CloseButton,
   } from "flowbite-svelte";
+  import { SearchOutline } from "flowbite-svelte-icons";
   import { getModalityIcon } from "$lib/utils.js";
 
   const dispatch = createEventDispatcher();
@@ -69,9 +70,7 @@
             text = "";
             document.getElementById("query").style.height = "auto";
           }}
-        >
-          Clear
-        </CloseButton>
+        />
       {/if}
     </div>
   </div>
@@ -122,7 +121,9 @@
     {/if}
   </Dropzone>
   <div class="flex justify-end">
-    <Button type="submit" class="m-1">Search</Button>
+    <Button type="submit" class="m-1 text-base"
+      ><SearchOutline class="mr-1" />Search</Button
+    >
   </div>
 
   <hr class="my-8" />
@@ -145,12 +146,22 @@
           </li>
         {/each}
       </ul>
+      <Button
+        class="mx-1.5 my-3 px-4 py-0.5 text-xs font-medium"
+        on:click={(event) => {
+          event.preventDefault();
+          datasets = datasets.map((dataset) => ({ ...dataset, checked: true }));
+        }}>Select All</Button
+      >
     </div>
 
     <div id="modality-settings">
       <P class="mb-4 font-semibold text-gray-900">Representation</P>
       <ul class="w-48">
         {#each modalities as modality, index}
+          {#if index === 0}
+            <P class="text-sm">Composite</P>
+          {/if}
           <li>
             <Checkbox
               name="modality"
@@ -166,8 +177,23 @@
               {modality.value}
             </Checkbox>
           </li>
+          {#if index === 0}
+            <P class="mt-2 text-sm">Separate</P>
+          {/if}
         {/each}
       </ul>
+      <Button
+        class="mx-1.5 my-3 px-4 py-0.5 text-xs font-medium"
+        on:click={(event) => {
+          event.preventDefault();
+          modalities = modalities.map((modality) => ({
+            ...modality,
+            checked: true,
+          }));
+        }}
+      >
+        Select All
+      </Button>
     </div>
   </div>
 </form>
