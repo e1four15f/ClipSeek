@@ -8,6 +8,7 @@
     Textarea,
     Checkbox,
     Dropzone,
+    CloseButton,
   } from "flowbite-svelte";
   import { getModalityIcon } from "$lib/utils.js";
 
@@ -31,30 +32,50 @@
     dispatch("search", { text, file, selectedDatasets, selectedModalities });
   }}
 >
-  <Label for="query" class="mb-2">Query or File:</Label>
-  <Textarea
-    id="query"
-    name="query"
-    placeholder="Your query"
-    bind:value={text}
-    on:input={(e) => {
-      e.target.style.height = "auto";
-      e.target.style.height = e.target.scrollHeight + "px";
-    }}
-    on:keydown={(e) => {
-      if (e.key === "Enter") {
-        e.preventDefault();
-        e.target
-          .closest("form")
-          .dispatchEvent(
-            new Event("submit", { cancelable: true, bubbles: true }),
-          );
-      }
-    }}
-    required
-    rows="1"
-    cols="50"
-  />
+  <div class="relative w-full">
+    <Label for="query" class="mb-2">Query or File:</Label>
+    <div class="relative">
+      <Textarea
+        id="query"
+        name="query"
+        placeholder="Your query"
+        bind:value={text}
+        class="w-full rounded-md border border-gray-300 p-2 pr-10"
+        on:input={(e) => {
+          const target = e.target;
+          const minHeight = target.style.minHeight || "auto";
+          target.style.height = minHeight;
+          target.style.height =
+            Math.max(target.scrollHeight, target.offsetHeight) + "px";
+        }}
+        on:keydown={(e) => {
+          if (e.key === "Enter") {
+            e.preventDefault();
+            e.target
+              .closest("form")
+              .dispatchEvent(
+                new Event("submit", { cancelable: true, bubbles: true }),
+              );
+          }
+        }}
+        rows="1"
+        cols="50"
+      />
+      {#if text !== ""}
+        <CloseButton
+          class="absolute right-1 top-1 m-0.5 rounded-lg p-1.5 text-gray-500 hover:bg-gray-300"
+          outline
+          on:click={() => {
+            text = "";
+            document.getElementById("query").style.height = "auto";
+          }}
+        >
+          Clear
+        </CloseButton>
+      {/if}
+    </div>
+  </div>
+
   <Dropzone
     id="dropzone"
     name="dropzone"
@@ -81,27 +102,26 @@
     acceptedFileTypes="image/*, video/*, audio/*"
   >
     {#if file == null}
-      <p class="mb-2 text-sm text-gray-500 dark:text-gray-400">
+      <p class="mb-2 text-sm text-gray-500">
         <span class="font-semibold">Click to upload</span>
       </p>
-      <p class="text-xs text-gray-500 dark:text-gray-400">
-        Video, image or audio file
-      </p>
+      <p class="text-xs text-gray-500">Video, image or audio file</p>
     {:else}
-      <p class="mb-2 text-sm text-gray-500 dark:text-gray-400">
+      <p class="mb-2 text-sm text-gray-500">
         <span class="font-semibold">Selected file</span>
       </p>
-      <p class="text-xs text-gray-500 dark:text-gray-400">{file.name}</p>
+      <p class="text-xs text-gray-500">{file.name}</p>
+      <CloseButton
+        class="absolute right-1 top-1 m-0.5 rounded-lg p-1.5 text-gray-500 hover:bg-gray-300"
+        outline
+        on:click={(event) => {
+          event.stopPropagation();
+          file = null;
+        }}
+      />
     {/if}
   </Dropzone>
   <div class="flex justify-end">
-    <Button
-      class="m-1"
-      outline
-      on:click={(event) => {
-        file = null;
-      }}>Clear</Button
-    >
     <Button type="submit" class="m-1">Search</Button>
   </div>
 
