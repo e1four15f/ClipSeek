@@ -95,14 +95,14 @@
     class="relative -mt-40 flex h-screen flex-col items-center justify-center text-center"
     out:fade={{ duration: 500 }}
   >
-    <Heading tag="h2" class="mb-4">Video Search</Heading>
+    <Heading tag="h2" class="mb-4">ClipSeek</Heading>
     <Pulse size="60" color="#FF3E00" unit="px" duration="1s" />
     <P class="mt-4">Loading</P>
   </div>
 {:else}
   <div id="main" class="flex">
     <div id="sidemenu" class="fixed left-0 top-0 h-full w-1/4 p-5">
-      <Heading tag="h2" class="mb-4">Video Search</Heading>
+      <Heading tag="h2" class="mb-4">ClipSeek</Heading>
       <SearchForm {text} {datasets} {modalities} on:search={handleSearch} />
     </div>
     {#if isScrolled}

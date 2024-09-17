@@ -34,15 +34,16 @@
   }}
 >
   <div class="relative w-full">
-    <Label for="query" class="mb-2">Query or File:</Label>
+    <Label for="query" class="mb-2">Search by Text or File</Label>
     <div class="relative">
       <Textarea
         id="query"
         name="query"
-        placeholder="Your query"
+        placeholder="Your text"
         bind:value={text}
         class="w-full rounded-md border border-gray-300 p-2 pr-10"
         on:input={(e) => {
+          file = null;
           const target = e.target;
           const minHeight = target.style.minHeight || "auto";
           target.style.height = minHeight;
@@ -93,6 +94,9 @@
     }}
     on:change={(event) => {
       file = event.target.files[0];
+      if (file != null) {
+        text = "";
+      }
     }}
     on:dragover={(event) => {
       event.preventDefault();
@@ -127,7 +131,7 @@
   </div>
 
   <hr class="my-8" />
-  <Heading tag="h4" class="mb-4">Settings</Heading>
+  <Heading tag="h3" class="mb-4">Settings</Heading>
   <div class="flex flex-wrap gap-5">
     <div id="dataset-settings">
       <P class="mb-4 font-semibold text-gray-900">Dataset</P>
