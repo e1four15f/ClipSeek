@@ -11,7 +11,7 @@
     CloseButton,
   } from "flowbite-svelte";
   import { SearchOutline } from "flowbite-svelte-icons";
-  import { getModalityIcon } from "$lib/utils.js";
+  import { getModalityIcon, isAudio, isImage, isVideo } from "$lib/utils.js";
 
   const dispatch = createEventDispatcher();
 
@@ -113,12 +113,24 @@
       <p class="mb-2 text-sm text-gray-500">
         <span class="font-semibold">Selected file</span>
       </p>
-      <p class="text-xs text-gray-500">{file.name}</p>
+      <p class="mb-2 text-xs text-gray-500">{file.name}</p>
+      {#if isVideo(file.name)}
+        <video src={URL.createObjectURL(file)} class="w-50 h-48 object-cover" />
+      {:else if isAudio(file.name)}
+        <audio src={URL.createObjectURL(file)} class="w-50 h-48 object-cover" />
+      {:else if isImage(file.name)}
+        <img
+          src={URL.createObjectURL(file)}
+          alt={file.name}
+          class="w-50 h-48 object-cover"
+        />
+      {/if}
       <CloseButton
         class="absolute right-1 top-1 m-0.5 rounded-lg p-1.5 text-gray-500 hover:bg-gray-300"
         outline
         on:click={(event) => {
           event.stopPropagation();
+          URL.revokeObjectURL(file);
           file = null;
         }}
       />

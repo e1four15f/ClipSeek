@@ -20,3 +20,7 @@ export const getModalityIcon = (modality) => {
       return QuestionCircleSolid;
   }
 };
+
+export const isVideo = (src) => src.match(/\.(mp4|webm|ogg)$/i);
+export const isAudio = (src) => src.match(/\.(mp3|wav|ogg)$/i);
+export const isImage = (src) => src.match(/\.(jpeg|jpg|png|gif|webp)$/i);

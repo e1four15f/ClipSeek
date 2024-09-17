@@ -1,6 +1,6 @@
 <script>
   import { Button, Modal } from "flowbite-svelte";
-  import { getModalityIcon } from "$lib/utils.js";
+  import { getModalityIcon, isAudio, isImage, isVideo } from "$lib/utils.js";
 
   export let item;
   const baseUrl = "http://localhost:8500/resources";
@@ -9,10 +9,6 @@
   $: rawUrl = `${baseUrl}/raw/${item.dataset}/${item.version}/${item.path}`;
 
   let showModal = false;
-
-  const isVideo = (src) => src.match(/\.(mp4|webm|ogg)$/i);
-  const isAudio = (src) => src.match(/\.(mp3|wav|ogg)$/i);
-  const isImage = (src) => src.match(/\.(jpeg|jpg|png|gif|webp)$/i);
 </script>
 
 <button
@@ -45,7 +41,9 @@
   <div class="h-auto w-full">
     {#if isVideo(item.path)}
       <video src={clipUrl} autoplay controls class="w-75 h-auto" />
-      <a href={rawUrl}>Full Video Link</a>
+      <Button href={rawUrl} target="_blank" rel="noopener noreferrer"
+        >Full Video Link</Button
+      >
     {:else if isAudio(item.path)}
       <audio src={rawUrl} autoplay controls class="w-75" />
     {:else if isImage(item.path)}
