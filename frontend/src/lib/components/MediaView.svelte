@@ -45,7 +45,7 @@
   <div class="h-auto w-full">
     {#if isVideo(item.path)}
       <video src={clipUrl} autoplay controls class="w-75 h-auto" />
-      <video src={rawUrl} controls class="w-75 h-auto" />
+      <a href={rawUrl}>Full Video Link</a>
     {:else if isAudio(item.path)}
       <audio src={rawUrl} autoplay controls class="w-75" />
     {:else if isImage(item.path)}
