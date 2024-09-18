@@ -27,9 +27,13 @@ class InfoHandler(IInfoHandler):
     async def get_indexes_info(self) -> IndexesInfoResponse:
         collections = utility.list_collections()
         infos = []
+        modalities_order = Modality.get_order()
         for collection_name in collections:
             collection = Collection(collection_name)
-            modalities = [partition.name for partition in collection.partitions if partition.name != "_default"]
+            modalities = sorted(
+                [partition.name for partition in collection.partitions if partition.name != "_default"],
+                key=lambda x: modalities_order.index(Modality(x))
+            )
             dataset, version = collection_name.split("__")
             infos.append(
                 IndexInfo(dataset=dataset, version=version, count=collection.num_entities, modalities=modalities)

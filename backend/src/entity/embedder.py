@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 from enum import Enum
 from typing import Any, Optional, Union
+from typing_extensions import Self
 
 import torch
 from languagebind import LanguageBind, to_device, transform_dict
@@ -16,6 +17,10 @@ class Modality(str, Enum):
     TEXT = "language"
     # Combined modalities
     HYBRID = "hybrid"
+
+    @classmethod
+    def get_order(cls) -> list[Self]:
+        return [cls.HYBRID, cls.VIDEO, cls.IMAGE, cls.AUDIO, cls.TEXT, cls.DEPTH, cls.THERMAL]
 
 
 class IEmbedder(ABC):
