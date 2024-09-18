@@ -72,17 +72,9 @@
   async function fetchFormData() {
     try {
       const response = await getIndexesInfo();
-      datasets = response.map((d) => ({
-        dataset: d.dataset,
-        version: d.version,
-        label: `${d.dataset}[${d.version}]`,
-        checked: false,
-      }));
-      modalities = modalities.map((m) => ({
-        value: m,
-        checked: false,
-      }));
-      datasets.sort((a, b) => a.label.localeCompare(b.label));
+      datasets = response.map((d) => ({ ...d, checked: false }));
+      modalities = modalities.map((m) => ({ value: m, checked: false }));
+      datasets.sort((a, b) => a.dataset.localeCompare(b.label));
     } catch (error) {
       logger.error(error);
     }
@@ -100,28 +92,21 @@
     <P class="mt-4">Loading</P>
   </div>
 {:else}
-  <div id="main" class="flex">
-    <div id="sidemenu" class="fixed left-0 top-0 h-full w-1/4 p-5">
+  <div class="flex h-screen">
+    <div class="fixed flex h-full w-1/4 flex-col bg-gray-100 p-4">
       <Heading tag="h2" class="mb-4">ClipSeek</Heading>
       <SearchForm {text} {datasets} {modalities} on:search={handleSearch} />
     </div>
-    {#if isScrolled}
-      <Button
-        class="fixed bottom-10 right-12 z-20 rounded bg-opacity-95 px-10 py-3 text-white shadow-lg"
-        on:click={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-      >
-        <CaretUpSolid /> Scroll to Top
-      </Button>
-    {/if}
-    <div id="content" class="ml-[25%] w-[75%] p-10">
+    <div class="ml-[25%] w-3/4 px-10 py-3">
       <Gallery items={results} on:continue={handleContinueSearch} />
     </div>
   </div>
+  {#if isScrolled}
+    <Button
+      class="fixed bottom-10 right-12 z-20 rounded bg-opacity-95 px-10 py-3 text-white shadow-lg"
+      on:click={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+    >
+      <CaretUpSolid /> Scroll to Top
+    </Button>
+  {/if}
 {/if}
-
-<style>
-  #sidemenu {
-    @apply bg-gray-100;
-    /* TODO what is style what in classes? What is the best for readability? */
-  }
-</style>
