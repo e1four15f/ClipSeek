@@ -74,7 +74,7 @@
       const response = await getIndexesInfo();
       datasets = response.map((d) => ({ ...d, checked: false }));
       modalities = modalities.map((m) => ({ value: m, checked: false }));
-      datasets.sort((a, b) => a.dataset.localeCompare(b.label));
+      datasets.sort((a, b) => a.dataset.localeCompare(b.dataset));
     } catch (error) {
       logger.error(error);
     }
