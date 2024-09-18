@@ -85,11 +85,13 @@
         }}
       />
     {/if}
+  </div>
 
+  <div class="relative mx-0.5">
     <Dropzone
       id="dropzone"
       name="dropzone"
-      class="h-auto rounded-md border border-dashed border-gray-300 py-2"
+      class="flex h-20 items-center justify-center rounded-md border border-dashed border-gray-300 py-2"
       bind:file
       on:drop={(event) => {
         event.preventDefault();
@@ -120,27 +122,31 @@
         </p>
         <p class="text-xs text-gray-500">Video, image or audio file</p>
       {:else}
-        <p class="mb-2 text-sm text-gray-500">
-          <span class="font-semibold">Selected file</span>
-        </p>
-        <p class="mb-2 text-xs text-gray-500">{file.name}</p>
-        {#if isVideo(file.name)}
-          <video
-            src={URL.createObjectURL(file)}
-            class="w-50 h-48 object-cover"
-          />
-        {:else if isAudio(file.name)}
-          <audio
-            src={URL.createObjectURL(file)}
-            class="w-50 h-48 object-cover"
-          />
-        {:else if isImage(file.name)}
-          <img
-            src={URL.createObjectURL(file)}
-            alt={file.name}
-            class="w-50 h-48 object-cover"
-          />
-        {/if}
+        <div class="flex items-center">
+          {#if isVideo(file.name)}
+            <video
+              src={URL.createObjectURL(file)}
+              class="mr-2 h-16 w-16 object-cover"
+            />
+          {:else if isAudio(file.name)}
+            <audio
+              src={URL.createObjectURL(file)}
+              class="mr-2 h-16 w-16 object-cover"
+            />
+          {:else if isImage(file.name)}
+            <img
+              src={URL.createObjectURL(file)}
+              alt={file.name}
+              class="mr-2 h-16 w-16 object-cover"
+            />
+          {/if}
+          <div>
+            <p class="mb-1 text-sm text-gray-500">
+              <span class="font-semibold">Selected file</span>
+            </p>
+            <p class="w-32 truncate text-xs text-gray-500">{file.name}</p>
+          </div>
+        </div>
         <CloseButton
           class="absolute right-1 top-1 m-0.5 rounded-lg p-1.5 text-gray-500 hover:bg-gray-300"
           outline
@@ -152,6 +158,7 @@
         />
       {/if}
     </Dropzone>
+
     <div class="flex justify-end">
       <Button type="submit" class="my-1 text-base"
         ><SearchOutline class="mr-1" />Search</Button
