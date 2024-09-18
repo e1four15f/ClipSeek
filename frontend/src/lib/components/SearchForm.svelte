@@ -219,7 +219,7 @@
       inputClass="bg-gray-50 rounded border border-gray-200 text-gray-900 text-xs p-1 focus:ring-orange-500 focus:border-orange-500"
     />
   </div>
-  <div class="flex-grow overflow-y-auto rounded border border-gray-300">
+  <div class="h-screen rounded border border-gray-300 bg-white">
     <Table class="w-full overflow-hidden rounded">
       <TableHead class="h-8 border-b-2 border-gray-200">
         <TableHeadCell class="w-10 p-0 pl-3"
@@ -272,6 +272,9 @@
             </TableBodyCell>
           </TableBodyRow>
         {/each}
+        <TableBodyRow class="">
+          <TableBodyCell colspan="4" class="p-0"></TableBodyCell>
+        </TableBodyRow>
       </TableBody>
     </Table>
   </div>
