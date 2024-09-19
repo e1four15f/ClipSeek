@@ -1,6 +1,7 @@
 <script>
   import { Button, Modal } from "flowbite-svelte";
   import { getModalityIcon, isAudio, isImage, isVideo } from "$lib/utils.js";
+  import { onMount, afterUpdate, onDestroy } from "svelte";
 
   export let item;
   const baseUrl = "http://localhost:8500/resources";
@@ -9,6 +10,33 @@
   $: rawUrl = `${baseUrl}/raw/${item.dataset}/${item.version}/${item.path}`;
 
   let showModal = false;
+  let videoElement;
+  let Plyr;
+  let player;
+
+  onMount(async () => {
+    const module = await import("plyr");
+    Plyr = module.default;
+  });
+
+  afterUpdate(() => {
+    if (showModal && isVideo(item.path)) {
+      player = new Plyr(videoElement);
+    }
+
+    if (showModal && player) {
+      player.source = {
+        type: "video",
+        sources: [{ src: clipUrl, type: "video/mp4" }],
+      };
+    }
+  });
+
+  onDestroy(() => {
+    if (player) {
+      player.destroy();
+    }
+  });
 </script>
 
 <button
@@ -28,7 +56,7 @@
   <div
     class="h-auto w-full rounded object-cover transition duration-300 ease-in-out hover:outline hover:outline-4 hover:outline-offset-[-2px] hover:outline-red-500"
   >
-    <img src={thumbnailUrl} class="w-full rounded" />
+    <img src={thumbnailUrl} als={thumbnailUrl} class="w-full rounded" />
   </div>
   <div
     class="absolute bottom-1 right-1 z-10 flex rounded bg-black bg-opacity-70 px-2 py-1 text-xs text-white"
@@ -40,10 +68,13 @@
 <Modal bind:open={showModal} size="xl" outsideclose>
   <div class="h-auto w-full">
     {#if isVideo(item.path)}
-      <video src={clipUrl} autoplay controls class="w-75 h-auto" />
-      <Button href={rawUrl} target="_blank" rel="noopener noreferrer"
-        >Full Video Link</Button
-      >
+      <video bind:this={videoElement} autoplay controls>
+        <source src={clipUrl} autoplay class="w-75 h-auto" type="video/mp4" />
+        Your browser does not support the video tag.
+      </video>
+      <Button href={rawUrl} target="_blank" rel="noopener noreferrer">
+        Full Video Link
+      </Button>
     {:else if isAudio(item.path)}
       <audio src={rawUrl} autoplay controls class="w-75" />
     {:else if isImage(item.path)}
