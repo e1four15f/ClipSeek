@@ -17,7 +17,7 @@ class SearchConfiguration(BaseModel):
     collections: list[dict[str, str]] = Field(
         ...,
         description="List of dataset and version mappings",
-        examples=[[{"dataset": "MSRVTT", "version": "all"}, {"dataset": "MSVD", "version": "5sec"}]],
+        examples=[[{"dataset": "MSRVTT", "version": "train"}, {"dataset": "MSVD", "version": "all"}]],
     )
 
     @model_validator(mode="before")
