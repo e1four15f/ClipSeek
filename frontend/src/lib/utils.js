@@ -21,6 +21,6 @@ export const getModalityIcon = (modality) => {
   }
 };
 
-export const isVideo = (src) => src.match(/\.(mp4|webm|ogg)$/i);
+export const isVideo = (src) => src.match(/\.(mp4|webm|ogg|avi)$/i);
 export const isAudio = (src) => src.match(/\.(mp3|wav|ogg)$/i);
 export const isImage = (src) => src.match(/\.(jpeg|jpg|png|gif|webp)$/i);

@@ -41,6 +41,41 @@ class ResourcesHandler(IResourcesHandler):
         full_path = os.path.join(self._dataset_paths[(dataset, version)], file_path)
         if not os.path.exists(full_path):
             raise HTTPException(status_code=404, detail="File not found")
+
+        if full_path.endswith(".mp4"):
+            return FileResponse(full_path)
+
+        mime_type, _ = mimetypes.guess_type(full_path)
+        if mime_type and mime_type.startswith("video"):
+            # Convert any video to MP4 format
+            tmp_mp4_path = f".tmp/{random.randint(0, 100)}.mp4"
+            command = [
+                "ffmpeg",
+                "-y",
+                "-i",
+                full_path,
+                "-c:v",
+                "libx264",
+                "-crf",
+                "23",
+                "-preset",
+                "medium",
+                "-c:a",
+                "aac",
+                "-b:a",
+                "192k",
+                tmp_mp4_path,
+            ]
+            try:
+                process = await asyncio.create_subprocess_exec(*command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                stdout, stderr = await process.communicate()
+
+                if process.returncode != 0:
+                    raise HTTPException(status_code=422, detail=f"Error converting video: {stderr.decode()}")
+
+                return FileResponse(tmp_mp4_path)
+            except Exception as e:
+                raise HTTPException(status_code=500, detail=f"Error converting video: {str(e)}")
         return FileResponse(full_path)
 
     async def get_thumbnail(
@@ -59,31 +94,30 @@ class ResourcesHandler(IResourcesHandler):
         tmp_image_path = f".tmp/{random.randint(0, 100)}.jpg"
 
         mime_type, _ = mimetypes.guess_type(full_path)
-
+        if mime_type and mime_type.startswith("video"):
+            command = ["ffmpeg", "-y"]
+            if time is not None:
+                command += ["-ss", str(time)]
+            command += [
+                "-i",
+                full_path,
+                "-vf",
+                "thumbnail,scale=320:-1",
+                "-frames:v",
+                "1",
+                tmp_image_path,
+            ]
+        else:
+            command = [
+                "ffmpeg",
+                "-y",
+                "-i",
+                full_path,
+                "-vf",
+                "scale=320:-1",
+                tmp_image_path,
+            ]
         try:
-            if mime_type and mime_type.startswith("video"):
-                command = ["ffmpeg", "-y"]
-                if time is not None:
-                    command += ["-ss", str(time)]
-                command += [
-                    "-i",
-                    full_path,
-                    "-vf",
-                    "thumbnail,scale=320:-1",
-                    "-frames:v",
-                    "1",
-                    tmp_image_path,
-                ]
-            else:
-                command = [
-                    "ffmpeg",
-                    "-y",
-                    "-i",
-                    full_path,
-                    "-vf",
-                    "scale=320:-1",
-                    tmp_image_path,
-                ]
             process = await asyncio.create_subprocess_exec(*command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             stdout, stderr = await process.communicate()
             if process.returncode != 0:
@@ -107,25 +141,24 @@ class ResourcesHandler(IResourcesHandler):
 
         os.makedirs(".tmp", exist_ok=True)
         tmp_file_path = f".tmp/{random.randint(0, 100)}.mp4"
+        command = [
+            "ffmpeg",
+            "-y",
+            "-i",
+            full_path,
+            "-ss",
+            str(start),
+            "-t",
+            str(end - start),
+            "-c",
+            "copy",
+            tmp_file_path,
+        ]
         try:
-            with open(tmp_file_path, "w"):
-                command = [
-                    "ffmpeg",
-                    "-y",
-                    "-i",
-                    full_path,
-                    "-ss",
-                    str(start),
-                    "-t",
-                    str(end - start),
-                    "-c",
-                    "copy",
-                    tmp_file_path,
-                ]
-                process = await asyncio.create_subprocess_exec(*command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-                stdout, stderr = await process.communicate()
-                if process.returncode != 0:
-                    raise HTTPException(status_code=422, detail=f"Error processing video: {stderr.decode()}")
-                return FileResponse(tmp_file_path)
+            process = await asyncio.create_subprocess_exec(*command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            stdout, stderr = await process.communicate()
+            if process.returncode != 0:
+                raise HTTPException(status_code=422, detail=f"Error processing video: {stderr.decode()}")
+            return FileResponse(tmp_file_path)
         except Exception as e:
             raise HTTPException(status_code=500, detail=f"Error processing video: {str(e)}")
