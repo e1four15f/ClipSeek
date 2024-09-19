@@ -32,7 +32,7 @@ class InfoHandler(IInfoHandler):
             collection = Collection(collection_name)
             modalities = sorted(
                 [partition.name for partition in collection.partitions if partition.name != "_default"],
-                key=lambda x: modalities_order.index(Modality(x))
+                key=lambda x: modalities_order.index(Modality(x)),
             )
             dataset, version = collection_name.split("__")
             infos.append(

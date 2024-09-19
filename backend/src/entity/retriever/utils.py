@@ -60,8 +60,8 @@ def build_milvus_collection(
         entities = (
             {
                 "path": label["path"],
-                "start": label["span"][0],
-                "end": label["span"][1],
+                "start": (label.get("span") or [0, 0])[0],
+                "end": (label.get("span") or [0, 0])[1],
                 "embedding": embedding,
                 "modality": modality,
             }

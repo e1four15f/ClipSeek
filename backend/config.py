@@ -11,15 +11,15 @@ DATASETS = [
     #     "modalities": # list of modalities to extract
     # },
     {
-        "data_path": "../../data/MSVD/5sec",
+        "data_path": "../../data/MSVD/YouTubeClips",
         "dataset": "MSVD",
-        "version": "5sec",
+        "version": "all",
         "modalities": ["video"],
     },
     {
         "data_path": "../../data/MSRVTT/all",
         "dataset": "MSRVTT",
-        "version": "all",
+        "version": "train",
         "modalities": ["video", "audio"],
     },
     {

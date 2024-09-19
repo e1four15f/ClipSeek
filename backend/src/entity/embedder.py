@@ -1,11 +1,11 @@
 from abc import ABC, abstractmethod
 from enum import Enum
 from typing import Any, Optional, Union
-from typing_extensions import Self
 
 import torch
 from languagebind import LanguageBind, to_device, transform_dict
 from languagebind.image.tokenization_image import LanguageBindImageTokenizer
+from typing_extensions import Self
 
 
 class Modality(str, Enum):

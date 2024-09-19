@@ -28,8 +28,8 @@
       detail: {
         text: text,
         selectedDatasets: [
-          { dataset: "MSRVTT", version: "all" },
-          { dataset: "MSVD", version: "5sec" },
+          { dataset: "MSRVTT", version: "train" },
+          { dataset: "MSVD", version: "all" },
         ],
         selectedModalities: ["video"],
       },
