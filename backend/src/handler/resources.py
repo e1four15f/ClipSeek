@@ -1,8 +1,10 @@
 import asyncio
+import mimetypes
 import os
 import random
 import subprocess
 from abc import ABC, abstractmethod
+from typing import Optional
 
 from fastapi import HTTPException, Path, Query
 from starlette.responses import FileResponse
@@ -16,7 +18,9 @@ class IResourcesHandler(ABC):
         pass
 
     @abstractmethod
-    async def get_thumbnail(self, dataset: Dataset, version: Version, file_path: str) -> FileResponse:
+    async def get_thumbnail(
+        self, dataset: Dataset, version: Version, file_path: str, time: Optional[int]
+    ) -> FileResponse:
         pass
 
     @abstractmethod
@@ -44,6 +48,7 @@ class ResourcesHandler(IResourcesHandler):
         dataset: str = Path(..., description="The dataset name or identifier"),
         version: str = Path(..., description="The version of the dataset"),
         file_path: str = Path(..., description="The path of the file within the dataset"),
+        time: Optional[int] = Query(None, description="Time (in seconds) to extract the thumbnail from"),
     ) -> FileResponse:
         full_path = os.path.join(self._dataset_paths[(dataset, version)], file_path)
 
@@ -52,18 +57,33 @@ class ResourcesHandler(IResourcesHandler):
 
         os.makedirs(".tmp", exist_ok=True)
         tmp_image_path = f".tmp/{random.randint(0, 100)}.jpg"
+
+        mime_type, _ = mimetypes.guess_type(full_path)
+
         try:
-            command = [
-                "ffmpeg",
-                "-y",
-                "-i",
-                full_path,
-                "-vf",
-                "thumbnail,scale=320:-1",  # Scale the width to 320px, keep aspect ratio
-                "-frames:v",
-                "1",  # select the first frame
-                tmp_image_path,
-            ]
+            if mime_type and mime_type.startswith("video"):
+                command = ["ffmpeg", "-y"]
+                if time is not None:
+                    command += ["-ss", str(time)]
+                command += [
+                    "-i",
+                    full_path,
+                    "-vf",
+                    "thumbnail,scale=320:-1",
+                    "-frames:v",
+                    "1",
+                    tmp_image_path,
+                ]
+            else:
+                command = [
+                    "ffmpeg",
+                    "-y",
+                    "-i",
+                    full_path,
+                    "-vf",
+                    "scale=320:-1",
+                    tmp_image_path,
+                ]
             process = await asyncio.create_subprocess_exec(*command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             stdout, stderr = await process.communicate()
             if process.returncode != 0:
