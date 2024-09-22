@@ -3,8 +3,10 @@
   import { Gallery } from "flowbite-svelte";
   import { MediaView } from "$lib/components";
 
+  let galleryElement;
+
   const dispatch = createEventDispatcher();
-  const n_cols = 4;
+  const n_cols = 4; // TODO to config
 
   export let items = [];
   $: itemsPerColumn = Array.from({ length: n_cols }, (_, i) =>
@@ -15,8 +17,14 @@
   const handleScroll = () => {
     if (isLoading) return;
 
+    console.log("window.scrollY", window.scrollY);
+    console.log(
+      "window.innerHeight + window.scrollY + 500",
+      window.innerHeight + window.scrollY + 500,
+    );
+    console.log("galleryElement.offsetHeight", galleryElement.offsetHeight);
     const bottom =
-      window.innerHeight + window.scrollY + 500 >= document.body.offsetHeight;
+      window.innerHeight + window.scrollY + 500 >= galleryElement.offsetHeight;
     if (bottom) {
       isLoading = true;
       dispatch("continue");
@@ -33,7 +41,7 @@
   });
 </script>
 
-<div class="flex flex-col items-center">
+<div bind:this={galleryElement} class="flex flex-col items-center">
   <Gallery class="grid grid-cols-{n_cols} gap-4">
     {#each itemsPerColumn as column}
       <div class="flex flex-col gap-4">
