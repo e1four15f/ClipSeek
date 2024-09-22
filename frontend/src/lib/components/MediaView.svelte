@@ -1,5 +1,5 @@
 <script>
-  import { Button, Modal } from "flowbite-svelte";
+  import { Button, Modal, P, Heading } from "flowbite-svelte";
   import { getModalityIcon, isAudio, isImage, isVideo } from "$lib/utils.js";
   import { onMount, afterUpdate, onDestroy } from "svelte";
 
@@ -21,7 +21,11 @@
 
   afterUpdate(() => {
     if (showModal && isVideo(item.path)) {
-      player = new Plyr(videoElement);
+      player = new Plyr(videoElement, {
+        hideControls: false,
+        autoplay: true,
+        loop: { active: true },
+      });
     }
 
     if (showModal && player) {
@@ -66,19 +70,56 @@
 </button>
 
 <Modal bind:open={showModal} size="xl" outsideclose>
-  <div class="h-auto w-full">
-    {#if isVideo(item.path)}
-      <video bind:this={videoElement} autoplay controls>
-        <source src={clipUrl} autoplay class="w-75 h-auto" type="video/mp4" />
-        Your browser does not support the video tag.
-      </video>
-      <Button href={rawUrl} target="_blank" rel="noopener noreferrer">
-        Full Video Link
-      </Button>
-    {:else if isAudio(item.path)}
-      <audio src={rawUrl} autoplay controls class="w-75" />
-    {:else if isImage(item.path)}
-      <img src={rawUrl} alt={item.src} class="w-75 h-auto" />
-    {/if}
+  <div class="h-[80vh] w-full px-4">
+    <Heading class="mb-2" tag="h3">{item.path.split("/").pop()}</Heading>
+
+    <div class="flex h-[90%]">
+      <div class="max-h-full w-3/4 overflow-hidden">
+        {#if isVideo(item.path)}
+          <video bind:this={videoElement}>
+            <source src={clipUrl} autoplay type="video/mp4" />
+            Your browser does not support the video tag.
+          </video>
+        {:else if isAudio(item.path)}
+          <audio src={rawUrl} autoplay controls />
+        {:else if isImage(item.path)}
+          <img src={rawUrl} alt={item.src} />
+        {/if}
+      </div>
+
+      <div class="flex w-1/4 flex-col justify-between pl-4">
+        <div class="info-box">
+          <Heading tag="h4" class="mb-2">Information</Heading>
+          <P><strong>Dataset:</strong> {item.dataset}</P>
+          <P><strong>Version:</strong> {item.version}</P>
+          <P><strong>Path:</strong> {item.path}</P>
+          <P><strong>Score:</strong> {item.score.toFixed(4)}</P>
+          <P class="flex items-center">
+            <strong>Modality:</strong>
+            <svelte:component
+              this={getModalityIcon(item.modality)}
+              class="mx-1 mt-0.5 h-4 w-4 text-black"
+            />
+            {item.modality}
+          </P>
+          <P
+            ><strong>Span:</strong>
+            {item.span[0]} - {item.span[1]} ({item.span[1] - item.span[0]} seconds)</P
+          >
+        </div>
+
+        <div class="mt-auto">
+          <Button
+            href={rawUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="mb-4 w-full"
+          >
+            Full Video Link
+          </Button>
+          <Button class="w-full">Find Similar</Button>
+        </div>
+      </div>
+    </div>
   </div>
 </Modal>
