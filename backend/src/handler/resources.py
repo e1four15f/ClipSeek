@@ -65,7 +65,7 @@ class ResourcesHandler(IResourcesHandler):
                 "-b:a",
                 "192k",
                 tmp_mp4_path,
-            ]
+            ]  # noqa: E501
             try:
                 process = await asyncio.create_subprocess_exec(*command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
                 stdout, stderr = await process.communicate()
@@ -75,7 +75,7 @@ class ResourcesHandler(IResourcesHandler):
 
                 return FileResponse(tmp_mp4_path)
             except Exception as e:
-                raise HTTPException(status_code=500, detail=f"Error converting video: {str(e)}")
+                raise HTTPException(status_code=500, detail=f"Error converting video: {str(e)}") from e
         return FileResponse(full_path)
 
     async def get_thumbnail(
@@ -124,7 +124,7 @@ class ResourcesHandler(IResourcesHandler):
                 raise HTTPException(status_code=422, detail=f"Error extracting thumbnail: {stderr.decode()}")
             return FileResponse(tmp_image_path)
         except Exception as e:
-            raise HTTPException(status_code=500, detail=f"Error extracting thumbnail: {str(e)}")
+            raise HTTPException(status_code=500, detail=f"Error extracting thumbnail: {str(e)}") from e
 
     async def get_clip(
         self,
@@ -161,4 +161,4 @@ class ResourcesHandler(IResourcesHandler):
                 raise HTTPException(status_code=422, detail=f"Error processing video: {stderr.decode()}")
             return FileResponse(tmp_file_path)
         except Exception as e:
-            raise HTTPException(status_code=500, detail=f"Error processing video: {str(e)}")
+            raise HTTPException(status_code=500, detail=f"Error processing video: {str(e)}") from e

@@ -21,12 +21,12 @@ class SearchConfiguration(BaseModel):
     )
 
     @model_validator(mode="before")
-    def check_and_parse_config(cls, values):
+    def check_and_parse_config(cls, values: str) -> dict:  # noqa: N805
         if isinstance(values, str):
             try:
                 values = json.loads(values)
-            except json.JSONDecodeError:
-                raise ValueError("Invalid JSON format for config")
+            except json.JSONDecodeError as e:
+                raise ValueError("Invalid JSON format for config") from e
         return values
 
 
@@ -103,7 +103,7 @@ class SearchHandler(ISearchHandler):
             file_embedding = self._embedder.embed(saved_file_path, modality=file_modality).detach().numpy()
             return self._try_perform_search(file_embedding, config=config)
 
-    def _try_perform_search(self, embedding: np.ndarray, config: SearchConfiguration):
+    def _try_perform_search(self, embedding: np.ndarray, config: SearchConfiguration) -> SearchResponse:
         try:
             candidates, session_id = self._searcher.search(
                 embedding=embedding,

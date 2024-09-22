@@ -54,7 +54,10 @@ def _get_faiss_retriever(dataset: str, version: str, modalities: tuple[str], dev
 
 
 def _get_milvus_retriever(
-    dataset: str, version: str, modalities: tuple[str], device: str
+    dataset: str,
+    version: str,
+    modalities: tuple[str],
+    device: str,  # noqa: ARG001
 ) -> MilvusSearchIteratorFactory:
     logger.info("Initializing Milvus retriever for dataset=%s version=%s...", dataset, version)
     index_path = cfg.INDEX_PATH / dataset / version

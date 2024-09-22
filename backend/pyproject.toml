@@ -35,10 +35,12 @@ python_version = 3.9
 
 [tool.ruff]
 lint.ignore = [
-    "T201",  # `print` found
+    "T201",  # `print` found  # TODO remove later
     "ERA001",  # Found commented-out code
     "ANN204",  # Missing return type annotation for special method `__init__`
     "ANN101",  # Missing type annotation for `self` in method
+    "ANN102",  # Missing type annotation for `cls` in classmethod
+    "S311",  # Standard pseudo-random generators are not suitable for cryptographic purposes
 ]
 line-length = 120
 lint.select = [
@@ -63,6 +65,9 @@ lint.select = [
     "ANN" # flake8-annotations
 ]
 target-version = "py39"
+
+[tool.ruff.lint.pylint]
+max-args = 8
 
 [build-system]
 requires = ["poetry-core"]
