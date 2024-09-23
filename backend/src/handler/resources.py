@@ -50,22 +50,15 @@ class ResourcesHandler(IResourcesHandler):
             # Convert any video to MP4 format
             tmp_mp4_path = f".tmp/{random.randint(0, 100)}.mp4"
             command = [
-                "ffmpeg",
-                "-y",
-                "-i",
-                full_path,
-                "-c:v",
-                "libx264",
-                "-crf",
-                "23",
-                "-preset",
-                "medium",
-                "-c:a",
-                "aac",
-                "-b:a",
-                "192k",
+                "ffmpeg", "-y",
+                "-i", full_path,
+                "-c:v", "libx264",
+                "-crf", "23",
+                "-preset", "medium",
+                "-c:a", "aac",
+                "-b:a", "192k",
                 tmp_mp4_path,
-            ]  # noqa: E501
+            ]  # fmt: skip
             try:
                 process = await asyncio.create_subprocess_exec(*command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
                 stdout, stderr = await process.communicate()
@@ -99,24 +92,18 @@ class ResourcesHandler(IResourcesHandler):
             if time is not None:
                 command += ["-ss", str(time)]
             command += [
-                "-i",
-                full_path,
-                "-vf",
-                "thumbnail,scale=320:-1",
-                "-frames:v",
-                "1",
+                "-i", full_path,
+                "-vf", "thumbnail,scale=320:-1",
+                "-frames:v", "1",
                 tmp_image_path,
-            ]
+            ]  # fmt: skip
         else:
             command = [
-                "ffmpeg",
-                "-y",
-                "-i",
-                full_path,
-                "-vf",
-                "scale=320:-1",
+                "ffmpeg", "-y",
+                "-i", full_path,
+                "-vf", "scale=320:-1",
                 tmp_image_path,
-            ]
+            ]  # fmt: skip
         try:
             process = await asyncio.create_subprocess_exec(*command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             stdout, stderr = await process.communicate()
@@ -142,18 +129,13 @@ class ResourcesHandler(IResourcesHandler):
         os.makedirs(".tmp", exist_ok=True)
         tmp_file_path = f".tmp/{random.randint(0, 100)}.mp4"
         command = [
-            "ffmpeg",
-            "-y",
-            "-i",
-            full_path,
-            "-ss",
-            str(start),
-            "-t",
-            str(end - start),
-            "-c",
-            "copy",
+            "ffmpeg", "-y",
+            "-ss", str(start),
+            "-i", full_path,
+            "-t", str(end - start),
+            "-c", "copy",
             tmp_file_path,
-        ]
+        ]  # fmt: skip
         try:
             process = await asyncio.create_subprocess_exec(*command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             stdout, stderr = await process.communicate()
