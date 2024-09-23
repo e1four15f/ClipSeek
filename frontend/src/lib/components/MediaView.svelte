@@ -23,6 +23,15 @@
     if (showModal && isVideo(item.path)) {
       player = new Plyr(videoElement, {
         hideControls: false,
+        controls: [
+          "progress",
+          "current-time",
+          "duration",
+          "mute",
+          "volume",
+          "captions",
+          "fullscreen",
+        ],
         autoplay: true,
         loop: { active: true },
       });

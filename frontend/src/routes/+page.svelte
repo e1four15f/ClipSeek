@@ -63,7 +63,7 @@
     try {
       const response = await continueSearch(sessionId);
       results = [...results, ...response.data];
-      logger.info("Continue");
+      // logger.info("Continue");
     } catch (error) {
       logger.error(error);
     }
