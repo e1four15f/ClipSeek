@@ -7,7 +7,7 @@ from fastapi.responses import ORJSONResponse
 
 from src.handler.info import IInfoHandler
 from src.handler.resources import IResourcesHandler
-from src.handler.search.v1 import ISearchHandler, SearchResponse
+from src.handler.search.v1 import ISearchHandler
 
 logger = logging.getLogger(__name__)
 
@@ -41,21 +41,18 @@ class AppServer:
             self._search_handler.search_by_text,
             methods=["POST"],
             tags=["Search"],
-            response_model=SearchResponse,
         )
         router.add_api_route(
             "/api/v1/search/by_file",
             self._search_handler.search_by_file,
             methods=["POST"],
             tags=["Search"],
-            response_model=SearchResponse,
         )
         router.add_api_route(
             "/api/v1/search/continue",
             self._search_handler.continue_search,
             methods=["POST"],
             tags=["Search"],
-            response_model=SearchResponse,
         )
         router.add_api_route(
             "/indexes/info",

@@ -7,14 +7,16 @@ from abc import ABC, abstractmethod
 from typing import Optional
 
 from fastapi import HTTPException, Path, Query
-from starlette.responses import FileResponse
+from starlette.requests import Request
+from starlette.responses import FileResponse, Response
 
 from src.aliases import Collection, Dataset, Version
+from src.utils.streaming import build_streaming_response
 
 
 class IResourcesHandler(ABC):
     @abstractmethod
-    async def get_raw(self, dataset: Dataset, version: Version, file_path: str) -> FileResponse:
+    async def get_raw(self, dataset: Dataset, version: Version, file_path: str) -> Response:
         pass
 
     @abstractmethod
@@ -34,16 +36,24 @@ class ResourcesHandler(IResourcesHandler):
 
     async def get_raw(
         self,
+        request: Request,
         dataset: str = Path(..., description="The dataset name or identifier"),
         version: str = Path(..., description="The version of the dataset"),
         file_path: str = Path(..., description="The path of the file within the dataset"),
-    ) -> FileResponse:
+    ) -> Response:
         full_path = os.path.join(self._dataset_paths[(dataset, version)], file_path)
         if not os.path.exists(full_path):
             raise HTTPException(status_code=404, detail="File not found")
 
-        if full_path.endswith(".mp4"):
-            return FileResponse(full_path)
+        if full_path.endswith(".mp4"):  # TODO: Just mp4? maybe other formats also work?
+            content_type = "video/mp4"
+            file_size = os.stat(full_path).st_size
+            return build_streaming_response(
+                request,
+                stream=open(full_path, "rb"),  # noqa: SIM115
+                file_size=file_size,
+                content_type=content_type,
+            )
 
         mime_type, _ = mimetypes.guess_type(full_path)
         if mime_type and mime_type.startswith("video"):

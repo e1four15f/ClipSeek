@@ -7,7 +7,7 @@ from pymilvus.orm import db, utility
 from src.aliases import Label
 from src.entity.embedder import Modality
 
-# TODO not utils please
+# TODO not utils please? Move to utils/retriever?
 
 
 def build_faiss_index(embeddings: np.ndarray, device: str = "cpu") -> faiss.IndexFlatIP:
