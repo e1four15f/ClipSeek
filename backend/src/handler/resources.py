@@ -1,14 +1,14 @@
 import asyncio
 import mimetypes
 import os
-import random
 import subprocess
 from abc import ABC, abstractmethod
+from io import BytesIO
 from typing import Optional
 
 from fastapi import HTTPException, Path, Query
 from starlette.requests import Request
-from starlette.responses import FileResponse, Response
+from starlette.responses import FileResponse, Response, StreamingResponse
 
 from src.aliases import Collection, Dataset, Version
 from src.utils.streaming import build_streaming_response
@@ -20,13 +20,11 @@ class IResourcesHandler(ABC):
         pass
 
     @abstractmethod
-    async def get_thumbnail(
-        self, dataset: Dataset, version: Version, file_path: str, time: Optional[int]
-    ) -> FileResponse:
+    async def get_thumbnail(self, dataset: Dataset, version: Version, file_path: str, time: Optional[int]) -> Response:
         pass
 
     @abstractmethod
-    async def get_clip(self, dataset: Dataset, version: Version, file_path: str, start: int, end: int) -> FileResponse:
+    async def get_clip(self, dataset: Dataset, version: Version, file_path: str, start: int, end: int) -> Response:
         pass
 
 
@@ -41,12 +39,12 @@ class ResourcesHandler(IResourcesHandler):
         version: str = Path(..., description="The version of the dataset"),
         file_path: str = Path(..., description="The path of the file within the dataset"),
     ) -> Response:
+        content_type = "video/mp4"
         full_path = os.path.join(self._dataset_paths[(dataset, version)], file_path)
         if not os.path.exists(full_path):
             raise HTTPException(status_code=404, detail="File not found")
 
         if full_path.endswith(".mp4"):  # TODO: Just mp4? maybe other formats also work?
-            content_type = "video/mp4"
             file_size = os.stat(full_path).st_size
             return build_streaming_response(
                 request,
@@ -55,10 +53,19 @@ class ResourcesHandler(IResourcesHandler):
                 content_type=content_type,
             )
 
+        tmp_mp4_path = f".tmp/{hash(('raw', full_path))}.mp4"
+        if os.path.exists(tmp_mp4_path):
+            file_size = os.stat(tmp_mp4_path).st_size
+            return build_streaming_response(
+                request,
+                stream=open(tmp_mp4_path, "rb"),  # noqa: SIM115
+                file_size=file_size,
+                content_type=content_type,
+            )
+
         mime_type, _ = mimetypes.guess_type(full_path)
         if mime_type and mime_type.startswith("video"):
             # Convert any video to MP4 format
-            tmp_mp4_path = f".tmp/{random.randint(0, 100)}.mp4"
             command = [
                 "ffmpeg", "-y",
                 "-i", full_path,
@@ -76,9 +83,17 @@ class ResourcesHandler(IResourcesHandler):
                 if process.returncode != 0:
                     raise HTTPException(status_code=422, detail=f"Error converting video: {stderr.decode()}")
 
-                return FileResponse(tmp_mp4_path)
+                file_size = os.stat(tmp_mp4_path).st_size
+                return build_streaming_response(
+                    request,
+                    stream=open(tmp_mp4_path, "rb"),  # noqa: SIM115
+                    file_size=file_size,
+                    content_type=content_type,
+                    background=file_cleanup(tmp_mp4_path),
+                )
             except Exception as e:
                 raise HTTPException(status_code=500, detail=f"Error converting video: {str(e)}") from e
+        # for images  # TODO what about audio?
         return FileResponse(full_path)
 
     async def get_thumbnail(
@@ -87,14 +102,11 @@ class ResourcesHandler(IResourcesHandler):
         version: str = Path(..., description="The version of the dataset"),
         file_path: str = Path(..., description="The path of the file within the dataset"),
         time: Optional[int] = Query(None, description="Time (in seconds) to extract the thumbnail from"),
-    ) -> FileResponse:
+    ) -> Response:
         full_path = os.path.join(self._dataset_paths[(dataset, version)], file_path)
 
         if not os.path.exists(full_path):
             raise HTTPException(status_code=404, detail="File not found")
-
-        os.makedirs(".tmp", exist_ok=True)
-        tmp_image_path = f".tmp/{random.randint(0, 100)}.jpg"
 
         mime_type, _ = mimetypes.guess_type(full_path)
         if mime_type and mime_type.startswith("video"):
@@ -105,52 +117,93 @@ class ResourcesHandler(IResourcesHandler):
                 "-i", full_path,
                 "-vf", "thumbnail,scale=320:-1",
                 "-frames:v", "1",
-                tmp_image_path,
+                "-f", "image2pipe",
+                "-vcodec", "mjpeg",
+                "pipe:1",
             ]  # fmt: skip
         else:
             command = [
                 "ffmpeg", "-y",
                 "-i", full_path,
                 "-vf", "scale=320:-1",
-                tmp_image_path,
+                "-f", "image2pipe",
+                "-vcodec", "mjpeg",
+                "pipe:1",
             ]  # fmt: skip
+
         try:
-            process = await asyncio.create_subprocess_exec(*command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            process = await asyncio.create_subprocess_exec(
+                *command,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+            )
             stdout, stderr = await process.communicate()
+
             if process.returncode != 0:
                 raise HTTPException(status_code=422, detail=f"Error extracting thumbnail: {stderr.decode()}")
-            return FileResponse(tmp_image_path)
+
+            image_bytes = BytesIO(stdout)
+            return StreamingResponse(image_bytes, media_type="image/jpeg")
         except Exception as e:
             raise HTTPException(status_code=500, detail=f"Error extracting thumbnail: {str(e)}") from e
 
     async def get_clip(
         self,
+        request: Request,
         dataset: str = Path(..., description="The dataset name or identifier"),
         version: str = Path(..., description="The version of the dataset"),
         file_path: str = Path(..., description="The path of the file within the dataset"),
         start: int = Query(..., description="Clip start time in seconds"),
         end: int = Query(..., description="Clip end time in seconds"),
-    ) -> FileResponse:
+    ) -> Response:
+        content_type = "video/mp4"
         full_path = os.path.join(self._dataset_paths[(dataset, version)], file_path)
 
         if not os.path.exists(full_path):
             raise HTTPException(status_code=404, detail="File not found")
 
-        os.makedirs(".tmp", exist_ok=True)
-        tmp_file_path = f".tmp/{random.randint(0, 100)}.mp4"
+        tmp_file_path = f".tmp/{hash(('clip', full_path))}.mp4"
+        if os.path.exists(tmp_file_path):
+            file_size = os.stat(tmp_file_path).st_size
+            return build_streaming_response(
+                request,
+                stream=open(tmp_file_path, "rb"),  # noqa: SIM115
+                file_size=file_size,
+                content_type=content_type,
+            )
+
         command = [
             "ffmpeg", "-y",
             "-ss", str(start),
             "-i", full_path,
             "-t", str(end - start),
             "-c", "copy",
+            # "-movflags", "faststart",
             tmp_file_path,
         ]  # fmt: skip
         try:
             process = await asyncio.create_subprocess_exec(*command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             stdout, stderr = await process.communicate()
+
             if process.returncode != 0:
                 raise HTTPException(status_code=422, detail=f"Error processing video: {stderr.decode()}")
-            return FileResponse(tmp_file_path)
+
+            file_size = os.stat(tmp_file_path).st_size
+            return build_streaming_response(
+                request,
+                stream=open(tmp_file_path, "rb"),  # noqa: SIM115
+                file_size=file_size,
+                content_type=content_type,
+                background=file_cleanup(tmp_file_path),
+            )
         except Exception as e:
             raise HTTPException(status_code=500, detail=f"Error processing video: {str(e)}") from e
+
+
+def file_cleanup(file_path: str) -> None:
+    """Cleanup function to close and delete the file after streaming"""
+    try:
+        if os.path.exists(file_path):
+            os.remove(file_path)
+    except Exception as e:
+        print(f"Error deleting file: {e}")

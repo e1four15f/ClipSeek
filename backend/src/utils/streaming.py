@@ -1,14 +1,15 @@
 from collections.abc import Iterable
 from http import HTTPStatus
-from typing import BinaryIO
+from typing import BinaryIO, Optional
 
 from fastapi import HTTPException
+from starlette.background import BackgroundTask
 from starlette.requests import Request
 from starlette.responses import StreamingResponse
 
 
 def build_streaming_response(
-    request: Request, stream: BinaryIO, file_size: int, content_type: str
+    request: Request, stream: BinaryIO, file_size: int, content_type: str, background: Optional[BackgroundTask] = None
 ) -> StreamingResponse:
     range_header = request.headers.get("range")
     start, end = 0, file_size - 1
@@ -41,6 +42,7 @@ def build_streaming_response(
         headers=headers,
         status_code=HTTPStatus.PARTIAL_CONTENT if range_header else HTTPStatus.OK,
         media_type=content_type,
+        background=background,
     )
 
 
