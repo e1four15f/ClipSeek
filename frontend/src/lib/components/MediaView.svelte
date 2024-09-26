@@ -118,10 +118,12 @@
             />
             {item.modality}
           </P>
-          <P
-            ><strong>Span:</strong>
-            {item.span[0]} - {item.span[1]} ({item.span[1] - item.span[0]} seconds)</P
-          >
+          {#if isVideo(item.path)}
+            <P
+              ><strong>Span:</strong>
+              {item.span[0]} - {item.span[1]} ({item.span[1] - item.span[0]} seconds)</P
+            >
+          {/if}
         </div>
 
         <div class="mt-auto">
@@ -131,7 +133,7 @@
             rel="noopener noreferrer"
             class="mb-4 w-full"
           >
-            Full Video Link
+            Source Link
           </Button>
           <Button class="w-full">Find Similar</Button>
         </div>

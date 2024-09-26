@@ -17,12 +17,6 @@
   const handleScroll = () => {
     if (isLoading) return;
 
-    console.log("window.scrollY", window.scrollY);
-    console.log(
-      "window.innerHeight + window.scrollY + 500",
-      window.innerHeight + window.scrollY + 500,
-    );
-    console.log("galleryElement.offsetHeight", galleryElement.offsetHeight);
     const bottom =
       window.innerHeight + window.scrollY + 500 >= galleryElement.offsetHeight;
     if (bottom) {
