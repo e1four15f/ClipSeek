@@ -3,12 +3,14 @@ import logging
 from functools import cache
 
 import numpy as np
+from pymilvus import MilvusClient
 
 import config as cfg
 from src.entity.embedder import IEmbedder, LanguageBindEmbedder, Modality, RandomEmbedder
 from src.entity.retriever.retriever import FaissSearchIteratorFactory, MilvusSearchIteratorFactory
 from src.entity.retriever.utils import create_milvus_connection
 from src.entity.searcher import BatchSearcher
+from src.entity.storage import IStorage, MilvusStorage
 
 logger = logging.getLogger(__name__)
 
@@ -40,6 +42,12 @@ def build_searcher() -> BatchSearcher:
             for d in cfg.DATASETS
         }
     )
+
+
+@cache
+def build_storage() -> IStorage:
+    client = MilvusClient(uri=cfg.MILVUS_URL, db_name=cfg.MILVUS_DB_NAME)
+    return MilvusStorage(client=client)
 
 
 # TODO delete or support

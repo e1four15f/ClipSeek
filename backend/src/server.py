@@ -49,6 +49,12 @@ class AppServer:
             tags=["Search"],
         )
         router.add_api_route(
+            "/api/v1/search/by_reference",
+            self._search_handler.search_by_reference,
+            methods=["POST"],
+            tags=["Search"],
+        )
+        router.add_api_route(
             "/api/v1/search/continue",
             self._search_handler.continue_search,
             methods=["POST"],

@@ -3,13 +3,13 @@ import tempfile
 from abc import ABC, abstractmethod
 from typing import Annotated
 
-import numpy as np
 from fastapi import File, Form, HTTPException, UploadFile
 from pydantic import BaseModel, Field, model_validator
 
 from src.aliases import CandidateWithCollection
 from src.entity.embedder import IEmbedder, Modality
 from src.entity.searcher import BatchSearcher
+from src.entity.storage import IStorage
 
 
 class SearchConfiguration(BaseModel):
@@ -66,6 +66,12 @@ class ISearchHandler(ABC):
         pass
 
     @abstractmethod
+    async def search_by_reference(
+        self, id: str, dataset: str, version: str, config: SearchConfiguration
+    ) -> SearchResponse:
+        pass
+
+    @abstractmethod
     async def continue_search(self, request: ContinueSearchRequest) -> SearchResponse:
         pass
 
@@ -74,15 +80,18 @@ class SearchHandler(ISearchHandler):
     def __init__(
         self,
         embedder: IEmbedder,
-        retriever: BatchSearcher,
+        storage: IStorage,
+        searcher: BatchSearcher,
         candidates_per_page: int,
     ) -> None:
         self._embedder = embedder
-        self._searcher = retriever
+        self._storage = storage
+        self._searcher = searcher
         self._candidates_per_page = candidates_per_page
 
     async def search_by_text(self, text: RequestText, config: SearchConfiguration) -> SearchResponse:
-        text_embedding = self._embedder.embed(text, modality=Modality.TEXT).detach().numpy()
+        # TODO think about -> torch.Tensor
+        text_embedding = self._embedder.embed(text, modality=Modality.TEXT).detach().cpu().tolist()
         return self._try_perform_search(text_embedding, config=config)
 
     async def search_by_file(self, file: RequestFile, config: SearchConfiguration) -> SearchResponse:
@@ -100,10 +109,17 @@ class SearchHandler(ISearchHandler):
             saved_file_path = tmp_file.name
             tmp_file.write(await file.read())
 
-            file_embedding = self._embedder.embed(saved_file_path, modality=file_modality).detach().numpy()
+            # TODO think about -> torch.Tensor
+            file_embedding = self._embedder.embed(saved_file_path, modality=file_modality).detach().cpu().tolist()
             return self._try_perform_search(file_embedding, config=config)
 
-    def _try_perform_search(self, embedding: np.ndarray, config: SearchConfiguration) -> SearchResponse:
+    async def search_by_reference(
+        self, id: str, dataset: str, version: str, config: SearchConfiguration
+    ) -> SearchResponse:
+        document = self._storage.get_by_id(id=id, dataset=dataset, version=version)
+        return self._try_perform_search(document.embedding, config=config)
+
+    def _try_perform_search(self, embedding: list[float], config: SearchConfiguration) -> SearchResponse:
         try:
             candidates, session_id = self._searcher.search(
                 embedding=embedding,

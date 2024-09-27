@@ -1,8 +1,6 @@
 import uuid
 from collections.abc import Generator, Iterator
 
-import numpy as np
-
 from src.aliases import Candidate, CandidateWithCollection, Collection
 from src.entity.embedder import Modality
 from src.entity.retriever.retriever import ISearchIteratorFactory
@@ -15,7 +13,7 @@ class BatchSearcher:
 
     def search(
         self,
-        embedding: np.ndarray,
+        embedding: list[float],
         collections: list[Collection],
         modalities: list[Modality],
         batch_size: int = 32,

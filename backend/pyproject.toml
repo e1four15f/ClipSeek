@@ -41,6 +41,7 @@ lint.ignore = [
     "ANN101",  # Missing type annotation for `self` in method
     "ANN102",  # Missing type annotation for `cls` in classmethod
     "S311",  # Standard pseudo-random generators are not suitable for cryptographic purposes
+    "A002",  # Argument `id` is shadowing a Python builtin
 ]
 line-length = 120
 lint.select = [

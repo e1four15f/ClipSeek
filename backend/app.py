@@ -4,7 +4,7 @@ import transformers
 from fastapi import FastAPI
 
 import config as cfg
-from src.entity.factory import build_embedder, build_searcher
+from src.entity.factory import build_embedder, build_searcher, build_storage
 from src.handler.info import InfoHandler
 from src.handler.resources import ResourcesHandler
 from src.handler.search.v1 import SearchHandler
@@ -16,11 +16,13 @@ logging.basicConfig(level=logging.INFO)
 
 def get_app() -> FastAPI:
     embedder = build_embedder()
-    retriever = build_searcher()
+    searcher = build_searcher()
+    storage = build_storage()
     return AppServer(
         search_handler=SearchHandler(
             embedder=embedder,
-            retriever=retriever,
+            storage=storage,
+            searcher=searcher,
             candidates_per_page=cfg.CANDIDATES_PER_PAGE,
         ),
         info_handler=InfoHandler(),

@@ -14,12 +14,13 @@ class ISearchIteratorFactory(ABC):
     # TODO change signature
     @abstractmethod
     def create_iterator(
-        self, embedding: np.ndarray, modalities: list[Modality], batch_size: int
+        self, embedding: list[float], modalities: list[Modality], batch_size: int
     ) -> Iterator[list[Candidate]]:
         pass
 
 
 class FaissSearchIteratorFactory(ISearchIteratorFactory):
+    # TODO embedding as list[float], move building to index phase
     def __init__(self, embeddings: np.ndarray, labels: list[str], device: str = "cpu"):
         self._labels = labels
         self._index = build_faiss_index(embeddings, device=device)
@@ -40,7 +41,7 @@ class MilvusSearchIteratorFactory(ISearchIteratorFactory):
     def __init__(
         self,
         index_name: str,
-        modality_embeddings: dict[Modality, np.ndarray],
+        modality_embeddings: dict[Modality, np.ndarray],  # TODO move to initialization np.ndarray
         embeddings_dim: int,
         labels: list[Label],
     ):
@@ -50,15 +51,14 @@ class MilvusSearchIteratorFactory(ISearchIteratorFactory):
         self._available_modalities = set(modality_embeddings.keys())
 
     def create_iterator(
-        self, embedding: np.ndarray, modalities: list[Modality], batch_size: int
+        self, embedding: list[float], modalities: list[Modality], batch_size: int
     ) -> Iterator[list[Candidate]]:
         request_modalities = list(set(modalities) & self._available_modalities)
         if not request_modalities:
             raise ValueError(f"Can not create iterator for selected modalities {modalities}.")
 
-        embedding = embedding.reshape(1, -1).astype(np.float32)
         search_iterator = self._collection.search_iterator(
-            embedding,
+            [embedding],
             anns_field="embedding",
             param={"metric_type": "COSINE"},
             batch_size=batch_size,
