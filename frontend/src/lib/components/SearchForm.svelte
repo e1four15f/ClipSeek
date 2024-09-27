@@ -24,8 +24,14 @@
 
   export let text = "";
   export let file = null;
+  export let reference = null;
   export let datasets = [];
   export let modalities = [];
+
+  const baseUrl = "http://localhost:8500/resources";
+  $: rawReferenceUrl = reference
+    ? `${baseUrl}/thumbnail/${reference.dataset}/${reference.version}/${reference.path}?time=${reference.span[0]}`
+    : null;
 
   let searchTerm = "";
   let allChecked = false;
@@ -44,7 +50,13 @@
     const selectedModalities = modalities
       .filter((m) => m.checked)
       .map((m) => m.value);
-    dispatch("search", { text, file, selectedDatasets, selectedModalities });
+    dispatch("search", {
+      text,
+      file,
+      reference,
+      selectedDatasets,
+      selectedModalities,
+    });
   }}
 >
   <Label for="query" class="mb-2">Search by Text or File</Label>
@@ -56,6 +68,7 @@
       class="resize-none overflow-hidden rounded-md border border-gray-300 p-2"
       on:input={(e) => {
         file = null;
+        reference = null;
         const target = e.target;
         const minHeight = target.style.minHeight || "auto";
         target.style.height = minHeight;
@@ -108,6 +121,7 @@
         file = event.target.files[0];
         if (file != null) {
           text = "";
+          reference = null;
         }
       }}
       on:dragover={(event) => {
@@ -116,37 +130,47 @@
       maxFiles="1"
       acceptedFileTypes="image/*, video/*, audio/*"
     >
-      {#if file == null}
-        <p class="mb-2 text-sm text-gray-500">
-          <span class="font-semibold">Click to upload</span>
-        </p>
-        <p class="text-xs text-gray-500">Video, image or audio file</p>
-      {:else}
+      {#if file !== null || reference !== null}
         <div class="flex items-center">
-          {#if isVideo(file.name)}
-            <video
-              src={URL.createObjectURL(file)}
-              class="mr-2 h-16 w-16 object-cover"
-            />
-          {:else if isAudio(file.name)}
-            <audio
-              src={URL.createObjectURL(file)}
-              class="mr-2 h-16 w-16 object-cover"
-            />
-          {:else if isImage(file.name)}
+          {#if file !== null}
+            {#if isVideo(file.name) || isAudio(file.name) || isImage(file.name)}
+              {#await Promise.resolve(URL.createObjectURL(file)) then fileUrl}
+                {#if isVideo(file.name)}
+                  <video src={fileUrl} class="mr-2 h-16 w-16 object-cover" />
+                {:else if isAudio(file.name)}
+                  <audio src={fileUrl} class="mr-2 h-16 w-16 object-cover" />
+                {:else if isImage(file.name)}
+                  <img
+                    src={fileUrl}
+                    alt={file.name}
+                    class="mr-2 h-16 w-16 object-cover"
+                  />
+                {/if}
+              {/await}
+            {/if}
+            <div>
+              <p class="mb-1 text-sm text-gray-500">
+                <span class="font-semibold">Selected file</span>
+              </p>
+              <p class="w-32 truncate text-xs text-gray-500">{file.name}</p>
+            </div>
+          {:else if reference !== null}
             <img
-              src={URL.createObjectURL(file)}
-              alt={file.name}
+              src={rawReferenceUrl}
+              alt={reference.path}
               class="mr-2 h-16 w-16 object-cover"
             />
+            <div>
+              <p class="mb-1 text-sm text-gray-500">
+                <span class="font-semibold">Similar to</span>
+              </p>
+              <p class="w-32 truncate text-xs text-gray-500">
+                {reference.path}
+              </p>
+            </div>
           {/if}
-          <div>
-            <p class="mb-1 text-sm text-gray-500">
-              <span class="font-semibold">Selected file</span>
-            </p>
-            <p class="w-32 truncate text-xs text-gray-500">{file.name}</p>
-          </div>
         </div>
+
         <CloseButton
           class="absolute right-1 top-1 m-0.5 rounded-lg p-1.5 text-gray-500 hover:bg-gray-300"
           outline
@@ -154,8 +178,14 @@
             event.stopPropagation();
             URL.revokeObjectURL(file);
             file = null;
+            reference = null;
           }}
         />
+      {:else}
+        <p class="mb-2 text-sm text-gray-500">
+          <span class="font-semibold">Click to upload</span>
+        </p>
+        <p class="text-xs text-gray-500">Video, image or audio file</p>
       {/if}
     </Dropzone>
 

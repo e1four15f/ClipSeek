@@ -40,7 +40,11 @@
     {#each itemsPerColumn as column}
       <div class="flex flex-col gap-4">
         {#each column as item}
-          <MediaView {item} />
+          <MediaView
+            {item}
+            on:similar={(event) =>
+              dispatch("similar", { item: event.detail.item })}
+          />
         {/each}
       </div>
     {/each}

@@ -1,11 +1,18 @@
 <script>
   import { Button, Modal, P, Heading } from "flowbite-svelte";
   import { getModalityIcon, isAudio, isImage, isVideo } from "$lib/utils.js";
-  import { onMount, afterUpdate, onDestroy } from "svelte";
+  import {
+    onMount,
+    afterUpdate,
+    onDestroy,
+    createEventDispatcher,
+  } from "svelte";
+
+  const dispatch = createEventDispatcher();
 
   export let item;
   const baseUrl = "http://localhost:8500/resources";
-  $: thumbnailUrl = `${baseUrl}/thumbnail/${item.dataset}/${item.version}/${item.path}`;
+  $: thumbnailUrl = `${baseUrl}/thumbnail/${item.dataset}/${item.version}/${item.path}?time=${item.span[0]}`;
   $: clipUrl = `${baseUrl}/clip/${item.dataset}/${item.version}/${item.path}?start=${item.span[0]}&end=${item.span[1]}`;
   $: rawUrl = `${baseUrl}/raw/${item.dataset}/${item.version}/${item.path}`;
 
@@ -135,7 +142,13 @@
           >
             Source Link
           </Button>
-          <Button class="w-full">Find Similar</Button>
+          <Button
+            class="w-full"
+            on:click={(event) => {
+              showModal = false;
+              dispatch("similar", { item });
+            }}>Find Similar</Button
+          >
         </div>
       </div>
     </div>

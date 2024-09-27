@@ -8,6 +8,7 @@
   import {
     searchByText,
     searchByFile,
+    searchByReference,
     continueSearch,
     getIndexesInfo,
   } from "$lib/api.js";
@@ -17,6 +18,8 @@
   let isScrolled = false;
 
   let text = "Cat in black suit is having meeting";
+  let file = null;
+  let reference = null;
   let datasets = [];
   let modalities = ["hybrid", "video", "image", "audio"];
   let results = [];
@@ -41,9 +44,27 @@
   });
 
   async function handleSearch(event) {
-    const { text, file, selectedDatasets, selectedModalities } = event.detail;
-    const input = file == null ? text : file;
-    const searchFunc = file == null ? searchByText : searchByFile;
+    const { text, file, reference, selectedDatasets, selectedModalities } =
+      event.detail;
+
+    let input;
+    let searchFunc;
+    let message;
+
+    if (file) {
+      input = file;
+      searchFunc = searchByFile;
+      message = file.name;
+    } else if (reference) {
+      input = reference;
+      searchFunc = searchByReference;
+      message = reference.path;
+    } else {
+      input = text;
+      searchFunc = searchByText;
+      message = text;
+    }
+
     try {
       const response = await searchFunc(
         input,
@@ -52,14 +73,14 @@
       );
       results = response.data;
       sessionId = response.session_id;
-      logger.info(`Search: ${file == null ? text : file.name}`);
+      logger.info(`Search: ${message}`);
     } catch (error) {
       results = [];
       logger.error(error);
     }
   }
 
-  async function handleContinueSearch() {
+  async function handleContinue() {
     try {
       const response = await continueSearch(sessionId);
       results = [...results, ...response.data];
@@ -67,6 +88,13 @@
     } catch (error) {
       logger.error(error);
     }
+  }
+
+  async function handleSimilar(event) {
+    const { item } = event.detail;
+    text = "";
+    file = null;
+    reference = item;
   }
 
   async function fetchFormData() {
@@ -95,10 +123,21 @@
   <div class="flex h-screen">
     <div class="fixed flex h-full w-1/4 flex-col bg-gray-100 p-4">
       <Heading tag="h2" class="mb-4">ClipSeek</Heading>
-      <SearchForm {text} {datasets} {modalities} on:search={handleSearch} />
+      <SearchForm
+        bind:text
+        bind:file
+        bind:reference
+        bind:datasets
+        bind:modalities
+        on:search={handleSearch}
+      />
     </div>
     <div class="ml-[25%] w-3/4 px-10 py-3">
-      <Gallery items={results} on:continue={handleContinueSearch} />
+      <Gallery
+        bind:items={results}
+        on:continue={handleContinue}
+        on:similar={handleSimilar}
+      />
     </div>
   </div>
   {#if isScrolled}
