@@ -41,13 +41,13 @@ class ContinueSearchRequest(BaseModel):
 
 
 class SearchResult(BaseModel):
+    id: str = Field(..., description="The unique file ID")
     dataset: str = Field(..., description="The dataset name")
     version: str = Field(..., description="The dataset version")
     path: str = Field(..., description="Relative path to the result file")
     score: float = Field(..., description="Similarity score")
     modality: str = Field(..., description="The modality of the result")
     span: tuple[int, int] = Field(..., description="Start and end seconds of the clip")
-    # TODO extra or extra in resources route?
 
 
 class SearchResponse(BaseModel):
@@ -136,6 +136,7 @@ class SearchHandler(ISearchHandler):
             hits=len(candidates),
             data=[
                 SearchResult(
+                    id=str(cid),
                     dataset=dataset,
                     version=version,
                     path=path,
@@ -143,6 +144,6 @@ class SearchHandler(ISearchHandler):
                     modality=modality,
                     span=span,
                 )
-                for ((path, score, modality, span), (dataset, version)) in candidates
+                for ((cid, path, score, modality, span), (dataset, version)) in candidates
             ],
         )

@@ -64,7 +64,7 @@ class MilvusSearchIteratorFactory(ISearchIteratorFactory):
             batch_size=batch_size,
             limit=2**10,
             partition_names=request_modalities,
-            output_fields=["path", "modality", "start", "end"],
+            output_fields=["id", "path", "modality", "start", "end"],
         )
 
         def _iterator() -> Iterator[list[Candidate]]:
@@ -73,7 +73,7 @@ class MilvusSearchIteratorFactory(ISearchIteratorFactory):
                     hits = search_iterator.next()
                     if not hits:
                         break
-                    yield [(hit.path, 1 - hit.distance, hit.modality, (hit.start, hit.end)) for hit in hits]
+                    yield [(hit.id, hit.path, 1 - hit.distance, hit.modality, (hit.start, hit.end)) for hit in hits]
             finally:
                 search_iterator.close()
 

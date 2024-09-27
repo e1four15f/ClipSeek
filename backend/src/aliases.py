@@ -6,10 +6,11 @@ Version = str
 Dataset = str
 Collection = tuple[Dataset, Version]
 
+Id = int
 Score = float
 Path = str
 Span = tuple[int, int]
-Candidate = tuple[Path, Score, Modality, Span]
+Candidate = tuple[Id, Path, Score, Modality, Span]
 CandidateWithCollection = tuple[Candidate, Collection]
 
 

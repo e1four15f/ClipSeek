@@ -57,7 +57,7 @@ class BatchSearcher:
                     except StopIteration:
                         del iterators[collection]
                 if buffer:
-                    buffer.sort(key=lambda x: x[0][1], reverse=False)  # TODO Sort may be optional
+                    buffer.sort(key=lambda x: x[0][2], reverse=False)  # TODO Sort may be optional
                     yield buffer[:batch_size]
                     buffer = buffer[batch_size:]
                 else:
