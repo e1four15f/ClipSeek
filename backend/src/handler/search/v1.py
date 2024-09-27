@@ -34,6 +34,9 @@ RequestText = Annotated[
     str, Form(description="Text query for search", examples=["Cat in black suit is having meeting"])
 ]
 RequestFile = Annotated[UploadFile, File(description="File to search for similar")]
+RequestID = Annotated[str, Form(description="Reference ID for the search")]
+RequestDataset = Annotated[str, Form(description="Reference's dataset for the search")]
+RequestVersion = Annotated[str, Form(description="Reference's version for the search")]
 
 
 class ContinueSearchRequest(BaseModel):
@@ -67,7 +70,7 @@ class ISearchHandler(ABC):
 
     @abstractmethod
     async def search_by_reference(
-        self, id: str, dataset: str, version: str, config: SearchConfiguration
+        self, id: RequestID, dataset: RequestDataset, version: RequestVersion, config: SearchConfiguration
     ) -> SearchResponse:
         pass
 
@@ -114,7 +117,7 @@ class SearchHandler(ISearchHandler):
             return self._try_perform_search(file_embedding, config=config)
 
     async def search_by_reference(
-        self, id: str, dataset: str, version: str, config: SearchConfiguration
+        self, id: RequestID, dataset: RequestDataset, version: RequestVersion, config: SearchConfiguration
     ) -> SearchResponse:
         document = self._storage.get_by_id(id=id, dataset=dataset, version=version)
         return self._try_perform_search(document.embedding, config=config)
