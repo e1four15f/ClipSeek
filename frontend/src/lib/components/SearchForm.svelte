@@ -19,6 +19,7 @@
   } from "flowbite-svelte";
   import { SearchOutline, CaretRightSolid } from "flowbite-svelte-icons";
   import { getModalityIcon, isAudio, isImage, isVideo } from "$lib/utils.js";
+  import { getThumbnailUrl } from "@config";
 
   const dispatch = createEventDispatcher();
 
@@ -28,9 +29,13 @@
   export let datasets = [];
   export let modalities = [];
 
-  const baseUrl = "http://localhost:8500/resources";
   $: rawReferenceUrl = reference
-    ? `${baseUrl}/thumbnail/${reference.dataset}/${reference.version}/${reference.path}?time=${reference.span[0]}`
+    ? getThumbnailUrl(
+        reference.dataset,
+        reference.version,
+        reference.path,
+        reference.span[0],
+      )
     : null;
 
   let searchTerm = "";

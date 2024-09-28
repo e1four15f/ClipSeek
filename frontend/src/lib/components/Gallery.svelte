@@ -2,11 +2,12 @@
   import { createEventDispatcher, onMount } from "svelte";
   import { Gallery } from "flowbite-svelte";
   import { MediaView } from "$lib/components";
+  import { N_RESULT_COLUMNS } from "@config";
 
   let galleryElement;
 
   const dispatch = createEventDispatcher();
-  const n_cols = 4; // TODO to config
+  const n_cols = N_RESULT_COLUMNS;
 
   export let items = [];
   $: itemsPerColumn = Array.from({ length: n_cols }, (_, i) =>

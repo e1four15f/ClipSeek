@@ -1,6 +1,7 @@
 <script>
   import { Button, Modal, P, Heading } from "flowbite-svelte";
   import { getModalityIcon, isAudio, isImage, isVideo } from "$lib/utils.js";
+  import { getThumbnailUrl, getClipUrl, getRawUrl } from "@config";
   import {
     onMount,
     afterUpdate,
@@ -11,10 +12,14 @@
   const dispatch = createEventDispatcher();
 
   export let item;
-  const baseUrl = "http://localhost:8500/resources";
-  $: thumbnailUrl = `${baseUrl}/thumbnail/${item.dataset}/${item.version}/${item.path}?time=${item.span[0]}`;
-  $: clipUrl = `${baseUrl}/clip/${item.dataset}/${item.version}/${item.path}?start=${item.span[0]}&end=${item.span[1]}`;
-  $: rawUrl = `${baseUrl}/raw/${item.dataset}/${item.version}/${item.path}`;
+  $: thumbnailUrl = getThumbnailUrl(
+    item.dataset,
+    item.version,
+    item.path,
+    item.span[0],
+  );
+  $: clipUrl = getClipUrl(item.dataset, item.version, item.path, item.span);
+  $: rawUrl = getRawUrl(item.dataset, item.version, item.path);
 
   let showModal = false;
   let videoElement;

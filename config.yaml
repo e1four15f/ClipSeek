@@ -1,0 +1,12 @@
+common:
+  CANDIDATES_PER_PAGE: 32
+  DEVELOPER_MODE: False
+
+backend:
+  MILVUS_URL: "http://localhost:19530"
+  MILVUS_DB_NAME: "MultimodalMediaSearch"
+  DEVICE: "cpu"
+
+frontend:
+  BACKEND_URL: "http://localhost:8500"
+  N_RESULT_COLUMNS: 4

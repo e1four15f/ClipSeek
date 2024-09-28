@@ -1,10 +1,12 @@
+import { backendSearchUrl } from "@config";
+
 export async function searchByText(
   text,
   selectedDatasets,
   selectedModalities,
   timeout = 10000,
 ) {
-  const url = "http://localhost:8500/api/v1/search/by_text";
+  const url = `${backendSearchUrl}/by_text`;
   const body = new URLSearchParams();
   body.append("text", text);
   body.append(
@@ -41,7 +43,7 @@ export async function searchByFile(
   selectedModalities,
   timeout = 10000,
 ) {
-  const url = "http://localhost:8500/api/v1/search/by_file";
+  const url = `${backendSearchUrl}/by_file`;
   const body = new FormData();
   body.append("file", file);
   body.append(
@@ -78,7 +80,7 @@ export async function searchByReference(
   selectedModalities,
   timeout = 10000,
 ) {
-  const url = "http://localhost:8500/api/v1/search/by_reference";
+  const url = `${backendSearchUrl}/by_reference`;
   const body = new FormData();
   body.append("id", reference.id);
   body.append("dataset", reference.dataset);
