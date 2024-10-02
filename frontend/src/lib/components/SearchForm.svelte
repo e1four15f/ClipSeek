@@ -48,7 +48,6 @@
 <form
   class="flex flex-col overflow-hidden"
   on:submit|preventDefault={(event) => {
-    window.scrollTo({ top: 0 });
     dispatch("search", {
       text,
       file,

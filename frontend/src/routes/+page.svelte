@@ -46,6 +46,7 @@
   });
 
   async function handleSearch(event) {
+    window.scrollTo({ top: 0 });
     const { text, file, reference, datasets, modalities } = event.detail;
 
     let input;
@@ -94,6 +95,7 @@
   }
 
   async function handleSimilar(event) {
+    window.scrollTo({ top: 0 });
     const { item } = event.detail;
     text = "";
     file = null;
