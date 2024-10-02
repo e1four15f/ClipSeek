@@ -21,7 +21,10 @@
   let file = null;
   let reference = null;
   let datasets = [];
-  let modalities = ["hybrid", "video", "image", "audio"];
+  let modalities = ["hybrid", "video", "image", "audio"].map((m) => ({
+    value: m,
+    checked: true,
+  }));
   let results = [];
   let sessionId = null;
 
@@ -29,12 +32,11 @@
     await fetchFormData();
     await handleSearch({
       detail: {
-        text: text,
-        selectedDatasets: [
-          { dataset: "MSRVTT", version: "train" },
-          { dataset: "MSVD", version: "all" },
-        ],
-        selectedModalities: ["video"],
+        text,
+        file,
+        reference,
+        datasets,
+        modalities,
       },
     });
     isLoaded = true;
@@ -44,8 +46,7 @@
   });
 
   async function handleSearch(event) {
-    const { text, file, reference, selectedDatasets, selectedModalities } =
-      event.detail;
+    const { text, file, reference, datasets, modalities } = event.detail;
 
     let input;
     let searchFunc;
@@ -68,8 +69,10 @@
     try {
       const response = await searchFunc(
         input,
-        selectedDatasets,
-        selectedModalities,
+        modalities.filter((m) => m.checked).map((m) => m.value),
+        datasets
+          .filter((d) => d.checked)
+          .map(({ dataset, version }) => ({ dataset, version })),
       );
       results = response.data;
       sessionId = response.session_id;
@@ -95,14 +98,24 @@
     text = "";
     file = null;
     reference = item;
+    await handleSearch({
+      detail: {
+        text,
+        file,
+        reference,
+        datasets,
+        modalities,
+      },
+    });
   }
 
   async function fetchFormData() {
     try {
       const response = await getIndexesInfo();
-      datasets = response.map((d) => ({ ...d, checked: false }));
-      modalities = modalities.map((m) => ({ value: m, checked: false }));
-      datasets.sort((a, b) => a.dataset.localeCompare(b.dataset));
+      datasets = response
+        .map((d) => ({ ...d, checked: false }))
+        .sort((a, b) => a.dataset.localeCompare(b.dataset))
+        .map((d, index) => ({ ...d, checked: index === 0 }));
     } catch (error) {
       logger.error(error);
     }

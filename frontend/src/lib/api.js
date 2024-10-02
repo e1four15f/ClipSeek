@@ -1,9 +1,11 @@
-import { backendSearchUrl } from "@config";
+import { backendUrl } from "@config";
+
+const backendSearchUrl = `${backendUrl}/api/v1/search`;
 
 export async function searchByText(
   text,
-  selectedDatasets,
-  selectedModalities,
+  modalities,
+  collections,
   timeout = 10000,
 ) {
   const url = `${backendSearchUrl}/by_text`;
@@ -12,8 +14,8 @@ export async function searchByText(
   body.append(
     "config",
     JSON.stringify({
-      modalities: selectedModalities,
-      collections: selectedDatasets,
+      modalities,
+      collections,
     }),
   );
 
@@ -39,8 +41,8 @@ export async function searchByText(
 
 export async function searchByFile(
   file,
-  selectedDatasets,
-  selectedModalities,
+  modalities,
+  collections,
   timeout = 10000,
 ) {
   const url = `${backendSearchUrl}/by_file`;
@@ -49,13 +51,12 @@ export async function searchByFile(
   body.append(
     "config",
     JSON.stringify({
-      modalities: selectedModalities,
-      collections: selectedDatasets,
+      modalities,
+      collections,
     }),
   );
 
-  console.debug("Sending request to", url, "body:", body);
-
+  console.debug("Sending request to", url, "body", body);
   const response = await fetch(url, {
     method: "POST",
     body: body,
@@ -76,8 +77,8 @@ export async function searchByFile(
 
 export async function searchByReference(
   reference,
-  selectedDatasets,
-  selectedModalities,
+  modalities,
+  collections,
   timeout = 10000,
 ) {
   const url = `${backendSearchUrl}/by_reference`;
@@ -88,13 +89,12 @@ export async function searchByReference(
   body.append(
     "config",
     JSON.stringify({
-      modalities: selectedModalities,
-      collections: selectedDatasets,
+      modalities,
+      collections,
     }),
   );
 
-  console.debug("Sending request to", url, "body:", body);
-
+  console.debug("Sending request to", url, "body", body);
   const response = await fetch(url, {
     method: "POST",
     body: body,
@@ -114,8 +114,9 @@ export async function searchByReference(
 }
 
 export async function continueSearch(sessionId, timeout = 10000) {
-  const url = "http://localhost:8500/api/v1/search/continue";
+  const url = `${backendSearchUrl}/continue`;
   const body = JSON.stringify({ session_id: sessionId });
+
   console.debug("Sending request to", url, "body", body);
   const response = await fetch(url, {
     method: "POST",
@@ -133,7 +134,8 @@ export async function continueSearch(sessionId, timeout = 10000) {
 }
 
 export async function getIndexesInfo(timeout = 10000) {
-  const url = "http://localhost:8500/indexes/info";
+  const url = `${backendUrl}/indexes/info`;
+
   console.debug("Sending request to", url);
   const response = await fetch(url, {
     method: "GET",

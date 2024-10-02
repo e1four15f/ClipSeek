@@ -40,8 +40,8 @@
 
   let searchTerm = "";
   let allChecked = false;
-  $: filteredDatasets = datasets.filter((dataset) =>
-    dataset.dataset.toLowerCase().includes(searchTerm.toLowerCase()),
+  $: filteredDatasets = datasets.filter((d) =>
+    d.dataset.toLowerCase().includes(searchTerm.toLowerCase()),
   );
 </script>
 
@@ -49,18 +49,12 @@
   class="flex flex-col overflow-hidden"
   on:submit|preventDefault={(event) => {
     window.scrollTo({ top: 0 });
-    const selectedDatasets = datasets
-      .filter((d) => d.checked)
-      .map((d) => ({ dataset: d.dataset, version: d.version }));
-    const selectedModalities = modalities
-      .filter((m) => m.checked)
-      .map((m) => m.value);
     dispatch("search", {
       text,
       file,
       reference,
-      selectedDatasets,
-      selectedModalities,
+      datasets,
+      modalities,
     });
   }}
 >
