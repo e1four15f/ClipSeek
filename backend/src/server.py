@@ -8,7 +8,7 @@ from fastapi.datastructures import Default
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import ORJSONResponse
 
-from config import TMP_DIR
+from src.config import Config
 from src.handler.info import IInfoHandler
 from src.handler.resources import IResourcesHandler
 from src.handler.search.v1 import ISearchHandler
@@ -95,8 +95,8 @@ class AppServer:
 
 @asynccontextmanager
 async def _lifespan(app: FastAPI):  # noqa
-    if not os.path.exists(TMP_DIR):
-        os.makedirs(TMP_DIR)
+    if not os.path.exists(Config.TMP_DIR):
+        os.makedirs(Config.TMP_DIR)
     yield
-    if os.path.exists(TMP_DIR):
-        shutil.rmtree(TMP_DIR)
+    if os.path.exists(Config.TMP_DIR):
+        shutil.rmtree(Config.TMP_DIR)

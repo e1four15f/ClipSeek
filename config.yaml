@@ -1,12 +1,51 @@
-common:
-  CANDIDATES_PER_PAGE: 32
-  DEVELOPER_MODE: False
+# General Settings
+DEVELOPER_MODE: false
 
-backend:
-  MILVUS_URL: "http://localhost:19530"
-  MILVUS_DB_NAME: "MultimodalMediaSearch"
-  DEVICE: "cpu"
+# Dataset Configuration
+DATASETS:
+  - data_path: "../../data/MSVD/YouTubeClips"
+    dataset: "MSVD"
+    version: "all"
+    modalities: [ "video" ]
 
-frontend:
-  BACKEND_URL: "http://localhost:8500"
-  N_RESULT_COLUMNS: 4
+  - data_path: "../../data/MSRVTT/all"
+    dataset: "MSRVTT"
+    version: "train"
+    modalities: [ "video", "audio" ]
+
+  - data_path: "../../data/MSRVTT/test"
+    dataset: "MSRVTT"
+    version: "test"
+    modalities: [ "video" ]
+
+  - data_path: "../../data/COCO/val2017"
+    dataset: "COCO"
+    version: "val2017"
+    modalities: [ "image" ]
+
+  - data_path: "../../data/COCO/test2017"
+    dataset: "COCO"
+    version: "test2017"
+    modalities: [ "image" ]
+
+# Frontend Settings
+RESULT_COLUMNS: 4
+CANDIDATES_PER_PAGE: 32
+
+# Backend Settings
+BACKEND_URL: "http://localhost:8500"
+## Milvus
+MILVUS_URL: "http://localhost:19530"
+MILVUS_DB_NAME: "MultimodalMediaSearch"
+## Model
+USE_DUMMY_MODEL: true
+CLIP_MODELS: {
+  video: "LanguageBind_Video",
+  audio: "LanguageBind_Audio",
+  image: "LanguageBind_Image"
+}
+DEVICE: "cpu"
+EMBEDDINGS_DIM: 768
+## Constants
+INDEX_PATH: "../data"
+TMP_DIR: ".tmp"
