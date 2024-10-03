@@ -51,6 +51,7 @@ CLIP_MODELS = {
 }
 EMBEDDINGS_DIM = 768
 
+
 # System
 MILVUS_URL = "http://localhost:19530"
 MILVUS_DB_NAME = "MultimodalMediaSearch"
@@ -59,6 +60,7 @@ DEVICE = "cpu"
 
 # Backend
 BACKEND_URL = "http://localhost:8500"
+TMP_DIR = ".tmp"
 
 # UI
 DEBUG = False

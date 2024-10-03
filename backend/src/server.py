@@ -1,10 +1,14 @@
 import logging
+import os
+import shutil
+from contextlib import asynccontextmanager
 
 from fastapi import APIRouter, FastAPI
 from fastapi.datastructures import Default
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import ORJSONResponse
 
+from config import TMP_DIR
 from src.handler.info import IInfoHandler
 from src.handler.resources import IResourcesHandler
 from src.handler.search.v1 import ISearchHandler
@@ -27,7 +31,7 @@ class AppServer:
 
     def create_application(self) -> FastAPI:
         logger.info("Creating application...")
-        app = FastAPI()
+        app = FastAPI(title="ClipSeek Backend", lifespan=_lifespan)
         app.add_middleware(
             CORSMiddleware,  # noqa
             allow_origins=self._ORIGINS,
@@ -87,3 +91,12 @@ class AppServer:
         app.include_router(router)
         logger.info("Starting app...")
         return app
+
+
+@asynccontextmanager
+async def _lifespan(app: FastAPI):  # noqa
+    if not os.path.exists(TMP_DIR):
+        os.makedirs(TMP_DIR)
+    yield
+    if os.path.exists(TMP_DIR):
+        shutil.rmtree(TMP_DIR)

@@ -10,6 +10,7 @@ from fastapi import HTTPException, Path, Query
 from starlette.requests import Request
 from starlette.responses import FileResponse, Response, StreamingResponse
 
+from config import TMP_DIR
 from src.aliases import Collection, Dataset, Version
 from src.utils.streaming import build_streaming_response
 
@@ -53,7 +54,7 @@ class ResourcesHandler(IResourcesHandler):
                 content_type=content_type,
             )
 
-        tmp_mp4_path = f".tmp/{hash(('raw', full_path))}.mp4"
+        tmp_mp4_path = f"{TMP_DIR}/{hash(('raw', full_path))}.mp4"
         if os.path.exists(tmp_mp4_path):
             file_size = os.stat(tmp_mp4_path).st_size
             return build_streaming_response(
@@ -162,7 +163,7 @@ class ResourcesHandler(IResourcesHandler):
         if not os.path.exists(full_path):
             raise HTTPException(status_code=404, detail="File not found")
 
-        tmp_file_path = f".tmp/{hash(('clip', full_path))}.mp4"
+        tmp_file_path = f"{TMP_DIR}/{hash(('clip', full_path))}.mp4"
         if os.path.exists(tmp_file_path):
             file_size = os.stat(tmp_file_path).st_size
             return build_streaming_response(
