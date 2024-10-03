@@ -22,6 +22,7 @@
   $: rawUrl = getRawUrl(item.dataset, item.version, item.path);
 
   let showModal = false;
+  let thumbnailLoaded = false;
   let videoElement;
   let Plyr;
   let player;
@@ -69,25 +70,34 @@
   on:click={() => (showModal = true)}
   aria-label="Open media"
 >
-  <div
-    class="absolute left-1 top-1 z-10 flex rounded bg-black bg-opacity-70 px-2 py-1 text-xs text-white"
-  >
-    <svelte:component
-      this={getModalityIcon(item.modality)}
-      class="mr-1 h-4 w-4 text-white"
-    />
-    {item.score.toFixed(4)}
-  </div>
+  {#if thumbnailLoaded}
+    <div
+      class="absolute left-1 top-1 z-10 flex rounded bg-black bg-opacity-70 px-2 py-1 text-xs text-white"
+    >
+      <svelte:component
+        this={getModalityIcon(item.modality)}
+        class="mr-1 h-4 w-4 text-white"
+      />
+      {item.score.toFixed(4)}
+    </div>
+  {/if}
   <div
     class="h-auto w-full rounded object-cover transition duration-300 ease-in-out hover:outline hover:outline-4 hover:outline-offset-[-2px] hover:outline-red-500"
   >
-    <img src={thumbnailUrl} als={thumbnailUrl} class="w-full rounded" />
+    <img
+      src={thumbnailUrl}
+      alt={thumbnailUrl}
+      class="w-full rounded"
+      on:load={() => (thumbnailLoaded = true)}
+    />
   </div>
-  <div
-    class="absolute bottom-1 right-1 z-10 flex rounded bg-black bg-opacity-70 px-2 py-1 text-xs text-white"
-  >
-    {item.dataset}
-  </div>
+  {#if thumbnailLoaded}
+    <div
+      class="absolute bottom-1 right-1 z-10 flex rounded bg-black bg-opacity-70 px-2 py-1 text-xs text-white"
+    >
+      {item.dataset}
+    </div>
+  {/if}
 </button>
 
 <Modal bind:open={showModal} size="xl" outsideclose>
@@ -97,6 +107,7 @@
         class="flex max-h-full w-3/4 items-center justify-center overflow-hidden rounded bg-black"
       >
         {#if isVideo(item.path)}
+          <!-- svelte-ignore a11y-media-has-caption -->
           <video bind:this={videoElement}>
             <source src={clipUrl} type="video/mp4" />
             Your browser does not support the video tag.

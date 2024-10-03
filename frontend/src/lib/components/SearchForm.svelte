@@ -134,6 +134,7 @@
             {#if isVideo(file.name) || isAudio(file.name) || isImage(file.name)}
               {#await Promise.resolve(URL.createObjectURL(file)) then fileUrl}
                 {#if isVideo(file.name)}
+                  <!-- svelte-ignore a11y-media-has-caption -->
                   <video src={fileUrl} class="mr-2 h-16 w-16 object-cover" />
                 {:else if isAudio(file.name)}
                   <audio src={fileUrl} class="mr-2 h-16 w-16 object-cover" />
