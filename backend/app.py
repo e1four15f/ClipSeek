@@ -13,9 +13,12 @@ from src.server import AppServer
 transformers.logging.set_verbosity_info()
 logging.basicConfig(level=logging.INFO)
 
+logger = logging.getLogger(__name__)
+
 
 def get_app() -> FastAPI:
     Config.load(config_file="../config.yaml")
+    logger.info("Config: %s", Config.dump())
 
     embedder = build_embedder()
     searcher = build_searcher()

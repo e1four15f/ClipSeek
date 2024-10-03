@@ -1,4 +1,4 @@
-import { backendUrl } from "@config";
+import { backendUrl, CANDIDATES_PER_PAGE, REQUESTS_TIMEOUT } from "@config";
 
 const backendSearchUrl = `${backendUrl}/api/v1/search`;
 
@@ -6,7 +6,8 @@ export async function searchByText(
   text,
   modalities,
   collections,
-  timeout = 10000,
+  n_candidates = CANDIDATES_PER_PAGE,
+  timeout = REQUESTS_TIMEOUT,
 ) {
   const url = `${backendSearchUrl}/by_text`;
   const body = new URLSearchParams();
@@ -14,6 +15,7 @@ export async function searchByText(
   body.append(
     "config",
     JSON.stringify({
+      n_candidates,
       modalities,
       collections,
     }),
@@ -43,7 +45,8 @@ export async function searchByFile(
   file,
   modalities,
   collections,
-  timeout = 10000,
+  n_candidates = CANDIDATES_PER_PAGE,
+  timeout = REQUESTS_TIMEOUT,
 ) {
   const url = `${backendSearchUrl}/by_file`;
   const body = new FormData();
@@ -51,6 +54,7 @@ export async function searchByFile(
   body.append(
     "config",
     JSON.stringify({
+      n_candidates,
       modalities,
       collections,
     }),
@@ -79,7 +83,8 @@ export async function searchByReference(
   reference,
   modalities,
   collections,
-  timeout = 10000,
+  n_candidates = CANDIDATES_PER_PAGE,
+  timeout = REQUESTS_TIMEOUT,
 ) {
   const url = `${backendSearchUrl}/by_reference`;
   const body = new FormData();
@@ -89,6 +94,7 @@ export async function searchByReference(
   body.append(
     "config",
     JSON.stringify({
+      n_candidates,
       modalities,
       collections,
     }),
@@ -113,7 +119,7 @@ export async function searchByReference(
   return data;
 }
 
-export async function continueSearch(sessionId, timeout = 10000) {
+export async function continueSearch(sessionId, timeout = REQUESTS_TIMEOUT) {
   const url = `${backendSearchUrl}/continue`;
   const body = JSON.stringify({ session_id: sessionId });
 
@@ -133,7 +139,7 @@ export async function continueSearch(sessionId, timeout = 10000) {
   return data;
 }
 
-export async function getIndexesInfo(timeout = 10000) {
+export async function getIndexesInfo(timeout = REQUESTS_TIMEOUT) {
   const url = `${backendUrl}/indexes/info`;
 
   console.debug("Sending request to", url);

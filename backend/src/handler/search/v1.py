@@ -13,6 +13,7 @@ from src.entity.storage import IStorage
 
 
 class SearchConfiguration(BaseModel):
+    n_candidates: int = Field(..., description="Number of results to retrieve", examples=[32])
     modalities: list[str] = Field(..., description="List of modalities to use for searching", examples=[["video"]])
     collections: list[dict[str, str]] = Field(
         ...,
@@ -128,7 +129,7 @@ class SearchHandler(ISearchHandler):
                 embedding=embedding,
                 collections=[(collection["dataset"], collection["version"]) for collection in config.collections],
                 modalities=config.modalities,
-                batch_size=self._candidates_per_page,
+                batch_size=config.n_candidates,
             )
         except StopIteration as e:
             raise HTTPException(status_code=404, detail="No results found.") from e

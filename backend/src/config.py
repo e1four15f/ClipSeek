@@ -1,3 +1,4 @@
+import json
 import os
 from typing import TypedDict
 
@@ -21,7 +22,7 @@ class Config:
     MILVUS_URL: str
     MILVUS_DB_NAME: str
     BACKEND_URL: str
-    N_RESULT_COLUMNS: int
+    RESULT_COLUMNS: int
     CLIP_MODELS: dict[str, str]
     EMBEDDINGS_DIM: int
     INDEX_PATH: str
@@ -36,3 +37,8 @@ class Config:
             if isinstance(value, str):
                 value = os.getenv(key, value)  # noqa: PLW2901
             setattr(cls, key, value)
+
+    @classmethod
+    def dump(cls) -> str:
+        fields = {key: getattr(cls, key) for key in cls.__annotations__}
+        return json.dumps(fields, indent=4)
