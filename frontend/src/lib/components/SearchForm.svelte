@@ -166,6 +166,11 @@
               <p class="w-32 truncate text-xs text-gray-500">
                 {reference.path}
               </p>
+              {#if reference.span[0] || reference.span[1]}
+                <p class="w-32 truncate text-xs text-gray-500">
+                  from {reference.span[0]}s to {reference.span[1]}s
+                </p>
+              {/if}
             </div>
           {/if}
         </div>
