@@ -11,15 +11,25 @@
 
   const dispatch = createEventDispatcher();
 
-  export let item;
-  $: thumbnailUrl = getThumbnailUrl(
-    item.dataset,
-    item.version,
-    item.path,
-    item.span[0],
+  export let items;
+  $: firstItem = items[0];
+  $: thumbnailUrls = items.map((item) =>
+    getThumbnailUrl(item.dataset, item.version, item.path, item.span[0]),
   );
-  $: clipUrl = getClipUrl(item.dataset, item.version, item.path, item.span);
-  $: rawUrl = getRawUrl(item.dataset, item.version, item.path);
+
+  $: selectedItemIndex = 0;
+  $: currentItem = items[selectedItemIndex];
+  $: clipUrl = getClipUrl(
+    currentItem.dataset,
+    currentItem.version,
+    currentItem.path,
+    currentItem.span,
+  );
+  $: rawUrl = getRawUrl(
+    currentItem.dataset,
+    currentItem.version,
+    currentItem.path,
+  );
 
   let showModal = false;
   let thumbnailLoaded = false;
@@ -33,7 +43,7 @@
   });
 
   afterUpdate(() => {
-    if (showModal && isVideo(item.path)) {
+    if (showModal && isVideo(currentItem.path)) {
       player = new Plyr(videoElement, {
         hideControls: false,
         controls: [
@@ -75,18 +85,18 @@
       class="absolute left-1 top-1 z-10 flex rounded bg-black bg-opacity-70 px-2 py-1 text-xs text-white"
     >
       <svelte:component
-        this={getModalityIcon(item.modality)}
+        this={getModalityIcon(firstItem.modality)}
         class="mr-1 h-4 w-4 text-white"
       />
-      {item.score.toFixed(4)}
+      {firstItem.score.toFixed(4)}
     </div>
   {/if}
   <div
     class="h-auto w-full rounded object-cover transition duration-300 ease-in-out hover:outline hover:outline-4 hover:outline-offset-[-2px] hover:outline-red-500"
   >
     <img
-      src={thumbnailUrl}
-      alt={thumbnailUrl}
+      src={thumbnailUrls[0]}
+      alt={thumbnailUrls[0]}
       class="w-full rounded"
       on:load={() => (thumbnailLoaded = true)}
     />
@@ -95,7 +105,7 @@
     <div
       class="absolute bottom-1 right-1 z-10 flex rounded bg-black bg-opacity-70 px-2 py-1 text-xs text-white"
     >
-      {item.dataset}
+      {firstItem.dataset}
     </div>
   {/if}
 </button>
@@ -106,65 +116,83 @@
       <div
         class="flex max-h-full w-3/4 items-center justify-center overflow-hidden rounded bg-black"
       >
-        {#if isVideo(item.path)}
+        {#if isVideo(currentItem.path)}
           <!-- svelte-ignore a11y-media-has-caption -->
           <video bind:this={videoElement}>
             <source src={clipUrl} type="video/mp4" />
             Your browser does not support the video tag.
           </video>
-        {:else if isAudio(item.path)}
+        {:else if isAudio(currentItem.path)}
           <audio src={rawUrl} autoplay controls />
-        {:else if isImage(item.path)}
+        {:else if isImage(currentItem.path)}
           <img
             src={rawUrl}
-            alt={item.src}
+            alt={currentItem.src}
             class="h-full w-full object-contain"
           />
         {:else}
-          Unknown media format for file: {item.path}
+          Unknown media format for file: {currentItem.path}
         {/if}
       </div>
 
       <div class="flex w-1/4 flex-col justify-between pl-4">
-        <div class="info-box">
+        <div>
           <Heading tag="h4" class="mb-2">Information</Heading>
-          <P><strong>Dataset:</strong> {item.dataset}</P>
-          <P><strong>Version:</strong> {item.version}</P>
-          <P><strong>Filename:</strong> {item.path.split("/").pop()}</P>
-          <P><strong>Path:</strong> {item.path}</P>
-          <P><strong>Score:</strong> {item.score.toFixed(4)}</P>
+          <P><strong>Dataset:</strong> {currentItem.dataset}</P>
+          <P><strong>Version:</strong> {currentItem.version}</P>
+          <P><strong>Filename:</strong> {currentItem.path.split("/").pop()}</P>
+          <P><strong>Path:</strong> {currentItem.path}</P>
+          <P><strong>Score:</strong> {currentItem.score.toFixed(4)}</P>
           <P class="flex items-center">
             <strong>Modality:</strong>
             <svelte:component
-              this={getModalityIcon(item.modality)}
+              this={getModalityIcon(currentItem.modality)}
               class="mx-1 mt-0.5 h-4 w-4 text-black"
             />
-            {item.modality}
+            {currentItem.modality}
           </P>
-          {#if isVideo(item.path)}
+          {#if isVideo(currentItem.path)}
             <P
               ><strong>Span:</strong>
-              {item.span[0]} - {item.span[1]} ({item.span[1] - item.span[0]} seconds)</P
+              {currentItem.span[0]} - {currentItem.span[1]} ({currentItem
+                .span[1] - currentItem.span[0]} seconds)</P
             >
           {/if}
         </div>
 
-        <div class="mt-auto">
+        {#if items.length > 2}
+          <Heading tag="h5" class="mt-4">More clips from this video</Heading>
+          <div class="my-2 max-h-full flex-grow overflow-y-auto">
+            <div class="pr-2">
+              {#each items.slice(1) as item, index}
+                <img
+                  src={thumbnailUrls[index]}
+                  alt={thumbnailUrls[index]}
+                  class="mb-2 w-full rounded"
+                />
+              {/each}
+            </div>
+          </div>
+        {/if}
+
+        <div class="mt-auto flex w-full space-x-2">
           <Button
             href={rawUrl}
             target="_blank"
             rel="noopener noreferrer"
-            class="mb-4 w-full"
+            class="w-1/3"
           >
-            Source Link
+            Source
           </Button>
           <Button
-            class="w-full"
+            class="w-2/3"
             on:click={(event) => {
               showModal = false;
-              dispatch("similar", { item });
-            }}>Find Similar</Button
+              dispatch("similar", { item: currentItem });
+            }}
           >
+            Find Similar
+          </Button>
         </div>
       </div>
     </div>
@@ -177,5 +205,9 @@
     width: 100%;
     height: 100%;
     --plyr-color-main: rgb(235 79 39);
+  }
+
+  * {
+    scrollbar-width: thin;
   }
 </style>

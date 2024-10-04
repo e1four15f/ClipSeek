@@ -75,7 +75,13 @@
           .filter((d) => d.checked)
           .map(({ dataset, version }) => ({ dataset, version })),
       );
-      results = response.data;
+      results = Object.values(
+        response.data.reduce((acc, item) => {
+          const key = `${item.dataset}-${item.version}-${item.path}`;
+          (acc[key] = acc[key] || []).push(item);
+          return acc;
+        }, {}),
+      );
       sessionId = response.session_id;
       logger.info(`Search: ${message}`);
     } catch (error) {
@@ -87,7 +93,14 @@
   async function handleContinue() {
     try {
       const response = await continueSearch(sessionId);
-      results = [...results, ...response.data];
+      const newResults = Object.values(
+        response.data.reduce((acc, item) => {
+          const key = `${item.dataset}-${item.version}-${item.path}`;
+          (acc[key] = acc[key] || []).push(item);
+          return acc;
+        }, {}),
+      );
+      results = [...results, ...newResults];
       // logger.info("Continue");
     } catch (error) {
       logger.error(error);

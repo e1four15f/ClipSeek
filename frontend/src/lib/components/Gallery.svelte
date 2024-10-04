@@ -40,9 +40,9 @@
   <Gallery class="grid grid-cols-{n_cols} gap-4">
     {#each itemsPerColumn as column}
       <div class="flex flex-col gap-4">
-        {#each column as item}
+        {#each column as items}
           <MediaView
-            {item}
+            {items}
             on:similar={(event) =>
               dispatch("similar", { item: event.detail.item })}
           />
