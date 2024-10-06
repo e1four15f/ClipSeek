@@ -2,23 +2,16 @@
   import { Button, Modal, P, Heading } from "flowbite-svelte";
   import { getModalityIcon, isAudio, isImage, isVideo } from "$lib/utils.js";
   import { getThumbnailUrl, getClipUrl, getRawUrl } from "@config";
-  import {
-    onMount,
-    afterUpdate,
-    onDestroy,
-    createEventDispatcher,
-  } from "svelte";
+  import { onMount, afterUpdate, createEventDispatcher } from "svelte";
 
   const dispatch = createEventDispatcher();
 
   export let items;
   $: firstItem = items[0];
+  $: currentItem = firstItem;
   $: thumbnailUrls = items.map((item) =>
     getThumbnailUrl(item.dataset, item.version, item.path, item.span[0]),
   );
-
-  $: selectedItemIndex = 0;
-  $: currentItem = items[selectedItemIndex];
   $: clipUrl = getClipUrl(
     currentItem.dataset,
     currentItem.version,
@@ -43,7 +36,7 @@
   });
 
   afterUpdate(() => {
-    if (showModal && isVideo(currentItem.path)) {
+    if (!player && showModal && isVideo(currentItem.path)) {
       player = new Plyr(videoElement, {
         hideControls: false,
         controls: [
@@ -58,9 +51,6 @@
         autoplay: true,
         loop: { active: true },
       });
-    }
-
-    if (showModal && player) {
       player.source = {
         type: "video",
         sources: [{ src: clipUrl, type: "video/mp4" }],
@@ -68,11 +58,14 @@
     }
   });
 
-  onDestroy(() => {
+  $: {
     if (player) {
-      player.destroy();
+      player.source = {
+        type: "video",
+        sources: [{ src: clipUrl, type: "video/mp4" }],
+      };
     }
-  });
+  }
 </script>
 
 <button
@@ -110,7 +103,18 @@
   {/if}
 </button>
 
-<Modal bind:open={showModal} size="xl" outsideclose>
+<Modal
+  bind:open={showModal}
+  size="xl"
+  outsideclose
+  on:close={() => {
+    showModal = false;
+    if (player) {
+      player.destroy();
+      player = null;
+    }
+  }}
+>
   <div class="h-[80vh] w-full">
     <div class="flex h-[98%]">
       <div
@@ -119,7 +123,6 @@
         {#if isVideo(currentItem.path)}
           <!-- svelte-ignore a11y-media-has-caption -->
           <video bind:this={videoElement}>
-            <source src={clipUrl} type="video/mp4" />
             Your browser does not support the video tag.
           </video>
         {:else if isAudio(currentItem.path)}
@@ -163,15 +166,32 @@
         {#if items.length > 2}
           <Heading tag="h5" class="mt-4">More clips from this video</Heading>
           <div class="my-2 max-h-full flex-grow overflow-y-auto">
-            <div class="pr-2">
-              {#each items.slice(1) as item, index}
-                <img
-                  src={thumbnailUrls[index]}
-                  alt={thumbnailUrls[index]}
-                  class="mb-2 w-full rounded"
-                />
-              {/each}
-            </div>
+            {#each items as item, index}
+              <div class="relative p-1 pr-4">
+                <!-- svelte-ignore a11y-click-events-have-key-events -->
+                <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
+                {#if item === currentItem}
+                  <img
+                    src={thumbnailUrls[index]}
+                    alt={thumbnailUrls[index]}
+                    class="mb-2 w-full cursor-pointer rounded outline outline-4 outline-offset-[-2px] outline-red-500"
+                    on:click={() => (currentItem = item)}
+                  />
+                {:else}
+                  <img
+                    src={thumbnailUrls[index]}
+                    alt={thumbnailUrls[index]}
+                    class="mb-2 w-full cursor-pointer rounded"
+                    on:click={() => (currentItem = item)}
+                  />
+                {/if}
+                <div
+                  class="absolute right-5 top-2 z-10 flex rounded bg-black bg-opacity-70 px-2 text-xs text-white"
+                >
+                  {item.span[0]} - {item.span[1]}
+                </div>
+              </div>
+            {/each}
           </div>
         {/if}
 
