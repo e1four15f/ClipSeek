@@ -60,6 +60,7 @@
   <Label for="query" class="mb-2">Search by Text or File</Label>
   <div class="relative mx-0.5">
     <Textarea
+      id="query"
       name="query"
       placeholder="Your text"
       bind:value={text}
