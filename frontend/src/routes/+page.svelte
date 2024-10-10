@@ -16,6 +16,8 @@
   let logger;
   let isLoaded = false;
   let isScrolled = false;
+  let isSearching = false;
+  let searchTime = 0;
 
   let text = "Cat in black suit is having meeting";
   let file = null;
@@ -46,6 +48,11 @@
   });
 
   async function handleSearch(event) {
+    isSearching = true;
+    searchTime = 0;
+    const timer = setInterval(() => {
+      searchTime += 1;
+    }, 1);
     window.scrollTo({ top: 0 });
     const { text, file, reference, datasets, modalities } = event.detail;
 
@@ -83,10 +90,13 @@
         }, {}),
       );
       sessionId = response.session_id;
-      logger.info(`Search: ${message}`);
+      logger.info(`Search done in ${searchTime} ms\n${message}`);
     } catch (error) {
       results = [];
       logger.error(error);
+    } finally {
+      isSearching = false;
+      clearInterval(timer);
     }
   }
 
@@ -108,7 +118,6 @@
   }
 
   async function handleSimilar(event) {
-    window.scrollTo({ top: 0 });
     const { item } = event.detail;
     text = "";
     file = null;
@@ -134,6 +143,13 @@
     } catch (error) {
       logger.error(error);
     }
+  }
+
+  function formatTime(milliseconds) {
+    const minutes = Math.floor(milliseconds / 60000);
+    const seconds = Math.floor((milliseconds % 60000) / 1000);
+    const ms = Math.floor((milliseconds % 1000) / 10);
+    return `${minutes}:${seconds < 10 ? "0" : ""}${seconds}:${ms < 10 ? "0" : ""}${ms}`;
   }
 </script>
 
@@ -161,11 +177,19 @@
       />
     </div>
     <div class="ml-[25%] w-3/4 px-10 py-3">
-      <Gallery
-        bind:items={results}
-        on:continue={handleContinue}
-        on:similar={handleSimilar}
-      />
+      {#if isSearching}
+        <div class="flex h-full flex-col items-center justify-center">
+          <Pulse size="60" color="#FF3E00" unit="px" duration="1s" />
+          <P class="mt-4">Searching</P>
+          <P class="font-mono">{formatTime(searchTime)}</P>
+        </div>
+      {:else}
+        <Gallery
+          bind:items={results}
+          on:continue={handleContinue}
+          on:similar={handleSimilar}
+        />
+      {/if}
     </div>
   </div>
   {#if isScrolled}
