@@ -31,7 +31,7 @@ DATASETS:
 # Frontend Settings
 RESULT_COLUMNS: 4
 CANDIDATES_PER_PAGE: 32
-REQUESTS_TIMEOUT: 10000
+REQUESTS_TIMEOUT: 60000  # 60 seconds
 
 # Backend Settings
 BACKEND_URL: "http://localhost:8500"
