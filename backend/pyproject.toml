@@ -16,12 +16,9 @@ priority = "explicit"
 
 [tool.poetry.dependencies]
 python = "^3.9.8"
-streamlit = "^1.33.0"
 faiss-cpu = "^1.8.0"
 pymilvus = "~2.4"  # keep synchronized with actual Milvus version in docker-compose.yml
 fastapi = "^0.111.0"
-moviepy = "^1.0.3"
-ffmpeg-python = "^0.2.0"
 languagebind = {path = "../LanguageBind"}
 
 [tool.poetry.group.dev.dependencies]
