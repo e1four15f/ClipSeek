@@ -69,7 +69,7 @@
 </script>
 
 <button
-  class="relative w-full cursor-pointer"
+  class="group relative w-full cursor-pointer"
   on:click={() => (showModal = true)}
   aria-label="Open media"
 >
@@ -84,6 +84,7 @@
       {firstItem.score.toFixed(4)}
     </div>
   {/if}
+
   <div
     class="h-auto w-full rounded object-cover transition duration-300 ease-in-out hover:outline hover:outline-4 hover:outline-offset-[-2px] hover:outline-red-500"
   >
@@ -94,7 +95,13 @@
       on:load={() => (thumbnailLoaded = true)}
     />
   </div>
+
   {#if thumbnailLoaded}
+    <div
+      class="absolute bottom-1 left-1 z-10 w-32 transform rounded bg-black bg-opacity-70 px-2 py-1 text-xs text-white opacity-0 transition-opacity duration-300 group-hover:opacity-100 group-hover:delay-1000"
+    >
+      {currentItem.path.split("/").pop()}
+    </div>
     <div
       class="absolute bottom-1 right-1 z-10 flex rounded bg-black bg-opacity-70 px-2 py-1 text-xs text-white"
     >
