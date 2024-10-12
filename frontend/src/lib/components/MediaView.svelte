@@ -26,6 +26,7 @@
 
   let showModal = false;
   let thumbnailLoaded = false;
+  let thumbnailBroken = false;
   let videoElement;
   let Plyr;
   let player;
@@ -73,7 +74,7 @@
   on:click={() => (showModal = true)}
   aria-label="Open media"
 >
-  {#if thumbnailLoaded}
+  {#if thumbnailLoaded || thumbnailBroken}
     <div
       class="absolute left-1 top-1 z-10 flex rounded bg-black bg-opacity-70 px-2 py-1 text-xs text-white"
     >
@@ -88,15 +89,25 @@
   <div
     class="h-auto w-full rounded object-cover transition duration-300 ease-in-out hover:outline hover:outline-4 hover:outline-offset-[-2px] hover:outline-red-500"
   >
-    <img
-      src={thumbnailUrls[0]}
-      alt={thumbnailUrls[0]}
-      class="w-full rounded"
-      on:load={() => (thumbnailLoaded = true)}
-    />
+    {#if !thumbnailBroken}
+      <img
+        src={thumbnailUrls[0]}
+        alt={thumbnailUrls[0]}
+        class="w-full rounded"
+        on:load={() => (thumbnailLoaded = true)}
+        on:error={() => (thumbnailBroken = true)}
+      />
+    {:else}
+      <div class="flex h-32 w-full items-center justify-center bg-gray-200">
+        <div class="text-center">
+          <p>Failed to load the thumbnail</p>
+          <p>{currentItem.path.split("/").pop()}</p>
+        </div>
+      </div>
+    {/if}
   </div>
 
-  {#if thumbnailLoaded}
+  {#if thumbnailLoaded || thumbnailBroken}
     <div
       class="absolute bottom-1 left-1 z-10 w-32 transform rounded bg-black bg-opacity-70 px-2 py-1 text-xs text-white opacity-0 transition-opacity duration-300 group-hover:opacity-100 group-hover:delay-1000"
     >
