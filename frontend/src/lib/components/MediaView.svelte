@@ -159,10 +159,16 @@
       <div class="flex w-1/4 flex-col justify-between pl-4">
         <div>
           <Heading tag="h4" class="mb-2">Information</Heading>
-          <P><strong>Dataset:</strong> {currentItem.dataset}</P>
-          <P><strong>Version:</strong> {currentItem.version}</P>
-          <P><strong>Filename:</strong> {currentItem.path.split("/").pop()}</P>
-          <P><strong>Path:</strong> {currentItem.path}</P>
+          <P class="break-words"
+            ><strong>Dataset:</strong> {currentItem.dataset}</P
+          >
+          <P class="break-words"
+            ><strong>Version:</strong> {currentItem.version}</P
+          >
+          <P class="break-words"
+            ><strong>Filename:</strong> {currentItem.path.split("/").pop()}</P
+          >
+          <P class="break-words"><strong>Path:</strong> {currentItem.path}</P>
           <P><strong>Score:</strong> {currentItem.score.toFixed(4)}</P>
           <P class="flex items-center">
             <strong>Modality:</strong>
