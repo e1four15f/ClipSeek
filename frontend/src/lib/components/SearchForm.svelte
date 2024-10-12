@@ -121,6 +121,7 @@
         if (file != null) {
           text = "";
           reference = null;
+          event.target.value = "";
         }
       }}
       on:dragover={(event) => {
