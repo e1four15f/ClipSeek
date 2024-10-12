@@ -42,6 +42,16 @@
 
   onMount(() => {
     window.addEventListener("scroll", handleScroll);
+
+    const interval = setInterval(() => {
+      if (!isLoading) {
+        const IsScrolled = handleScroll();
+        if (!IsScrolled) {
+          clearInterval(interval);
+        }
+      }
+    }, 1000);
+
     return () => window.removeEventListener("scroll", handleScroll);
   });
 </script>
