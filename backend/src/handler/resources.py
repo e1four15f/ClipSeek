@@ -41,12 +41,7 @@ class ResourcesHandler(IResourcesHandler):
         file_path: str = Path(..., description="The path of the file within the dataset"),
     ) -> Response:
         content_type = "video/mp4"
-        try:
-            full_path = os.path.join(self._dataset_paths[Collection(dataset=dataset, version=version)], file_path)
-        except KeyError as e:
-            raise HTTPException(status_code=404, detail=f"{e.args[0]} not found.") from e
-        if not os.path.exists(full_path):
-            raise HTTPException(status_code=404, detail="File not found")
+        full_path = self._get_full_path(file_path, dataset, version)
 
         if full_path.endswith(".mp4"):  # TODO: Just mp4? maybe other formats also work?
             file_size = os.stat(full_path).st_size
@@ -107,12 +102,7 @@ class ResourcesHandler(IResourcesHandler):
         file_path: str = Path(..., description="The path of the file within the dataset"),
         time: Optional[int] = Query(None, description="Time (in seconds) to extract the thumbnail from"),
     ) -> Response:
-        try:
-            full_path = os.path.join(self._dataset_paths[Collection(dataset=dataset, version=version)], file_path)
-        except KeyError as e:
-            raise HTTPException(status_code=404, detail=f"{e.args[0]} not found.") from e
-        if not os.path.exists(full_path):
-            raise HTTPException(status_code=404, detail="File not found")
+        full_path = self._get_full_path(file_path, dataset, version)
 
         mime_type, _ = mimetypes.guess_type(full_path)
         if mime_type and mime_type.startswith("video"):
@@ -163,13 +153,7 @@ class ResourcesHandler(IResourcesHandler):
         end: int = Query(..., description="Clip end time in seconds"),
     ) -> Response:
         content_type = "video/mp4"
-        try:
-            full_path = os.path.join(self._dataset_paths[Collection(dataset=dataset, version=version)], file_path)
-        except KeyError as e:
-            raise HTTPException(status_code=404, detail=f"{e.args[0]} not found.") from e
-
-        if not os.path.exists(full_path):
-            raise HTTPException(status_code=404, detail="File not found")
+        full_path = self._get_full_path(file_path, dataset, version)
 
         tmp_file_path = f"{Config.TMP_DIR}/{hash(('clip', full_path))}.mp4"
         if os.path.exists(tmp_file_path):
@@ -207,6 +191,15 @@ class ResourcesHandler(IResourcesHandler):
             )
         except Exception as e:
             raise HTTPException(status_code=500, detail=f"Error processing video: {str(e)}") from e
+
+    def _get_full_path(self, file_path: str, dataset: str, version: str) -> str:
+        try:
+            full_path = os.path.join(self._dataset_paths[Collection(dataset=dataset, version=version)], file_path)
+        except KeyError as e:
+            raise HTTPException(status_code=404, detail=f"{e.args[0]} not found.") from e
+        if not os.path.exists(full_path):
+            raise HTTPException(status_code=404, detail="File not found")
+        return full_path
 
 
 def file_cleanup(file_path: str) -> None:
