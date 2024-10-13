@@ -4,8 +4,8 @@ from more_itertools import chunked
 from pymilvus import Collection, CollectionSchema, DataType, FieldSchema, connections
 from pymilvus.orm import db, utility
 
-from src.aliases import Label
 from src.entity.embedder import Modality
+from src.types import Label
 
 # TODO not utils please? Move to utils/retriever?
 

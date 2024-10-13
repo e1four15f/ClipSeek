@@ -1,15 +1,15 @@
 import uuid
 from collections.abc import Generator, Iterator
 
-from src.aliases import Candidate, CandidateWithCollection, Collection
 from src.entity.embedder import Modality
 from src.entity.retriever.retriever import ISearchIteratorFactory
+from src.types import Candidate, CandidateWithCollection, Collection
 
 
 class BatchSearcher:
     def __init__(self, iterator_factories: dict[Collection, ISearchIteratorFactory]):
         self._iterator_factories = iterator_factories
-        self._sessions = {}  # TODO CACHE
+        self._sessions = {}  # TODO TTL CACHE because it increates over time?
 
     def search(
         self,
@@ -51,11 +51,21 @@ class BatchSearcher:
                         candidates = next(iterator)
                         if candidates:
                             for candidate in candidates:
-                                buffer.append((candidate, collection))
+                                buffer.append(
+                                    CandidateWithCollection(
+                                        id=candidate.id,
+                                        path=candidate.path,
+                                        score=candidate.score,
+                                        modality=candidate.modality,
+                                        span=candidate.span,
+                                        dataset=collection.dataset,
+                                        version=collection.version,
+                                    )
+                                )
                     except StopIteration:
                         del iterators[collection]
                 if buffer:
-                    buffer.sort(key=lambda x: x[0][2], reverse=False)  # TODO Sort may be optional
+                    buffer.sort(key=lambda x: x.score, reverse=False)
                     yield buffer[:batch_size]
                     buffer = buffer[batch_size:]
                 else:

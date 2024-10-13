@@ -9,6 +9,7 @@ from src.handler.info import InfoHandler
 from src.handler.resources import ResourcesHandler
 from src.handler.search.v1 import SearchHandler
 from src.server import AppServer
+from src.types import Collection
 
 transformers.logging.set_verbosity_info()
 logging.basicConfig(level=logging.INFO)
@@ -33,7 +34,9 @@ def get_app() -> FastAPI:
         ),
         info_handler=InfoHandler(),
         resources_handler=ResourcesHandler(
-            dataset_paths={(d["dataset"], d["version"]): d["data_path"] for d in Config.DATASETS}
+            dataset_paths={
+                Collection(dataset=d["dataset"], version=d["version"]): d["data_path"] for d in Config.DATASETS
+            }
         ),
     ).create_application()
 

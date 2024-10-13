@@ -5,9 +5,9 @@ import faiss
 import numpy as np
 import torch
 
-from src.aliases import Candidate, Label
 from src.entity.embedder import Modality
 from src.entity.retriever.utils import build_faiss_index, build_milvus_collection
+from src.types import Candidate, Label
 
 
 class ISearchIteratorFactory(ABC):
@@ -73,7 +73,16 @@ class MilvusSearchIteratorFactory(ISearchIteratorFactory):
                     hits = search_iterator.next()
                     if not hits:
                         break
-                    yield [(hit.id, hit.path, 1 - hit.distance, hit.modality, (hit.start, hit.end)) for hit in hits]
+                    yield [
+                        Candidate(
+                            id=hit.id,
+                            path=hit.path,
+                            score=1 - hit.distance,
+                            modality=Modality(hit.modality),
+                            span=(hit.start, hit.end),
+                        )
+                        for hit in hits
+                    ]
             finally:
                 search_iterator.close()
 

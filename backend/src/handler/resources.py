@@ -10,22 +10,22 @@ from fastapi import HTTPException, Path, Query
 from starlette.requests import Request
 from starlette.responses import FileResponse, Response, StreamingResponse
 
-from src.aliases import Collection, Dataset, Version
 from src.config import Config
+from src.types import Collection
 from src.utils.streaming import build_streaming_response
 
 
 class IResourcesHandler(ABC):
     @abstractmethod
-    async def get_raw(self, dataset: Dataset, version: Version, file_path: str) -> Response:
+    async def get_raw(self, dataset: str, version: str, file_path: str) -> Response:
         pass
 
     @abstractmethod
-    async def get_thumbnail(self, dataset: Dataset, version: Version, file_path: str, time: Optional[int]) -> Response:
+    async def get_thumbnail(self, dataset: str, version: str, file_path: str, time: Optional[int]) -> Response:
         pass
 
     @abstractmethod
-    async def get_clip(self, dataset: Dataset, version: Version, file_path: str, start: int, end: int) -> Response:
+    async def get_clip(self, dataset: str, version: str, file_path: str, start: int, end: int) -> Response:
         pass
 
 
@@ -41,7 +41,7 @@ class ResourcesHandler(IResourcesHandler):
         file_path: str = Path(..., description="The path of the file within the dataset"),
     ) -> Response:
         content_type = "video/mp4"
-        full_path = os.path.join(self._dataset_paths[(dataset, version)], file_path)
+        full_path = os.path.join(self._dataset_paths[Collection(dataset=dataset, version=version)], file_path)
         if not os.path.exists(full_path):
             raise HTTPException(status_code=404, detail="File not found")
 
@@ -104,7 +104,7 @@ class ResourcesHandler(IResourcesHandler):
         file_path: str = Path(..., description="The path of the file within the dataset"),
         time: Optional[int] = Query(None, description="Time (in seconds) to extract the thumbnail from"),
     ) -> Response:
-        full_path = os.path.join(self._dataset_paths[(dataset, version)], file_path)
+        full_path = os.path.join(self._dataset_paths[Collection(dataset=dataset, version=version)], file_path)
 
         if not os.path.exists(full_path):
             raise HTTPException(status_code=404, detail="File not found")
@@ -158,7 +158,7 @@ class ResourcesHandler(IResourcesHandler):
         end: int = Query(..., description="Clip end time in seconds"),
     ) -> Response:
         content_type = "video/mp4"
-        full_path = os.path.join(self._dataset_paths[(dataset, version)], file_path)
+        full_path = os.path.join(self._dataset_paths[Collection(dataset=dataset, version=version)], file_path)
 
         if not os.path.exists(full_path):
             raise HTTPException(status_code=404, detail="File not found")

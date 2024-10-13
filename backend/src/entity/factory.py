@@ -12,6 +12,7 @@ from src.entity.retriever.retriever import FaissSearchIteratorFactory, MilvusSea
 from src.entity.retriever.utils import create_milvus_connection
 from src.entity.searcher import BatchSearcher
 from src.entity.storage import IStorage, MilvusStorage
+from src.types import Collection
 
 logger = logging.getLogger(__name__)
 
@@ -34,7 +35,7 @@ def build_searcher() -> BatchSearcher:
     # TODO create collections here, not on Searcher initizlization
     return BatchSearcher(
         iterator_factories={
-            (d["dataset"], d["version"]): _get_milvus_retriever(
+            Collection(dataset=d["dataset"], version=d["version"]): _get_milvus_retriever(
                 dataset=d["dataset"],
                 version=d["version"],
                 modalities=d["modalities"],

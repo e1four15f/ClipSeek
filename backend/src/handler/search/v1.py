@@ -6,10 +6,10 @@ from typing import Annotated
 from fastapi import File, Form, HTTPException, UploadFile
 from pydantic import BaseModel, Field, model_validator
 
-from src.aliases import CandidateWithCollection
 from src.entity.embedder import IEmbedder, Modality
 from src.entity.searcher import BatchSearcher
 from src.entity.storage import IStorage
+from src.types import CandidateWithCollection, Collection
 
 
 class SearchConfiguration(BaseModel):
@@ -127,12 +127,14 @@ class SearchHandler(ISearchHandler):
         try:
             candidates, session_id = self._searcher.search(
                 embedding=embedding,
-                collections=[(collection["dataset"], collection["version"]) for collection in config.collections],
+                collections=[Collection(dataset=c["dataset"], version=c["version"]) for c in config.collections],
                 modalities=config.modalities,
                 batch_size=config.n_candidates,
             )
         except StopIteration as e:
             raise HTTPException(status_code=404, detail="No results found.") from e
+        except KeyError as e:
+            raise HTTPException(status_code=404, detail="Dataset not found.") from e
         return self._build_search_response(
             session_id=session_id,
             candidates=candidates,
@@ -156,14 +158,14 @@ class SearchHandler(ISearchHandler):
             hits=len(candidates),
             data=[
                 SearchResult(
-                    id=str(cid),
-                    dataset=dataset,
-                    version=version,
-                    path=path,
-                    score=score,
-                    modality=modality,
-                    span=span,
+                    id=str(candidate.id),
+                    dataset=candidate.dataset,
+                    version=candidate.version,
+                    path=candidate.path,
+                    score=candidate.score,
+                    modality=candidate.modality,
+                    span=candidate.span,
                 )
-                for ((cid, path, score, modality, span), (dataset, version)) in candidates
+                for candidate in candidates
             ],
         )
