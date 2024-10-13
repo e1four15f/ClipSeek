@@ -166,7 +166,7 @@
 {:else}
   <div class="flex h-screen">
     <div class="fixed flex h-full w-1/4 flex-col bg-gray-100 p-4">
-      <div class="flex items-center">
+      <div class="mb-4 flex items-center">
         <img src="favicon.png" alt="favicon.png" class="mr-1 h-10 w-10" />
         <Heading tag="h2" class="mb-1">ClipSeek</Heading>
       </div>
