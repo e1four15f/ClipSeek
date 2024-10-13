@@ -1,6 +1,8 @@
 import uuid
 from collections.abc import Generator, Iterator
 
+from cachetools import TTLCache
+
 from src.entity.embedder import Modality
 from src.entity.retriever.retriever import ISearchIteratorFactory
 from src.types import Candidate, CandidateWithCollection, Collection
@@ -9,7 +11,7 @@ from src.types import Candidate, CandidateWithCollection, Collection
 class BatchSearcher:
     def __init__(self, iterator_factories: dict[Collection, ISearchIteratorFactory]):
         self._iterator_factories = iterator_factories
-        self._sessions = {}  # TODO TTL CACHE because it increates over time?
+        self._sessions = TTLCache(maxsize=2**11, ttl=600)
 
     def search(
         self,
