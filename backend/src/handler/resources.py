@@ -41,7 +41,10 @@ class ResourcesHandler(IResourcesHandler):
         file_path: str = Path(..., description="The path of the file within the dataset"),
     ) -> Response:
         content_type = "video/mp4"
-        full_path = os.path.join(self._dataset_paths[Collection(dataset=dataset, version=version)], file_path)
+        try:
+            full_path = os.path.join(self._dataset_paths[Collection(dataset=dataset, version=version)], file_path)
+        except KeyError as e:
+            raise HTTPException(status_code=404, detail=f"{e.args[0]} not found.") from e
         if not os.path.exists(full_path):
             raise HTTPException(status_code=404, detail="File not found")
 
@@ -104,8 +107,10 @@ class ResourcesHandler(IResourcesHandler):
         file_path: str = Path(..., description="The path of the file within the dataset"),
         time: Optional[int] = Query(None, description="Time (in seconds) to extract the thumbnail from"),
     ) -> Response:
-        full_path = os.path.join(self._dataset_paths[Collection(dataset=dataset, version=version)], file_path)
-
+        try:
+            full_path = os.path.join(self._dataset_paths[Collection(dataset=dataset, version=version)], file_path)
+        except KeyError as e:
+            raise HTTPException(status_code=404, detail=f"{e.args[0]} not found.") from e
         if not os.path.exists(full_path):
             raise HTTPException(status_code=404, detail="File not found")
 
@@ -158,7 +163,10 @@ class ResourcesHandler(IResourcesHandler):
         end: int = Query(..., description="Clip end time in seconds"),
     ) -> Response:
         content_type = "video/mp4"
-        full_path = os.path.join(self._dataset_paths[Collection(dataset=dataset, version=version)], file_path)
+        try:
+            full_path = os.path.join(self._dataset_paths[Collection(dataset=dataset, version=version)], file_path)
+        except KeyError as e:
+            raise HTTPException(status_code=404, detail=f"{e.args[0]} not found.") from e
 
         if not os.path.exists(full_path):
             raise HTTPException(status_code=404, detail="File not found")

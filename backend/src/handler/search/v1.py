@@ -5,6 +5,8 @@ from typing import Annotated
 
 from fastapi import File, Form, HTTPException, UploadFile
 from pydantic import BaseModel, Field, model_validator
+from pymilvus import MilvusException
+from pymilvus.exceptions import DescribeCollectionException
 
 from src.entity.embedder import IEmbedder, Modality
 from src.entity.searcher import BatchSearcher
@@ -107,7 +109,7 @@ class SearchHandler(ISearchHandler):
         elif mime_type.startswith("audio/"):
             file_modality = Modality.AUDIO
         else:
-            raise ValueError(f"Unsupported MIME type: {mime_type}")
+            raise HTTPException(status_code=422, detail=f"Unsupported MIME type: {mime_type}")
 
         with tempfile.NamedTemporaryFile() as tmp_file:
             saved_file_path = tmp_file.name
@@ -120,7 +122,12 @@ class SearchHandler(ISearchHandler):
     async def search_by_reference(
         self, id: RequestID, dataset: RequestDataset, version: RequestVersion, config: SearchConfiguration
     ) -> SearchResponse:
-        document = self._storage.get_by_id(id=id, dataset=dataset, version=version)
+        try:
+            document = self._storage.get_by_id(id=id, dataset=dataset, version=version)
+        except DescribeCollectionException as e:
+            raise HTTPException(status_code=404, detail=e.message) from e
+        except MilvusException as e:
+            raise HTTPException(status_code=500, detail=f"Milvus error: {str(e)}") from e
         return self._try_perform_search(document.embedding, config=config)
 
     def _try_perform_search(self, embedding: list[float], config: SearchConfiguration) -> SearchResponse:
@@ -134,7 +141,7 @@ class SearchHandler(ISearchHandler):
         except StopIteration as e:
             raise HTTPException(status_code=404, detail="No results found.") from e
         except KeyError as e:
-            raise HTTPException(status_code=404, detail="Dataset not found.") from e
+            raise HTTPException(status_code=404, detail=f"{e.args[0]} not found.") from e
         return self._build_search_response(
             session_id=session_id,
             candidates=candidates,
