@@ -7,6 +7,7 @@ from io import BytesIO
 from typing import Optional
 
 from fastapi import HTTPException, Path, Query
+from starlette.background import BackgroundTask
 from starlette.requests import Request
 from starlette.responses import FileResponse, Response, StreamingResponse
 
@@ -17,15 +18,19 @@ from src.utils.streaming import build_streaming_response
 
 class IResourcesHandler(ABC):
     @abstractmethod
-    async def get_raw(self, dataset: str, version: str, file_path: str) -> Response:
+    async def get_raw(self, request: Request, dataset: str, version: str, file_path: str) -> Response:
         pass
 
     @abstractmethod
-    async def get_thumbnail(self, dataset: str, version: str, file_path: str, time: Optional[int]) -> Response:
+    async def get_thumbnail(
+        self, request: Request, dataset: str, version: str, file_path: str, time: Optional[int]
+    ) -> Response:
         pass
 
     @abstractmethod
-    async def get_clip(self, dataset: str, version: str, file_path: str, start: int, end: int) -> Response:
+    async def get_clip(
+        self, request: Request, dataset: str, version: str, file_path: str, start: int, end: int
+    ) -> Response:
         pass
 
 
@@ -88,7 +93,7 @@ class ResourcesHandler(IResourcesHandler):
                     stream=open(tmp_mp4_path, "rb"),  # noqa: SIM115
                     file_size=file_size,
                     content_type=content_type,
-                    background=file_cleanup(tmp_mp4_path),
+                    background=_file_cleanup_task(tmp_mp4_path),
                 )
             except Exception as e:
                 raise HTTPException(status_code=500, detail=f"Error converting video: {str(e)}") from e
@@ -97,6 +102,7 @@ class ResourcesHandler(IResourcesHandler):
 
     async def get_thumbnail(
         self,
+        request: Request,  # noqa: ARG002
         dataset: str = Path(..., description="The dataset name or identifier"),
         version: str = Path(..., description="The version of the dataset"),
         file_path: str = Path(..., description="The path of the file within the dataset"),
@@ -187,7 +193,7 @@ class ResourcesHandler(IResourcesHandler):
                 stream=open(tmp_file_path, "rb"),  # noqa: SIM115
                 file_size=file_size,
                 content_type=content_type,
-                background=file_cleanup(tmp_file_path),
+                background=_file_cleanup_task(tmp_file_path),
             )
         except Exception as e:
             raise HTTPException(status_code=500, detail=f"Error processing video: {str(e)}") from e
@@ -202,10 +208,14 @@ class ResourcesHandler(IResourcesHandler):
         return full_path
 
 
-def file_cleanup(file_path: str) -> None:
+def _file_cleanup_task(file_path: str) -> BackgroundTask:
     """Cleanup function to close and delete the file after streaming"""
-    try:
-        if os.path.exists(file_path):
-            os.remove(file_path)
-    except Exception as e:
-        print(f"Error deleting file: {e}")
+
+    async def _inner() -> None:
+        try:
+            if os.path.exists(file_path):
+                os.remove(file_path)
+        except Exception as e:
+            print(f"Error deleting file: {e}")
+
+    return _inner  # type: ignore[return-value]

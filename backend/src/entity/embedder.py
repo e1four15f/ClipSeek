@@ -5,7 +5,6 @@ from typing import Any, Optional, Union
 import torch
 from languagebind import LanguageBind, to_device, transform_dict
 from languagebind.image.tokenization_image import LanguageBindImageTokenizer
-from typing_extensions import Self
 
 
 class Modality(str, Enum):
@@ -19,7 +18,7 @@ class Modality(str, Enum):
     HYBRID = "hybrid"
 
     @classmethod
-    def get_order(cls) -> list[Self]:
+    def get_order(cls) -> list[str]:
         return [cls.HYBRID, cls.VIDEO, cls.IMAGE, cls.AUDIO, cls.TEXT, cls.DEPTH, cls.THERMAL]
 
 
@@ -58,7 +57,7 @@ class LanguageBindEmbedder(IEmbedder):
     def embed(self, data: Union[str, list[str], torch.Tensor], modality: Modality) -> torch.Tensor:
         inputs = {modality: data}
         if not isinstance(data, torch.Tensor):
-            inputs = self._preprocess_inputs(inputs)
+            inputs = self._preprocess_inputs(inputs)  # type: ignore[assignment]
 
         with torch.no_grad():
             outputs = self._model(inputs)

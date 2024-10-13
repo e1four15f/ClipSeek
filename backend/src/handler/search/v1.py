@@ -30,7 +30,7 @@ class SearchConfiguration(BaseModel):
                 values = json.loads(values)
             except json.JSONDecodeError as e:
                 raise ValueError("Invalid JSON format for config") from e
-        return values
+        return values  # type: ignore[return-value]
 
 
 RequestText = Annotated[
@@ -100,14 +100,17 @@ class SearchHandler(ISearchHandler):
 
     async def search_by_file(self, file: RequestFile, config: SearchConfiguration) -> SearchResponse:
         mime_type = file.content_type
-        if mime_type.startswith("image/"):
-            file_modality = Modality.IMAGE
-        elif mime_type.startswith("video/"):
-            file_modality = Modality.VIDEO
-        elif mime_type.startswith("audio/"):
-            file_modality = Modality.AUDIO
+        if mime_type:
+            if mime_type.startswith("image/"):
+                file_modality = Modality.IMAGE
+            elif mime_type.startswith("video/"):
+                file_modality = Modality.VIDEO
+            elif mime_type.startswith("audio/"):
+                file_modality = Modality.AUDIO
+            else:
+                raise HTTPException(status_code=422, detail=f"Unsupported MIME type: {mime_type}")
         else:
-            raise HTTPException(status_code=422, detail=f"Unsupported MIME type: {mime_type}")
+            raise HTTPException(status_code=422, detail="Received file without MIME type")
 
         with tempfile.NamedTemporaryFile() as tmp_file:
             saved_file_path = tmp_file.name
@@ -133,7 +136,7 @@ class SearchHandler(ISearchHandler):
             candidates, session_id = self._searcher.search(
                 embedding=embedding,
                 collections=[Collection(dataset=c["dataset"], version=c["version"]) for c in config.collections],
-                modalities=config.modalities,
+                modalities=[Modality(m) for m in config.modalities],
                 batch_size=config.n_candidates,
             )
         except StopIteration as e:

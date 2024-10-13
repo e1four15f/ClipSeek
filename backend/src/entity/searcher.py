@@ -11,7 +11,7 @@ from src.types import Candidate, CandidateWithCollection, Collection
 class BatchSearcher:
     def __init__(self, iterator_factories: dict[Collection, ISearchIteratorFactory]):
         self._iterator_factories = iterator_factories
-        self._sessions = TTLCache(maxsize=2**11, ttl=600)
+        self._sessions: dict[str, Generator] = TTLCache(maxsize=2**11, ttl=600)  # type: ignore[assignment]
 
     def search(
         self,

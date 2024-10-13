@@ -4,12 +4,14 @@ from typing import TypedDict
 
 import yaml
 
+from src.entity.embedder import Modality
+
 
 class _DatasetConfig(TypedDict):
     data_path: str
     dataset: str
     version: str
-    modalities: list[str]
+    modalities: list[Modality]
 
 
 class Config:
@@ -21,9 +23,9 @@ class Config:
     MILVUS_URL: str
     MILVUS_DB_NAME: str
     BACKEND_URL: str
-    CLIP_MODELS: dict[str, str]
+    CLIP_MODELS: dict[Modality, str]
     EMBEDDINGS_DIM: int
-    INDEX_PATH: str
+    INDEXES_ROOT: str
 
     @classmethod
     def load(cls, config_file: str) -> None:

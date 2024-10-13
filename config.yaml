@@ -48,5 +48,5 @@ CLIP_MODELS: {
 DEVICE: "cpu"
 EMBEDDINGS_DIM: 768
 ## Constants
-INDEX_PATH: "../data"
+INDEXES_ROOT: "../data"
 TMP_DIR: ".tmp"

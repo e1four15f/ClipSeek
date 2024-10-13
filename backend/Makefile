@@ -1,15 +1,8 @@
 VENV = .venv
-CODE = . ../scripts
+CODE = src scripts app.py
 
 run:
 	@$(VENV)/bin/python app.py
-
-
-PYTHONPATH=. python scripts/index_dataset.py \
---data-path 'data/MSRVTT' \
---media-path 'data/MSRVTT/5sec' \
---modality 'audio' \
---device 'cpu'
 
 up:
 	docker-compose up -d
@@ -22,9 +15,7 @@ logs:
 
 lint:
 	ruff check $(CODE)
-	# mypy is too strict
-	# mypy --install-types --non-interactive $(CODE)
-
+	mypy --install-types --non-interactive $(CODE)
 
 pretty:
 	ruff format $(CODE)

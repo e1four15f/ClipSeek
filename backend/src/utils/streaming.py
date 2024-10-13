@@ -16,7 +16,7 @@ def build_streaming_response(
 
     if range_header:
         try:
-            start, end = (int(x) if x else None for x in range_header.replace("bytes=", "").split("-"))
+            start, end = (int(x) if x else None for x in range_header.replace("bytes=", "").split("-"))  # type: ignore[assignment]
             start = start or 0
             end = end or file_size - 1
         except ValueError as e:

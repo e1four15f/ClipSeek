@@ -1,13 +1,11 @@
 import logging
 from functools import cache
-from pathlib import Path
 
-import numpy as np
 from pymilvus import MilvusClient
 
 from src.config import Config
 from src.entity.embedder import IEmbedder, LanguageBindEmbedder, Modality, RandomEmbedder
-from src.entity.retriever.retriever import FaissSearchIteratorFactory, MilvusSearchIteratorFactory
+from src.entity.retriever.retriever import MilvusSearchIteratorFactory
 from src.entity.retriever.utils import create_milvus_connection
 from src.entity.searcher import BatchSearcher
 from src.entity.storage import IStorage, MilvusStorage
@@ -37,7 +35,7 @@ def build_searcher() -> BatchSearcher:
             Collection(dataset=d["dataset"], version=d["version"]): _get_milvus_retriever(
                 dataset=d["dataset"],
                 version=d["version"],
-                modalities=d["modalities"],
+                modalities=[Modality(m) for m in d["modalities"]],
             )
             for d in Config.DATASETS
         }
@@ -51,14 +49,15 @@ def build_storage() -> IStorage:
 
 
 # TODO delete or support
-def _get_faiss_retriever(dataset: str, version: str, modalities: tuple[str], device: str) -> FaissSearchIteratorFactory:
-    logger.info("Initializing FAISS retriever for dataset=%s version=%s...", dataset, version)
-    index_path = Path(Config.INDEX_PATH) / dataset / version
-    index_embeddings = {
-        modality: np.load(index_path / f"LanguageBind_{modality}_embeddings.npy") for modality in modalities
-    }  # TODO model hardcode
-    labels = (index_path / "labels.txt").open().read().splitlines()
-    return FaissSearchIteratorFactory(embeddings=index_embeddings, labels=labels, device=device)
+# def _get_faiss_retriever(dataset: str, version: str, modalities: tuple[str], device: str
+# ) -> FaissSearchIteratorFactory:
+#     logger.info("Initializing FAISS retriever for dataset=%s version=%s...", dataset, version)
+#     index_path = Path(Config.INDEXES_ROOT) / dataset / version
+#     index_embeddings = {
+#         modality: np.load(index_path / f"LanguageBind_{modality}_embeddings.npy") for modality in modalities
+#     }  # TODO model hardcode
+#     labels = (index_path / "labels.txt").open().read().splitlines()
+#     return FaissSearchIteratorFactory(embeddings=index_embeddings, labels=labels, device=device)
 
 
 def _get_milvus_retriever(
