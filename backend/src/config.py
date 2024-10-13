@@ -13,7 +13,6 @@ class _DatasetConfig(TypedDict):
 
 
 class Config:
-    CANDIDATES_PER_PAGE: int  # TODO order and remove
     DEVELOPER_MODE: bool
     DEVICE: str
     TMP_DIR: str
@@ -22,7 +21,6 @@ class Config:
     MILVUS_URL: str
     MILVUS_DB_NAME: str
     BACKEND_URL: str
-    RESULT_COLUMNS: int
     CLIP_MODELS: dict[str, str]
     EMBEDDINGS_DIM: int
     INDEX_PATH: str

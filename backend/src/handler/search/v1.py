@@ -88,12 +88,10 @@ class SearchHandler(ISearchHandler):
         embedder: IEmbedder,
         storage: IStorage,
         searcher: BatchSearcher,
-        candidates_per_page: int,
     ) -> None:
         self._embedder = embedder
         self._storage = storage
         self._searcher = searcher
-        self._candidates_per_page = candidates_per_page
 
     async def search_by_text(self, text: RequestText, config: SearchConfiguration) -> SearchResponse:
         # TODO think about -> torch.Tensor

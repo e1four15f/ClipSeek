@@ -1,18 +1,9 @@
 from abc import ABC, abstractmethod
-from dataclasses import dataclass
 
 from pymilvus import MilvusClient
 
 from src.entity.embedder import Modality
-
-
-@dataclass(frozen=True)
-class IndexedEntity:
-    id: int
-    path: str
-    span: tuple[int, int]
-    modality: Modality
-    embedding: list[float]
+from src.types import IndexedEntity
 
 
 class IStorage(ABC):

@@ -30,7 +30,6 @@ def get_app() -> FastAPI:
             embedder=embedder,
             storage=storage,
             searcher=searcher,
-            candidates_per_page=Config.CANDIDATES_PER_PAGE,
         ),
         info_handler=InfoHandler(),
         resources_handler=ResourcesHandler(

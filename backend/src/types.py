@@ -30,3 +30,12 @@ class CandidateWithCollection(Candidate, Collection):
 class Label(TypedDict):
     path: str
     span: tuple[int, int]
+
+
+@dataclass(frozen=True)
+class IndexedEntity:
+    id: int
+    path: str
+    span: tuple[int, int]
+    modality: Modality
+    embedding: list[float]
