@@ -1,4 +1,3 @@
-import json
 import logging
 from functools import cache
 from pathlib import Path
@@ -39,7 +38,6 @@ def build_searcher() -> BatchSearcher:
                 dataset=d["dataset"],
                 version=d["version"],
                 modalities=d["modalities"],
-                device=Config.DEVICE,
             )
             for d in Config.DATASETS
         }
@@ -66,23 +64,10 @@ def _get_faiss_retriever(dataset: str, version: str, modalities: tuple[str], dev
 def _get_milvus_retriever(
     dataset: str,
     version: str,
-    modalities: tuple[str],
-    device: str,  # noqa: ARG001
+    modalities: list[Modality],
 ) -> MilvusSearchIteratorFactory:
     logger.info("Initializing Milvus retriever for dataset=%s version=%s...", dataset, version)
-    index_path = Path(Config.INDEX_PATH) / dataset / version
-    index_embeddings = {
-        modality: np.load(index_path / f"LanguageBind_{modality}_embeddings.npy") for modality in modalities
-    }  # TODO model hardcode
-    if len(modalities) > 1:
-        index_embeddings[Modality.HYBRID] = np.mean(list(index_embeddings.values()), axis=0)
-
-    with open(index_path / "labels.jsonlines") as f:
-        labels = [json.loads(line) for line in f]
-
     return MilvusSearchIteratorFactory(
-        index_name=f"{dataset}__{version}",
-        modality_embeddings=index_embeddings,  # noqa
-        embeddings_dim=Config.EMBEDDINGS_DIM,
-        labels=labels,
+        collection_name=f"{dataset}__{version}",
+        modalities=modalities,
     )

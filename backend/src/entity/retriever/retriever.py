@@ -4,10 +4,11 @@ from collections.abc import Iterator
 import faiss
 import numpy as np
 import torch
+from pymilvus import Collection
 
 from src.entity.embedder import Modality
-from src.entity.retriever.utils import build_faiss_index, build_milvus_collection
-from src.types import Candidate, Label
+from src.entity.retriever.utils import build_faiss_index
+from src.types import Candidate
 
 
 class ISearchIteratorFactory(ABC):
@@ -40,15 +41,12 @@ class FaissSearchIteratorFactory(ISearchIteratorFactory):
 class MilvusSearchIteratorFactory(ISearchIteratorFactory):
     def __init__(
         self,
-        index_name: str,
-        modality_embeddings: dict[Modality, np.ndarray],  # TODO move to initialization np.ndarray
-        embeddings_dim: int,
-        labels: list[Label],
+        collection_name: str,
+        modalities: list[Modality],
     ):
-        self._collection = build_milvus_collection(
-            index_name, modality_embeddings=modality_embeddings, embeddings_dim=embeddings_dim, labels=labels
-        )
-        self._available_modalities = set(modality_embeddings.keys())
+        self._collection = Collection(collection_name)
+        self._collection.load()
+        self._available_modalities = set(modalities)
 
     def create_iterator(
         self, embedding: list[float], modalities: list[Modality], batch_size: int
