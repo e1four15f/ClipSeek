@@ -169,7 +169,10 @@
             ><strong>Filename:</strong> {currentItem.path.split("/").pop()}</P
           >
           <P class="break-words"><strong>Path:</strong> {currentItem.path}</P>
-          <P><strong>Score:</strong> {Math.abs(currentItem.score.toFixed(4)).toFixed(4)}</P>
+          <P
+            ><strong>Score:</strong>
+            {Math.abs(currentItem.score.toFixed(4)).toFixed(4)}</P
+          >
           <P class="flex items-center">
             <strong>Modality:</strong>
             <svelte:component
