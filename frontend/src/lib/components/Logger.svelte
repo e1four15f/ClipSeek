@@ -4,15 +4,16 @@
 
   let logs = [];
 
-  export const info = logWithConsole("info");
-  export const warning = logWithConsole("warn");
-  export const error = logWithConsole("error");
+  export const info = (message, timeout = 2000) =>
+    logWithConsole("info", message, timeout);
+  export const warning = (message, timeout = 4000) =>
+    logWithConsole("warn", message, timeout);
+  export const error = (message, timeout = 5000) =>
+    logWithConsole("error", message, timeout);
 
-  function logWithConsole(level) {
-    return (message, timeout = 5000) => {
-      console[level](message);
-      return addLog(level, message, timeout);
-    };
+  function logWithConsole(level, message, timeout) {
+    console[level](message);
+    return addLog(level, message, timeout);
   }
 
   function addLog(level, message, timeout) {

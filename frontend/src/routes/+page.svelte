@@ -111,7 +111,7 @@
         }, {}),
       );
       results = [...results, ...newResults];
-      // logger.info("Continue");
+      logger.info("Continue", 500);
     } catch (error) {
       logger.error(error);
     }
