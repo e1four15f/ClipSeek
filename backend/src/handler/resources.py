@@ -1,4 +1,5 @@
 import asyncio
+import logging
 import mimetypes
 import os
 import subprocess
@@ -14,6 +15,8 @@ from starlette.responses import FileResponse, Response, StreamingResponse
 from src.config import Config
 from src.types import Collection
 from src.utils.streaming import build_streaming_response
+
+logger = logging.getLogger(__name__)
 
 
 class IResourcesHandler(ABC):
@@ -216,6 +219,6 @@ def _file_cleanup_task(file_path: str) -> BackgroundTask:
             if os.path.exists(file_path):
                 os.remove(file_path)
         except Exception as e:
-            print(f"Error deleting file: {e}")
+            logger.warning("Error deleting file: %s", e)
 
     return _inner  # type: ignore[return-value]
