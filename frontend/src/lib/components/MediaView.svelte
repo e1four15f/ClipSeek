@@ -109,7 +109,7 @@
 
   {#if thumbnailLoaded || thumbnailBroken}
     <div
-      class="absolute bottom-1 left-1 z-10 w-32 transform rounded bg-black bg-opacity-70 px-2 py-1 text-xs text-white opacity-0 transition-opacity duration-300 group-hover:opacity-100 group-hover:delay-1000"
+      class="absolute bottom-1 left-1 z-10 w-40 transform rounded bg-black bg-opacity-70 px-2 py-1 text-xs text-white opacity-0 transition-opacity duration-300 group-hover:opacity-100 group-hover:delay-1000"
     >
       {currentItem.path.split("/").pop()}
     </div>
@@ -184,8 +184,9 @@
           {#if isVideo(currentItem.path)}
             <P
               ><strong>Span:</strong>
-              {currentItem.span[0]} - {currentItem.span[1]} ({currentItem
-                .span[1] - currentItem.span[0]} seconds)</P
+              {currentItem.span[0].toFixed(2)} - {currentItem.span[1].toFixed(
+                2,
+              )} ({(currentItem.span[1] - currentItem.span[0]).toFixed(2)} seconds)</P
             >
           {/if}
         </div>
@@ -215,7 +216,7 @@
                 <div
                   class="absolute right-5 top-2 z-10 flex rounded bg-black bg-opacity-70 px-2 text-xs text-white"
                 >
-                  {item.span[0]} - {item.span[1]}
+                  {item.span[0].toFixed(2)} - {item.span[1].toFixed(2)}
                 </div>
               </div>
             {/each}

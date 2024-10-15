@@ -43,10 +43,13 @@
   onMount(() => {
     window.addEventListener("scroll", handleScroll);
 
+    let tries = 0;
     const interval = setInterval(() => {
       if (!isLoading) {
         const IsScrolled = handleScroll();
-        if (!IsScrolled) {
+        tries++;
+
+        if (!IsScrolled || tries >= 5) {
           clearInterval(interval);
         }
       }

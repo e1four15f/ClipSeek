@@ -53,7 +53,7 @@ class SearchResult(BaseModel):
     path: str = Field(..., description="Relative path to the result file")
     score: float = Field(..., description="Similarity score")
     modality: str = Field(..., description="The modality of the result")
-    span: tuple[int, int] = Field(..., description="Start and end seconds of the clip")
+    span: tuple[float, float] = Field(..., description="Start and end seconds of the clip")
 
 
 class SearchResponse(BaseModel):
@@ -140,7 +140,7 @@ class SearchHandler(ISearchHandler):
                 batch_size=config.n_candidates,
             )
         except StopIteration as e:
-            raise HTTPException(status_code=404, detail="No results found.") from e
+            raise HTTPException(status_code=429, detail="No results found.") from e
         except KeyError as e:
             raise HTTPException(status_code=404, detail=f"{e.args[0]} not found.") from e
         return self._build_search_response(
@@ -152,7 +152,7 @@ class SearchHandler(ISearchHandler):
         try:
             candidates = self._searcher.next(request.session_id)
         except StopIteration as e:
-            raise HTTPException(status_code=204, detail="Continue limit reached.") from e
+            raise HTTPException(status_code=429, detail="Continue limit reached.") from e
         except KeyError as e:
             raise HTTPException(status_code=404, detail="Recieved unknown session_id.") from e
         return self._build_search_response(

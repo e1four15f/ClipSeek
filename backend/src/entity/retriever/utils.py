@@ -2,7 +2,7 @@ import faiss
 import numpy as np
 from more_itertools import chunked
 from pymilvus import Collection, CollectionSchema, DataType, FieldSchema, connections
-from pymilvus.orm import db, utility
+from pymilvus.orm import db
 
 from src.entity.embedder import Modality
 from src.types import Label
@@ -33,16 +33,11 @@ def create_milvus_connection(url: str, database_name: str = "default") -> None:
 def build_milvus_collection(
     index_name: str, modality_embeddings: dict[Modality, np.ndarray], embeddings_dim: int, labels: list[Label]
 ) -> Collection:
-    if utility.has_collection(index_name):
-        collection = Collection(index_name)
-        collection.load()
-        return collection
-
     fields = [
         FieldSchema(name="id", dtype=DataType.INT64, is_primary=True, auto_id=True),
         FieldSchema(name="path", dtype=DataType.VARCHAR, max_length=4096),
-        FieldSchema(name="start", dtype=DataType.INT64),
-        FieldSchema(name="end", dtype=DataType.INT64),
+        FieldSchema(name="start", dtype=DataType.FLOAT),
+        FieldSchema(name="end", dtype=DataType.FLOAT),
         FieldSchema(name="modality", dtype=DataType.VARCHAR, max_length=32),
         FieldSchema(name="embedding", dtype=DataType.FLOAT_VECTOR, dim=embeddings_dim),
     ]

@@ -102,6 +102,9 @@
 
   async function handleContinue() {
     try {
+      if (sessionId == null) {
+        throw new Error("SessionId is null");
+      }
       const response = await continueSearch(sessionId);
       const newResults = Object.values(
         response.data.reduce((acc, item) => {

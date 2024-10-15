@@ -26,13 +26,13 @@ class IResourcesHandler(ABC):
 
     @abstractmethod
     async def get_thumbnail(
-        self, request: Request, dataset: str, version: str, file_path: str, time: Optional[int]
+        self, request: Request, dataset: str, version: str, file_path: str, time: Optional[float]
     ) -> Response:
         pass
 
     @abstractmethod
     async def get_clip(
-        self, request: Request, dataset: str, version: str, file_path: str, start: int, end: int
+        self, request: Request, dataset: str, version: str, file_path: str, start: float, end: float
     ) -> Response:
         pass
 
@@ -109,7 +109,7 @@ class ResourcesHandler(IResourcesHandler):
         dataset: str = Path(..., description="The dataset name or identifier"),
         version: str = Path(..., description="The version of the dataset"),
         file_path: str = Path(..., description="The path of the file within the dataset"),
-        time: Optional[int] = Query(None, description="Time (in seconds) to extract the thumbnail from"),
+        time: Optional[float] = Query(None, description="Time (in seconds) to extract the thumbnail from"),
     ) -> Response:
         full_path = self._get_full_path(file_path, dataset, version)
 
@@ -158,8 +158,8 @@ class ResourcesHandler(IResourcesHandler):
         dataset: str = Path(..., description="The dataset name or identifier"),
         version: str = Path(..., description="The version of the dataset"),
         file_path: str = Path(..., description="The path of the file within the dataset"),
-        start: int = Query(..., description="Clip start time in seconds"),
-        end: int = Query(..., description="Clip end time in seconds"),
+        start: float = Query(..., description="Clip start time in seconds"),
+        end: float = Query(..., description="Clip end time in seconds"),
     ) -> Response:
         content_type = "video/mp4"
         full_path = self._get_full_path(file_path, dataset, version)

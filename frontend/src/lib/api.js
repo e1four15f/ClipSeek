@@ -30,11 +30,13 @@ export async function searchByText(
   });
 
   if (response.status == 404) {
-    throw new Error("Not found!");
+    const errorData = await response.json();
+    throw new Error(`Not found! ${errorData.detail}`);
   }
 
   if (!response.ok) {
-    throw new Error("Failed to fetch search data!");
+    const errorData = await response.json();
+    throw new Error(`Failed to fetch search data! ${errorData.detail}`);
   }
 
   const data = await response.json();
@@ -68,11 +70,13 @@ export async function searchByFile(
   });
 
   if (response.status == 404) {
-    throw new Error("Not found!");
+    const errorData = await response.json();
+    throw new Error(`Not found! ${errorData.detail}`);
   }
 
   if (!response.ok) {
-    throw new Error("Failed to fetch search data!");
+    const errorData = await response.json();
+    throw new Error(`Failed to fetch search data! ${errorData.detail}`);
   }
 
   const data = await response.json();
@@ -108,11 +112,13 @@ export async function searchByReference(
   });
 
   if (response.status == 404) {
-    throw new Error("Not found!");
+    const errorData = await response.json();
+    throw new Error(`Not found! ${errorData.detail}`);
   }
 
   if (!response.ok) {
-    throw new Error("Failed to fetch search data!");
+    const errorData = await response.json();
+    throw new Error(`Failed to fetch search data! ${errorData.detail}`);
   }
 
   const data = await response.json();
@@ -132,7 +138,10 @@ export async function continueSearch(sessionId, timeout = REQUESTS_TIMEOUT) {
   });
 
   if (!response.ok) {
-    throw new Error("Failed to fetch continue searching data!");
+    const errorData = await response.json();
+    throw new Error(
+      `Failed to fetch continue searching data! ${errorData.detail}`,
+    );
   }
 
   const data = await response.json();
@@ -150,7 +159,8 @@ export async function getIndexesInfo(timeout = REQUESTS_TIMEOUT) {
   });
 
   if (!response.ok) {
-    throw new Error("Failed to fetch indexes data!");
+    const errorData = await response.json();
+    throw new Error(`Failed to fetch indexes data! ${errorData.detail}`);
   }
 
   const data = await response.json();

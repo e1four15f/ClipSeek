@@ -72,7 +72,7 @@ class MilvusSearchIteratorFactory(ISearchIteratorFactory):
                             path=hit.path,
                             score=1 - hit.distance,
                             modality=Modality(hit.modality),
-                            span=(hit.start, hit.end),
+                            span=(round(hit.start, 2), round(hit.end, 2)),
                         )
                         for hit in hits
                     ]
