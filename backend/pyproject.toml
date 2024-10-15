@@ -34,12 +34,12 @@ ignore_missing_imports = true
 
 [tool.ruff]
 lint.ignore = [
-    "T201",  # `print` found  # TODO remove later
     "ERA001",  # Found commented-out code
     "ANN204",  # Missing return type annotation for special method `__init__`
     "ANN101",  # Missing type annotation for `self` in method
     "ANN102",  # Missing type annotation for `cls` in classmethod
     "S311",  # Standard pseudo-random generators are not suitable for cryptographic purposes
+    "S603",  # subprocess call: check for execution of untrusted input
     "A002",  # Argument `id` is shadowing a Python builtin
 ]
 line-length = 120
@@ -65,6 +65,12 @@ lint.select = [
     "ANN" # flake8-annotations
 ]
 target-version = "py39"
+
+[tool.ruff.lint.per-file-ignores]
+"scripts/*" = [
+    "T201",  # `print` found
+    "PLR0915",  # Too many statements
+]
 
 [tool.ruff.lint.pylint]
 max-args = 8

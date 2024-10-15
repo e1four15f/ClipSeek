@@ -1,6 +1,6 @@
 VENV = .venv
-CODE = src scripts app.py
-
+CODE = src app.py
+# scripts
 run:
 	@$(VENV)/bin/python app.py
 
