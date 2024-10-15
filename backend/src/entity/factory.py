@@ -25,6 +25,7 @@ def build_embedder() -> IEmbedder:
 @cache
 def build_searcher() -> BatchSearcher:
     logger.info("Initializing Searcher...")
+    # TODO move this to app.py?
     create_milvus_connection(
         url=Config.MILVUS_URL,
         database_name=Config.MILVUS_DB_NAME,

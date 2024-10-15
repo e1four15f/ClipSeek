@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import TypedDict
+from typing import TypedDict, Any
 
 from src.entity.embedder import Modality
 
@@ -11,6 +11,13 @@ class Collection:
 
     def __hash__(self) -> int:
         return hash((self.dataset, self.version))
+
+    def __eq__(self, other: Any) -> bool:
+        if isinstance(other, tuple):
+            return (self.dataset, self.version) == other
+        if isinstance(other, Collection):
+            return (self.dataset, self.version) == (other.dataset, other.version)
+        return NotImplemented
 
 
 @dataclass(frozen=True)
@@ -39,3 +46,10 @@ class IndexedEntity:
     span: tuple[int, int]
     modality: Modality
     embedding: list[float]
+
+
+@dataclass(frozen=True)
+class CollectionEntity:
+    name: str
+    partitions: list[str]
+    row_count: int

@@ -25,18 +25,16 @@ def get_app() -> FastAPI:
     searcher = build_searcher()
     storage = build_storage()
 
+    dataset_paths = {Collection(dataset=d["dataset"], version=d["version"]): d["data_path"] for d in Config.DATASETS}
+
     return AppServer(
         search_handler=SearchHandler(
             embedder=embedder,
             storage=storage,
             searcher=searcher,
         ),
-        info_handler=InfoHandler(),
-        resources_handler=ResourcesHandler(
-            dataset_paths={
-                Collection(dataset=d["dataset"], version=d["version"]): d["data_path"] for d in Config.DATASETS
-            }
-        ),
+        info_handler=InfoHandler(storage=storage, available_collections=list(dataset_paths.keys())),
+        resources_handler=ResourcesHandler(dataset_paths=dataset_paths),
     ).create_application()
 
 
