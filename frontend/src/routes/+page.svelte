@@ -103,7 +103,8 @@
   async function handleContinue() {
     try {
       if (sessionId == null) {
-        throw new Error("SessionId is null");
+        logger.warning("SessionId is null");
+        return;
       }
       const response = await continueSearch(sessionId);
       const newResults = Object.values(
@@ -117,6 +118,9 @@
       logger.info("Continue", 500);
     } catch (error) {
       logger.error(error);
+      if (error.message.includes("Continue limit reached")) {
+        sessionId = null;
+      }
     }
   }
 
