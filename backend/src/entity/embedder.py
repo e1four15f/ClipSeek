@@ -10,16 +10,14 @@ from languagebind.image.tokenization_image import LanguageBindImageTokenizer
 class Modality(str, Enum):
     VIDEO = "video"
     AUDIO = "audio"
-    THERMAL = "thermal"
     IMAGE = "image"
-    DEPTH = "depth"
     TEXT = "language"
     # Combined modalities
     HYBRID = "hybrid"
 
     @classmethod
-    def get_order(cls) -> list[str]:
-        return [cls.HYBRID, cls.VIDEO, cls.IMAGE, cls.AUDIO, cls.TEXT, cls.DEPTH, cls.THERMAL]
+    def get_order(cls) -> list["Modality"]:
+        return [cls.HYBRID, cls.VIDEO, cls.IMAGE, cls.AUDIO, cls.TEXT]
 
 
 class IEmbedder(ABC):
@@ -39,9 +37,7 @@ class LanguageBindEmbedder(IEmbedder):
         clip_type = models or {
             Modality.VIDEO: "LanguageBind_Video",
             Modality.AUDIO: "LanguageBind_Audio",
-            Modality.THERMAL: "LanguageBind_Thermal",
             Modality.IMAGE: "LanguageBind_Image",
-            Modality.DEPTH: "LanguageBind_Depth",
         }
         self._model = LanguageBind(clip_type=clip_type)
         self._model.to(device)

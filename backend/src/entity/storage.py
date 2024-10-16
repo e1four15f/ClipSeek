@@ -3,7 +3,7 @@ from abc import ABC, abstractmethod
 from pymilvus import MilvusClient
 
 from src.entity.embedder import Modality
-from src.types import IndexedEntity, CollectionEntity
+from src.types import CollectionEntity, IndexedEntity
 
 
 class IStorage(ABC):
@@ -40,8 +40,8 @@ class MilvusStorage(IStorage):
             collection_entities.append(
                 CollectionEntity(
                     name=collection,
-                    partitions=[partition for partition in partitions if partition != '_default'],
-                    row_count=collection_stats["row_count"]
+                    partitions=[partition for partition in partitions if partition != "_default"],
+                    row_count=collection_stats["row_count"],
                 )
             )
         return collection_entities

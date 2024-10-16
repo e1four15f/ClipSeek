@@ -40,11 +40,6 @@ MILVUS_URL: "http://localhost:19530"
 MILVUS_DB_NAME: "MultimodalMediaSearch"
 ## Model
 USE_DUMMY_MODEL: true
-CLIP_MODELS: {
-  video: "LanguageBind_Video",
-  audio: "LanguageBind_Audio",
-  image: "LanguageBind_Image"
-}
 DEVICE: "cpu"
 EMBEDDINGS_DIM: 768
 ## Constants

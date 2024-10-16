@@ -23,7 +23,6 @@ class Config:
     MILVUS_URL: str
     MILVUS_DB_NAME: str
     BACKEND_URL: str
-    CLIP_MODELS: dict[Modality, str]
     EMBEDDINGS_DIM: int
     INDEXES_ROOT: str
 

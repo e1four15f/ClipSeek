@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import TypedDict, Any
+from typing import Any, TypedDict
 
 from src.entity.embedder import Modality
 
@@ -12,7 +12,7 @@ class Collection:
     def __hash__(self) -> int:
         return hash((self.dataset, self.version))
 
-    def __eq__(self, other: Any) -> bool:
+    def __eq__(self, other: Any) -> bool:  # noqa: ANN401
         if isinstance(other, tuple):
             return (self.dataset, self.version) == other
         if isinstance(other, Collection):

@@ -19,7 +19,7 @@ def build_embedder() -> IEmbedder:
     logger.info("Initializing Embedder...")
     if Config.USE_DUMMY_MODEL:
         return RandomEmbedder(embeddings_dim=Config.EMBEDDINGS_DIM)
-    return LanguageBindEmbedder(models=Config.CLIP_MODELS, device=Config.DEVICE)
+    return LanguageBindEmbedder(device=Config.DEVICE)
 
 
 @cache

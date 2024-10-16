@@ -38,10 +38,8 @@ class InfoHandler(IInfoHandler):
                 continue
 
             modalities = sorted(
-                collection.partitions,
+                [Modality(x) for x in collection.partitions],
                 key=lambda x: modalities_order.index(Modality(x)),
             )
-            infos.append(
-                IndexInfo(dataset=dataset, version=version, count=collection.row_count, modalities=modalities)
-            )
+            infos.append(IndexInfo(dataset=dataset, version=version, count=collection.row_count, modalities=modalities))
         return IndexesInfoResponse(infos)
