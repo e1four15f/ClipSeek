@@ -24,7 +24,7 @@ class Mode(str, Enum):
         return {
             Mode.VIDEO: [".mp4", ".avi", ".mov", ".mkv", ".wmv", ".flv"],
             Mode.VIDEO_WITH_AUDIO: [".mp4", ".avi", ".mov", ".mkv", ".wmv", ".flv"],
-            Mode.IMAGE: [".jpg", ".jpeg", ".png", ".gif", ".bmp", ".tiff", ".svg"],
+            Mode.IMAGE: [".jpg", ".jpeg", ".png", ".gif", ".bmp", ".tiff"],
         }[self]
 
     def get_modalities(self) -> list[Modality]:
@@ -47,6 +47,7 @@ def main(
     dataset_version: str,
     mode: Mode,
     model: Model,
+    clip_length: float,
     device: str,
     batch_size: int,
 ) -> None:
@@ -57,6 +58,8 @@ def main(
         f"Dataset Name: {dataset_name}\n"
         f"Dataset Version: {dataset_version}\n"
         f"Mode: {mode}\n"
+        f"Model: {model}\n"
+        f"Clip Length: {clip_length}\n"
         f"Device: {device}\n"
         f"Batch Size: {batch_size}\n"
         "####################"
@@ -203,6 +206,9 @@ def main(
                 )
                 if clip_info["clip_path"].exists():
                     clip_info["clip_path"].unlink()
+            for path in audio_paths:
+                if Path(path).exists():
+                    Path(path).unlink()
     else:
         raise NotImplementedError
 
@@ -214,6 +220,14 @@ def main(
 
     print("Saving metadata")
     with (index_path / "meta.yaml").open("w") as file:
+        dataset_meta = {}
+        if mode == Mode.IMAGE:
+            dataset_meta["Images Count"] = len(media_paths)
+        else:
+            dataset_meta["Video Count"] = len(media_paths)
+            dataset_meta["Clips Count"] = sum(1 for _ in labels_path.open())
+        dataset_meta["Errors Count"] = sum(1 for _ in errors_path.open())
+        dataset_meta["Embeddings Shape"] = f"{emb_shapes}"
         yaml.dump(
             {
                 "Dataset": [
@@ -221,15 +235,10 @@ def main(
                         "data_path": str(dataset_path.resolve()),
                         "dataset": dataset_name,
                         "version": dataset_version,
-                        "modalities": [str(m) for m in mode.get_modalities()],
+                        "modalities": [str(m.value) for m in mode.get_modalities()],
                     }
                 ],
-                "Dataset Meta": {
-                    "Video Count": len(media_paths),
-                    "Clips Count": sum(1 for _ in labels_path.open()),
-                    "Errors Count": sum(1 for _ in errors_path.open()),
-                    "Embeddings Shape": f"{emb_shapes}"
-                },
+                "Dataset Meta": dataset_meta,
                 "Script Run Configuration": {
                     "Date": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
                     "Indexes Root": str(indexes_root),
@@ -237,6 +246,8 @@ def main(
                     "Dataset Name": dataset_name,
                     "Dataset Version": dataset_version,
                     "Mode": str(mode),
+                    "Model": model,
+                    "Clip Length": clip_length,
                     "Device": device,
                     "Batch Size": batch_size,
                 },
@@ -316,9 +327,6 @@ def split_video(input_path: Path, output_path: Path, segment_duration: float) ->
         "-nostats",
     ]  # fmt: skip
 
-    if input_path.suffix.lower() in [".mp4", ".avi", ".mov"]:
-        command += ["-bsf:v", "h264_mp4toannexb"]
-
     output_pattern = output_path / f"{input_path.stem}.clip%03d{input_path.suffix}"
     command += [str(output_pattern)]
 
@@ -334,12 +342,13 @@ def extract_audio(input_path: Path, output_path: Path) -> Path:
         "ffmpeg", "-y",
         "-i", str(input_path),
         "-vn",
-        "-acodec", "copy",
+        "-acodec", "pcm_s16le",
+        "-ar", "44100",
         "-loglevel", "error",
         "-nostats",
     ]
 
-    output_file = output_path / f"{input_path.stem}.audio.mp4"
+    output_file = output_path / f"{input_path.stem}.audio.wav"
     command += [str(output_file)]
 
     result = subprocess.run(command, capture_output=True, text=True, check=True)
@@ -417,6 +426,12 @@ if __name__ == "__main__":
         help="Embedder model"
     )
     parser.add_argument(
+        "--clip-length", "-cl",
+        type=float,
+        default=5.0,
+        help="Set the maximum clip length for splitting videos (in seconds)."
+    )
+    parser.add_argument(
         "--device",
         "-d",
         type=str,
@@ -439,6 +454,7 @@ if __name__ == "__main__":
         dataset_version=args.dataset_version,
         mode=args.mode,
         model=args.model,
+        clip_length=args.clip_length,
         device=args.device,
         batch_size=args.batch_size,
     )
