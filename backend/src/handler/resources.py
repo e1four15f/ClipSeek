@@ -14,27 +14,28 @@ from starlette.responses import FileResponse, Response, StreamingResponse
 
 from src.config import Config
 from src.types import Collection
+from src.utils.docstring import DocstringMixin
 from src.utils.streaming import build_streaming_response
 
 logger = logging.getLogger(__name__)
 
 
-class IResourcesHandler(ABC):
+class IResourcesHandler(ABC, DocstringMixin):
     @abstractmethod
     async def get_raw(self, request: Request, dataset: str, version: str, file_path: str) -> Response:
-        pass
+        """Retrieves the original media file from the specified dataset, converting it to MP4 format if necessary."""
 
     @abstractmethod
     async def get_thumbnail(
         self, request: Request, dataset: str, version: str, file_path: str, time: Optional[float]
     ) -> Response:
-        pass
+        """Cuts a clip from the specified video based on the defined start and end times."""
 
     @abstractmethod
     async def get_clip(
         self, request: Request, dataset: str, version: str, file_path: str, start: float, end: float
     ) -> Response:
-        pass
+        """Extracts a thumbnail image from a specified time and scales it to 320 pixels wide."""
 
 
 class ResourcesHandler(IResourcesHandler):

@@ -12,6 +12,7 @@ from src.entity.embedder import IEmbedder, Modality
 from src.entity.searcher import BatchSearcher
 from src.entity.storage import IStorage
 from src.types import CandidateWithCollection, Collection
+from src.utils.docstring import DocstringMixin
 
 
 class SearchConfiguration(BaseModel):
@@ -62,24 +63,24 @@ class SearchResponse(BaseModel):
     data: list[SearchResult] = Field(..., description="The list of search results")
 
 
-class ISearchHandler(ABC):
+class ISearchHandler(ABC, DocstringMixin):
     @abstractmethod
     async def search_by_text(self, text: RequestText, config: SearchConfiguration) -> SearchResponse:
-        pass
+        """Searches for similar results based on the provided text query."""
 
     @abstractmethod
     async def search_by_file(self, file: RequestFile, config: SearchConfiguration) -> SearchResponse:
-        pass
+        """Searches for similar results based on the contents of the uploaded file."""
 
     @abstractmethod
     async def search_by_reference(
         self, id: RequestID, dataset: RequestDataset, version: RequestVersion, config: SearchConfiguration
     ) -> SearchResponse:
-        pass
+        """Searches for similar results using a reference to indexed data."""
 
     @abstractmethod
     async def continue_search(self, request: ContinueSearchRequest) -> SearchResponse:
-        pass
+        """Proceeds to fetch additional search results from an ongoing session using a session ID."""
 
 
 class SearchHandler(ISearchHandler):

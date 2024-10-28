@@ -5,6 +5,7 @@ from pydantic import BaseModel, RootModel
 from src.entity.embedder import Modality
 from src.entity.storage import IStorage
 from src.types import Collection
+from src.utils.docstring import DocstringMixin
 
 
 class IndexInfo(BaseModel):
@@ -17,10 +18,13 @@ class IndexInfo(BaseModel):
 IndexesInfoResponse = RootModel[list[IndexInfo]]
 
 
-class IInfoHandler(ABC):
+class IInfoHandler(ABC, DocstringMixin):
     @abstractmethod
     async def get_indexes_info(self) -> IndexesInfoResponse:
-        pass
+        """
+        Retrieves information about available indexes,
+        including dataset details, version, row count, and associated modalities.
+        """
 
 
 class InfoHandler(IInfoHandler):
