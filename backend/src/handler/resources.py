@@ -46,7 +46,7 @@ class ResourcesHandler(IResourcesHandler):
         request: Request,
         dataset: str = Path(..., description="The dataset name or identifier"),
         version: str = Path(..., description="The version of the dataset"),
-        file_path: str = Path(..., description="The path of the file within the dataset"),
+        file_path: str = Path(..., description="The file's path within the dataset"),
     ) -> Response:
         content_type = "video/mp4"
         full_path = self._get_full_path(file_path, dataset, version)
@@ -108,7 +108,7 @@ class ResourcesHandler(IResourcesHandler):
         request: Request,  # noqa: ARG002
         dataset: str = Path(..., description="The dataset name or identifier"),
         version: str = Path(..., description="The version of the dataset"),
-        file_path: str = Path(..., description="The path of the file within the dataset"),
+        file_path: str = Path(..., description="The file's path within the dataset"),
         time: Optional[float] = Query(None, description="Time (in seconds) to extract the thumbnail from"),
     ) -> Response:
         full_path = self._get_full_path(file_path, dataset, version)
@@ -157,7 +157,7 @@ class ResourcesHandler(IResourcesHandler):
         request: Request,
         dataset: str = Path(..., description="The dataset name or identifier"),
         version: str = Path(..., description="The version of the dataset"),
-        file_path: str = Path(..., description="The path of the file within the dataset"),
+        file_path: str = Path(..., description="The file's path within the dataset"),
         start: float = Query(..., description="Clip start time in seconds"),
         end: float = Query(..., description="Clip end time in seconds"),
     ) -> Response:
