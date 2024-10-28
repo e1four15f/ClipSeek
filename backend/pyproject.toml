@@ -17,7 +17,7 @@ priority = "explicit"
 [tool.poetry.dependencies]
 python = "^3.9.8"
 faiss-cpu = "^1.8.0"
-pymilvus = "~2.4"  # keep synchronized with actual Milvus version in docker-compose.yml
+pymilvus = "~2.4"  # keep synchronized with actual Milvus version in docker-compose.yaml
 fastapi = "^0.111.0"
 languagebind = {path = "../LanguageBind"}
 cachetools = "^5.5.0"
