@@ -70,7 +70,7 @@ class ISearchHandler(ABC, DocstringMixin):
 
     @abstractmethod
     async def search_by_file(self, file: RequestFile, config: SearchConfiguration) -> SearchResponse:
-        """Searches for similar results based on the contents of the uploaded file."""
+        """Searches for similar results based on the uploaded file's content."""
 
     @abstractmethod
     async def search_by_reference(
