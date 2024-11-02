@@ -4,14 +4,14 @@ from collections.abc import Generator, Iterator
 from cachetools import TTLCache
 
 from src.entity.embedder.base import Modality
-from src.entity.retriever.base import ISearchIteratorFactory
+from src.entity.retriever.base import IRetriever
 from src.entity.searcher.base import ISearcher
 from src.types import Candidate, CandidateWithCollection, Collection
 
 
 class BatchSearcher(ISearcher):
-    def __init__(self, iterator_factories: dict[Collection, ISearchIteratorFactory]):
-        self._iterator_factories = iterator_factories
+    def __init__(self, retrievers: dict[Collection, IRetriever]):
+        self._retrievers = retrievers
         self._sessions: dict[str, Generator] = TTLCache(maxsize=2**11, ttl=600)  # type: ignore[assignment]
 
     def search(
@@ -25,7 +25,7 @@ class BatchSearcher(ISearcher):
         iterators = {}
         for collection in collections:
             try:
-                iterators[collection] = self._iterator_factories[collection].create_iterator(
+                iterators[collection] = self._retrievers[collection].create_iterator(
                     embedding=embedding,
                     modalities=modalities,
                     batch_size=batch_size,

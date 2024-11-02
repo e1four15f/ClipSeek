@@ -5,7 +5,7 @@ from src.entity.embedder.base import Modality
 from src.types import Candidate
 
 
-class ISearchIteratorFactory(ABC):
+class IRetriever(ABC):
     @abstractmethod
     def create_iterator(
         self, embedding: list[float], modalities: list[Modality], batch_size: int

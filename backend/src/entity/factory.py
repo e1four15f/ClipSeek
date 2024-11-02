@@ -7,7 +7,7 @@ from src.config import Config
 from src.entity.embedder.base import EmbedderType, IEmbedder, Modality
 from src.entity.embedder.language_bind import LanguageBindEmbedder
 from src.entity.embedder.random import RandomEmbedder
-from src.entity.retriever.retriever import MilvusSearchIteratorFactory
+from src.entity.retriever.milvus import MilvusRetriever
 from src.entity.searcher.base import ISearcher
 from src.entity.searcher.batch import BatchSearcher
 from src.entity.storage.base import IStorage, StorageType
@@ -36,7 +36,7 @@ def build_searcher() -> ISearcher:
         database_name=Config.MILVUS_DB_NAME,
     )
     return BatchSearcher(
-        iterator_factories={
+        retrievers={
             Collection(dataset=d["dataset"], version=d["version"]): _get_milvus_retriever(
                 dataset=d["dataset"],
                 version=d["version"],
@@ -74,9 +74,9 @@ def _get_milvus_retriever(
     dataset: str,
     version: str,
     modalities: list[Modality],
-) -> MilvusSearchIteratorFactory:
+) -> MilvusRetriever:
     logger.info("Initializing Milvus retriever for dataset=%s version=%s...", dataset, version)
-    return MilvusSearchIteratorFactory(
+    return MilvusRetriever(
         collection_name=f"{dataset}__{version}",
         modalities=modalities,
     )
