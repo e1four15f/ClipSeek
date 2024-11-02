@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from typing import Any, TypedDict
 
-from src.entity.embedder import Modality
+from src.entity.embedder.base import Modality
 
 
 @dataclass(frozen=True)

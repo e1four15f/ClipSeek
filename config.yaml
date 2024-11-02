@@ -1,7 +1,4 @@
-# General Settings
-DEVELOPER_MODE: false
-
-# Dataset Configuration
+# Datasets Configuration
 DATASETS:
   - data_path: "../../data/MSVD/YouTubeClips"
     dataset: "MSVD"
@@ -42,6 +39,8 @@ MILVUS_DB_NAME: "ClipSeek"
 USE_DUMMY_MODEL: false
 DEVICE: "cpu"
 EMBEDDINGS_DIM: 768
-## Constants
 INDEXES_ROOT: "../indexes"
 TMP_DIR: ".tmp"
+
+# General Settings
+DEVELOPER_MODE: false

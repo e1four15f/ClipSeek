@@ -3,12 +3,13 @@ from collections.abc import Generator, Iterator
 
 from cachetools import TTLCache
 
-from src.entity.embedder import Modality
-from src.entity.retriever.retriever import ISearchIteratorFactory
+from src.entity.embedder.base import Modality
+from src.entity.retriever.base import ISearchIteratorFactory
+from src.entity.searcher.base import ISearcher
 from src.types import Candidate, CandidateWithCollection, Collection
 
 
-class BatchSearcher:
+class BatchSearcher(ISearcher):
     def __init__(self, iterator_factories: dict[Collection, ISearchIteratorFactory]):
         self._iterator_factories = iterator_factories
         self._sessions: dict[str, Generator] = TTLCache(maxsize=2**11, ttl=600)  # type: ignore[assignment]

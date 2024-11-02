@@ -4,11 +4,14 @@ from functools import cache
 from pymilvus import MilvusClient
 
 from src.config import Config
-from src.entity.embedder import IEmbedder, LanguageBindEmbedder, Modality, RandomEmbedder
+from src.entity.embedder.base import IEmbedder, Modality
+from src.entity.embedder.language_bind import LanguageBindEmbedder
+from src.entity.embedder.random import RandomEmbedder
 from src.entity.retriever.retriever import MilvusSearchIteratorFactory
 from src.entity.retriever.utils import create_milvus_connection
-from src.entity.searcher import BatchSearcher
-from src.entity.storage import IStorage, MilvusStorage
+from src.entity.searcher.batch import BatchSearcher
+from src.entity.storage.base import IStorage
+from src.entity.storage.milvus import MilvusStorage
 from src.types import Collection
 
 logger = logging.getLogger(__name__)

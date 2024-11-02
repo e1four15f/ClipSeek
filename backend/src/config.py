@@ -4,7 +4,7 @@ from typing import TypedDict
 
 import yaml
 
-from src.entity.embedder import Modality
+from src.entity.embedder.base import Modality
 
 
 class _DatasetConfig(TypedDict):

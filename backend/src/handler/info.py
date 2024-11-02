@@ -2,8 +2,8 @@ from abc import ABC, abstractmethod
 
 from pydantic import BaseModel, RootModel
 
-from src.entity.embedder import Modality
-from src.entity.storage import IStorage
+from src.entity.embedder.base import Modality
+from src.entity.storage.base import IStorage
 from src.types import Collection
 from src.utils.docstring import DocstringMixin
 

@@ -12,7 +12,9 @@ import yaml
 from more_itertools import chunked
 from tqdm import tqdm
 
-from src.entity.embedder import LanguageBindEmbedder, Modality, RandomEmbedder
+from src.entity.embedder.language_bind import LanguageBindEmbedder
+from src.entity.embedder.random import RandomEmbedder
+from src.entity.embedder.base import Modality, Model
 
 
 class Mode(str, Enum):
@@ -33,11 +35,6 @@ class Mode(str, Enum):
             Mode.VIDEO_WITH_AUDIO: [Modality.VIDEO, Modality.AUDIO],
             Mode.IMAGE: [Modality.IMAGE],
         }[self]
-
-
-class Model(str, Enum):
-    LANGUAGE_BIND = 'LanguageBind'
-    RANDOM = 'random'
 
 
 def main(

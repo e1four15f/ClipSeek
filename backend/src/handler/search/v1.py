@@ -8,9 +8,9 @@ from pydantic import BaseModel, Field, model_validator
 from pymilvus import MilvusException
 from pymilvus.exceptions import DescribeCollectionException
 
-from src.entity.embedder import IEmbedder, Modality
-from src.entity.searcher import BatchSearcher
-from src.entity.storage import IStorage
+from src.entity.embedder.base import IEmbedder, Modality
+from src.entity.searcher.base import ISearcher
+from src.entity.storage.base import IStorage
 from src.types import CandidateWithCollection, Collection
 from src.utils.docstring import DocstringMixin
 
@@ -88,7 +88,7 @@ class SearchHandler(ISearchHandler):
         self,
         embedder: IEmbedder,
         storage: IStorage,
-        searcher: BatchSearcher,
+        searcher: ISearcher,
     ) -> None:
         self._embedder = embedder
         self._storage = storage

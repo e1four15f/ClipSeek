@@ -1,19 +1,8 @@
-from abc import ABC, abstractmethod
-
 from pymilvus import MilvusClient
 
-from src.entity.embedder import Modality
+from src.entity.embedder.base import Modality
+from src.entity.storage.base import IStorage
 from src.types import CollectionEntity, IndexedEntity
-
-
-class IStorage(ABC):
-    @abstractmethod
-    def get_by_id(self, id: str, dataset: str, version: str) -> IndexedEntity:
-        pass
-
-    @abstractmethod
-    def get_collections(self) -> list[CollectionEntity]:
-        pass
 
 
 class MilvusStorage(IStorage):
