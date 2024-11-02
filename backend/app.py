@@ -21,9 +21,9 @@ def get_app() -> FastAPI:
     Config.load(config_file="../config.yaml")
     logger.info("Config: %s", Config.dump())
 
-    embedder = build_embedder()
+    embedder = build_embedder(Config.EMBEDDER_TYPE, device=Config.DEVICE)
     searcher = build_searcher()
-    storage = build_storage()
+    storage = build_storage(Config.STORAGE_TYPE)
 
     dataset_paths = {Collection(dataset=d["dataset"], version=d["version"]): d["data_path"] for d in Config.DATASETS}
 

@@ -6,7 +6,7 @@ from src.entity.embedder.base import IEmbedder, Modality
 
 
 class RandomEmbedder(IEmbedder):
-    def __init__(self, embeddings_dim: int):
+    def __init__(self, embeddings_dim: int = 768):
         self._embeddings_dim = embeddings_dim
 
     def embed(self, data: Union[str, list[str], torch.Tensor], modality: Modality) -> torch.Tensor:  # noqa

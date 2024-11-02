@@ -12,9 +12,8 @@ import yaml
 from more_itertools import chunked
 from tqdm import tqdm
 
-from src.entity.embedder.base import Embedder, IEmbedder, Modality
-from src.entity.embedder.language_bind import LanguageBindEmbedder
-from src.entity.embedder.random import RandomEmbedder
+from src.entity.embedder.base import EmbedderType, Modality
+from src.entity.factory import build_embedder
 
 
 class Mode(str, Enum):
@@ -43,7 +42,7 @@ def main(
     dataset_name: str,
     dataset_version: str,
     mode: Mode,
-    model: Embedder,
+    model: EmbedderType,
     clip_length: float,
     device: str,
     batch_size: int,
@@ -80,13 +79,7 @@ def main(
     errors_path.open("w").close()
 
     print("Loading model...")
-    embedder: IEmbedder
-    if model == Embedder.LANGUAGE_BIND:
-        embedder = LanguageBindEmbedder(device=device)
-    elif model == Embedder.RANDOM:
-        embedder = RandomEmbedder(embeddings_dim=768)
-    else:
-        raise NotImplementedError
+    embedder = build_embedder(embedder_type=model, device=device)
 
     print(f'Computing embeddings to "{index_path}"...')
     embeddings: dict[Modality, list] = {modality: [] for modality in mode.get_modalities()}
@@ -420,10 +413,10 @@ if __name__ == "__main__":
     )
     parser.add_argument(
         "--model",
-        type=Embedder,
+        type=EmbedderType,
         required=True,
-        choices=list(Embedder),  # noqa
-        default=Embedder.LANGUAGE_BIND,
+        choices=list(EmbedderType),  # noqa
+        default=EmbedderType.LANGUAGE_BIND,
         help="Embedder model",
     )
     parser.add_argument(

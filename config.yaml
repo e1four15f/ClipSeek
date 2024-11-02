@@ -1,5 +1,10 @@
 # Datasets Configuration
 DATASETS:
+#  - data_path: /Users/v.karmazin/repos/data/TEST/sample
+#    dataset: TEST
+#    version: 5s
+#    modalities:
+#      - video
   - data_path: "../../data/MSVD/YouTubeClips"
     dataset: "MSVD"
     version: "all"
@@ -32,13 +37,11 @@ REQUESTS_TIMEOUT: 60000  # 60 seconds
 
 # Backend Settings
 BACKEND_URL: "http://localhost:8500"
-## Milvus
-MILVUS_URL: "http://localhost:19530"
-MILVUS_DB_NAME: "ClipSeek"
-## Model
-USE_DUMMY_MODEL: false
+EMBEDDER_TYPE: "LanguageBind"
 DEVICE: "cpu"
-EMBEDDINGS_DIM: 768
+STORAGE_TYPE: "Milvus"
+MILVUS_URL: "http://localhost:19530"
+MILVUS_DB_NAME: "MultimodalMediaSearch"
 INDEXES_ROOT: "../indexes"
 TMP_DIR: ".tmp"
 

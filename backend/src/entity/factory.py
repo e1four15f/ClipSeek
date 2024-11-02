@@ -4,12 +4,13 @@ from functools import cache
 from pymilvus import MilvusClient
 
 from src.config import Config
-from src.entity.embedder.base import IEmbedder, Modality
+from src.entity.embedder.base import EmbedderType, IEmbedder, Modality
 from src.entity.embedder.language_bind import LanguageBindEmbedder
 from src.entity.embedder.random import RandomEmbedder
 from src.entity.retriever.retriever import MilvusSearchIteratorFactory
+from src.entity.searcher.base import ISearcher
 from src.entity.searcher.batch import BatchSearcher
-from src.entity.storage.base import IStorage
+from src.entity.storage.base import IStorage, StorageType
 from src.entity.storage.milvus import MilvusStorage, create_milvus_connection
 from src.types import Collection
 
@@ -17,22 +18,23 @@ logger = logging.getLogger(__name__)
 
 
 @cache
-def build_embedder() -> IEmbedder:
-    logger.info("Initializing Embedder...")
-    if Config.USE_DUMMY_MODEL:
-        return RandomEmbedder(embeddings_dim=Config.EMBEDDINGS_DIM)
-    return LanguageBindEmbedder(device=Config.DEVICE)
+def build_embedder(embedder_type: EmbedderType, device: str) -> IEmbedder:
+    logger.info("Initializing %s embedder on device %s...", embedder_type, device)
+    if embedder_type == EmbedderType.LANGUAGE_BIND:
+        return LanguageBindEmbedder(device=device)
+    if embedder_type == EmbedderType.RANDOM:
+        return RandomEmbedder()
+    raise NotImplementedError(f"Embedder type '{embedder_type}' is not implemented.")
 
 
 @cache
-def build_searcher() -> BatchSearcher:
+def build_searcher() -> ISearcher:
     logger.info("Initializing Searcher...")
     # TODO move this to app.py?
     create_milvus_connection(
         url=Config.MILVUS_URL,
         database_name=Config.MILVUS_DB_NAME,
     )
-    # TODO create collections here, not on Searcher initizlization
     return BatchSearcher(
         iterator_factories={
             Collection(dataset=d["dataset"], version=d["version"]): _get_milvus_retriever(
@@ -46,9 +48,14 @@ def build_searcher() -> BatchSearcher:
 
 
 @cache
-def build_storage() -> IStorage:
-    client = MilvusClient(uri=Config.MILVUS_URL, db_name=Config.MILVUS_DB_NAME)
-    return MilvusStorage(client=client)
+def build_storage(storage_type: StorageType) -> IStorage:
+    logger.info("Initializing %s Storage...", storage_type)
+    if storage_type == StorageType.MILVUS:
+        client = MilvusClient(uri=Config.MILVUS_URL, db_name=Config.MILVUS_DB_NAME)
+        return MilvusStorage(client=client)
+    if storage_type == StorageType.FAISS:
+        pass  # TODO
+    raise NotImplementedError(f"Storage type '{storage_type}' is not implemented.")
 
 
 # TODO delete or support

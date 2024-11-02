@@ -1,6 +1,12 @@
 from abc import ABC, abstractmethod
+from enum import Enum
 
 from src.types import CollectionEntity, IndexedEntity
+
+
+class StorageType(str, Enum):
+    MILVUS = "Milvus"
+    FAISS = "FAISS"
 
 
 class IStorage(ABC):

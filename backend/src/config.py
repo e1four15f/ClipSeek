@@ -4,7 +4,8 @@ from typing import TypedDict
 
 import yaml
 
-from src.entity.embedder.base import Modality
+from src.entity.embedder.base import EmbedderType, Modality
+from src.entity.storage.base import StorageType
 
 
 class _DatasetConfig(TypedDict):
@@ -15,16 +16,15 @@ class _DatasetConfig(TypedDict):
 
 
 class Config:
-    DEVELOPER_MODE: bool
+    EMBEDDER_TYPE: EmbedderType
     DEVICE: str
-    TMP_DIR: str
-    USE_DUMMY_MODEL: bool
-    DATASETS: list[_DatasetConfig]
+    STORAGE_TYPE: StorageType
     MILVUS_URL: str
     MILVUS_DB_NAME: str
-    BACKEND_URL: str
-    EMBEDDINGS_DIM: int
+    DATASETS: list[_DatasetConfig]
     INDEXES_ROOT: str
+    TMP_DIR: str
+    DEVELOPER_MODE: bool
 
     @classmethod
     def load(cls, config_file: str) -> None:

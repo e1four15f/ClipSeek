@@ -24,6 +24,7 @@ from src.types import Candidate
 #         return [(self._labels[i], 1 - distances[0][j]) for j, i in enumerate(indices[0])]
 
 
+# TODO: check this mess
 class MilvusSearchIteratorFactory(ISearchIteratorFactory):
     def __init__(
         self,

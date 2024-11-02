@@ -5,11 +5,18 @@ from pathlib import Path
 import numpy as np
 
 from src.config import Config
-from src.entity.embedder.base import Embedder, Modality
+from src.entity.embedder.base import EmbedderType, Modality
+from src.entity.storage.base import StorageType
 from src.entity.storage.milvus import build_milvus_collection, create_milvus_connection
 
 
-def main(indexes_root: Path, dataset_name: str, dataset_version: str, model: Embedder) -> None:
+def main(
+    indexes_root: Path,
+    dataset_name: str,
+    dataset_version: str,
+    model: EmbedderType,
+    storage: StorageType,
+) -> None:
     index_path = Path(indexes_root) / dataset_name / dataset_version
     index_name = f"{dataset_name}__{dataset_version}"
 
@@ -34,7 +41,6 @@ def main(indexes_root: Path, dataset_name: str, dataset_version: str, model: Emb
         database_name=Config.MILVUS_DB_NAME,  # TODO hardcode
     )
     # TODO ability to add aknn index or index params. Put them into args as json
-    # TODO can we split this into several calls?
     build_milvus_collection(
         index_name, modality_embeddings=modality_embeddings, embeddings_dim=embeddings_dim, labels=labels
     )
@@ -62,11 +68,19 @@ if __name__ == "__main__":
     )
     parser.add_argument(
         "--model",
-        type=Embedder,
+        type=EmbedderType,
         required=True,
-        choices=list(Embedder),  # noqa
-        default=Embedder.LANGUAGE_BIND,
+        choices=list(EmbedderType),  # noqa
+        default=EmbedderType.LANGUAGE_BIND,
         help="Embedder model",
+    )
+    parser.add_argument(
+        "--storage",
+        type=StorageType,
+        required=True,
+        choices=list(StorageType),  # noqa
+        default=StorageType.MILVUS,
+        help="Storage type",
     )
 
     args = parser.parse_args()
@@ -75,4 +89,5 @@ if __name__ == "__main__":
         dataset_name=args.dataset_name,
         dataset_version=args.dataset_version,
         model=args.model,
+        storage=args.storage,
     )
