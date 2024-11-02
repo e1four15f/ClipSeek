@@ -95,7 +95,6 @@ class SearchHandler(ISearchHandler):
         self._searcher = searcher
 
     async def search_by_text(self, text: RequestText, config: SearchConfiguration) -> SearchResponse:
-        # TODO think about -> torch.Tensor
         text_embedding = self._embedder.embed(text, modality=Modality.TEXT).detach().cpu().tolist()
         return self._try_perform_search(text_embedding, config=config)
 
@@ -117,7 +116,6 @@ class SearchHandler(ISearchHandler):
             saved_file_path = tmp_file.name
             tmp_file.write(await file.read())
 
-            # TODO think about -> torch.Tensor
             file_embedding = self._embedder.embed(saved_file_path, modality=file_modality).detach().cpu().tolist()
             return self._try_perform_search(file_embedding, config=config)
 
