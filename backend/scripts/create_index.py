@@ -5,18 +5,18 @@ from pathlib import Path
 import numpy as np
 
 from src.config import Config
-from src.entity.embedder.base import Modality, Model
-from src.entity.retriever.utils import build_milvus_collection, create_milvus_connection
+from src.entity.embedder.base import Embedder, Modality
+from src.entity.storage.milvus import build_milvus_collection, create_milvus_connection
 
 
-def main(indexes_root: Path, dataset_name: str, dataset_version: str, model: Model) -> None:
+def main(indexes_root: Path, dataset_name: str, dataset_version: str, model: Embedder) -> None:
     index_path = Path(indexes_root) / dataset_name / dataset_version
     index_name = f"{dataset_name}__{dataset_version}"
 
     modality_embeddings = {}
     embeddings_dim = None
     for file in Path(index_path).glob(f"{model}_*_embeddings.npy"):
-        modality = file.stem.split('_')[1]  # Extract modality from the filename
+        modality = file.stem.split("_")[1]  # Extract modality from the filename
         embeddings = np.load(file)
         modality_embeddings[modality] = embeddings
         embeddings_dim = embeddings.shape[-1]
@@ -47,15 +47,10 @@ if __name__ == "__main__":
         "--indexes-root",
         type=Path,
         default="../indexes",
-        help="Path to the root directory where computed indexes will be stored."
+        help="Path to the root directory where computed indexes will be stored.",
     )
     parser.add_argument(
-        "--dataset-name",
-        "--name",
-        "-n",
-        type=str,
-        required=True,
-        help="Name of the dataset (e.g., 'VideoDataset')."
+        "--dataset-name", "--name", "-n", type=str, required=True, help="Name of the dataset (e.g., 'VideoDataset')."
     )
     parser.add_argument(
         "--dataset-version",
@@ -63,15 +58,15 @@ if __name__ == "__main__":
         "-v",
         type=str,
         required=True,
-        help="Version of the dataset (e.g., 'v1.0', '5s')."
+        help="Version of the dataset (e.g., 'v1.0', '5s').",
     )
     parser.add_argument(
         "--model",
-        type=Model,
+        type=Embedder,
         required=True,
-        choices=list(Model),  # noqa
-        default=Model.LANGUAGE_BIND,
-        help="Embedder model"
+        choices=list(Embedder),  # noqa
+        default=Embedder.LANGUAGE_BIND,
+        help="Embedder model",
     )
 
     args = parser.parse_args()

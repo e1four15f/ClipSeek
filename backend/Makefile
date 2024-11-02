@@ -1,17 +1,8 @@
 VENV = .venv
 CODE = src app.py
-# scripts
+# TODO: scripts
 run:
 	@$(VENV)/bin/python app.py
-
-up:
-	docker-compose up -d
-
-down:
-	docker-compose down
-
-logs:
-	docker-compose logs -f
 
 lint:
 	ruff check $(CODE)

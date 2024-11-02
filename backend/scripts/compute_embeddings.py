@@ -1,26 +1,26 @@
 import argparse
-from datetime import datetime
 import json
 import subprocess
 from collections.abc import Generator
+from datetime import datetime
 from enum import Enum
 from pathlib import Path
-from typing import Union, Optional
+from typing import Any, Optional, Union
 
 import numpy as np
 import yaml
 from more_itertools import chunked
 from tqdm import tqdm
 
+from src.entity.embedder.base import Embedder, IEmbedder, Modality
 from src.entity.embedder.language_bind import LanguageBindEmbedder
 from src.entity.embedder.random import RandomEmbedder
-from src.entity.embedder.base import Modality, Model
 
 
 class Mode(str, Enum):
-    VIDEO = 'video'
-    VIDEO_WITH_AUDIO = 'video+audio'
-    IMAGE = 'image'
+    VIDEO = "video"
+    VIDEO_WITH_AUDIO = "video+audio"
+    IMAGE = "image"
 
     def get_extentions(self) -> list[str]:
         return {
@@ -43,7 +43,7 @@ def main(
     dataset_name: str,
     dataset_version: str,
     mode: Mode,
-    model: Model,
+    model: Embedder,
     clip_length: float,
     device: str,
     batch_size: int,
@@ -65,8 +65,8 @@ def main(
     print(f'Found "{len(media_paths)}" {mode} files')
     if not len(media_paths):
         raise ValueError(
-            f'No {mode.get_modalities()} files found in directory: {dataset_path}. '
-            'Please check the dataset path and modality.'
+            f"No {mode.get_modalities()} files found in directory: {dataset_path}. "
+            "Please check the dataset path and modality."
         )
 
     index_path = indexes_root / dataset_name / dataset_version
@@ -80,23 +80,21 @@ def main(
     errors_path.open("w").close()
 
     print("Loading model...")
-    if model == Model.LANGUAGE_BIND:
+    embedder: IEmbedder
+    if model == Embedder.LANGUAGE_BIND:
         embedder = LanguageBindEmbedder(device=device)
-    elif model == Model.RANDOM:
+    elif model == Embedder.RANDOM:
         embedder = RandomEmbedder(embeddings_dim=768)
     else:
         raise NotImplementedError
 
     print(f'Computing embeddings to "{index_path}"...')
-    embeddings = {modality: [] for modality in mode.get_modalities()}
+    embeddings: dict[Modality, list] = {modality: [] for modality in mode.get_modalities()}
     if mode == Mode.IMAGE:
         for i, batch in enumerate(tqdm(list(chunked(media_paths, n=batch_size)))):
             try:
                 image_embeddings = (
-                    embedder.embed([str(path) for path in batch], modality=Modality.IMAGE)
-                    .detach()
-                    .cpu()
-                    .numpy()
+                    embedder.embed([str(path) for path in batch], modality=Modality.IMAGE).detach().cpu().numpy()
                 )
             except Exception as e:
                 print(f"Batch skipped! Exception while processing image batch {i}")
@@ -106,16 +104,17 @@ def main(
             np.save(tmp_path / "embeddings" / f"{model}_{Modality.IMAGE}_embeddings.{i}", image_embeddings)
             embeddings[Modality.IMAGE].append(image_embeddings)
             for path in batch:
-                write_labels(
-                    labels_path, media_path=path.relative_to(dataset_path)
-                )
+                write_labels(labels_path, media_path=path.relative_to(dataset_path))
     elif mode == mode.VIDEO:
-        for i, clips_info in enumerate(clip_generator(media_paths, output_path=(tmp_path/"clips"), batch_size=batch_size)):
+        for i, clips_info in enumerate(
+            clip_generator(media_paths, output_path=(tmp_path / "clips"), batch_size=batch_size)
+        ):
             if isinstance(clips_info, dict):
                 clip_info = clips_info
                 write_error(
-                    errors_path, media_path=clip_info["media_path"].relative_to(dataset_path),
-                    message=clip_info["error"]
+                    errors_path,
+                    media_path=clip_info["media_path"].relative_to(dataset_path),
+                    message=clip_info["error"],
                 )
                 continue
 
@@ -129,8 +128,9 @@ def main(
             except Exception as e:
                 print(f"Batch skipped! Exception while processing video batch {i}")
                 for clip_info in clips_info:
-                    write_error(errors_path, media_path=clip_info["media_path"].relative_to(dataset_path),
-                                message=str(e))
+                    write_error(
+                        errors_path, media_path=clip_info["media_path"].relative_to(dataset_path), message=str(e)
+                    )
                 continue
             np.save(tmp_path / "embeddings" / f"{model}_{Modality.VIDEO}_embeddings.{i}", video_embeddings)
             embeddings[Modality.VIDEO].append(video_embeddings)
@@ -141,12 +141,15 @@ def main(
                 if clip_info["clip_path"].exists():
                     clip_info["clip_path"].unlink()
     elif mode == mode.VIDEO_WITH_AUDIO:
-        for i, clips_info in enumerate(clip_generator(media_paths, output_path=(tmp_path / "clips"), batch_size=batch_size)):
+        for i, clips_info in enumerate(
+            clip_generator(media_paths, output_path=(tmp_path / "clips"), batch_size=batch_size)
+        ):
             if isinstance(clips_info, dict):
                 clip_info = clips_info
                 write_error(
-                    errors_path, media_path=clip_info["media_path"].relative_to(dataset_path),
-                    message=clip_info["error"]
+                    errors_path,
+                    media_path=clip_info["media_path"].relative_to(dataset_path),
+                    message=clip_info["error"],
                 )
                 continue
 
@@ -161,8 +164,9 @@ def main(
             except Exception as e:
                 print(f"Batch skipped! Exception while processing video batch {i}")
                 for clip_info in clips_info:
-                    write_error(errors_path, media_path=clip_info["media_path"].relative_to(dataset_path),
-                                message=str(e))
+                    write_error(
+                        errors_path, media_path=clip_info["media_path"].relative_to(dataset_path), message=str(e)
+                    )
                 continue
 
             # Audio
@@ -171,24 +175,22 @@ def main(
                 valid_indexes_mask = []
                 for j, clip in enumerate(clips_info):
                     try:
-                        audio_path = extract_audio(clip["clip_path"], output_path=(tmp_path / 'audios'))
+                        audio_path = extract_audio(clip["clip_path"], output_path=(tmp_path / "audios"))
                         audio_paths.append(str(audio_path))
                         valid_indexes_mask.append(j)
-                    except Exception as e:
+                    except Exception:
                         print(f'Video {clip["clip_path"]} does not have audio stream')
                 audio_embeddings = np.zeros((len(clips_info), video_embeddings.shape[1]))
                 if audio_paths:
                     audio_embeddings[valid_indexes_mask] = (
-                        embedder.embed(audio_paths, modality=Modality.AUDIO)
-                        .detach()
-                        .cpu()
-                        .numpy()
+                        embedder.embed(audio_paths, modality=Modality.AUDIO).detach().cpu().numpy()
                     )
             except Exception as e:
                 print(f"Batch skipped! Exception while processing audio batch {i}")
                 for clip_info in clips_info:
-                    write_error(errors_path, media_path=clip_info["media_path"].relative_to(dataset_path),
-                                message=str(e))
+                    write_error(
+                        errors_path, media_path=clip_info["media_path"].relative_to(dataset_path), message=str(e)
+                    )
                 continue
 
             np.save(tmp_path / "embeddings" / f"{model}_{Modality.VIDEO}_embeddings.{i}", video_embeddings)
@@ -217,7 +219,7 @@ def main(
 
     print("Saving metadata")
     with (index_path / "meta.yaml").open("w") as file:
-        dataset_meta = {}
+        dataset_meta: dict[str, Any] = {}
         if mode == Mode.IMAGE:
             dataset_meta["Images Count"] = len(media_paths)
         else:
@@ -257,7 +259,9 @@ def main(
     print("Done!")
 
 
-def clip_generator(paths: list[Path], output_path: Path, batch_size: int) -> Generator[Union[list[dict], dict], None, None]:
+def clip_generator(
+    paths: list[Path], output_path: Path, batch_size: int
+) -> Generator[Union[list[dict], dict], None, None]:
     buffer = []
     for path in tqdm(paths):
         try:
@@ -284,9 +288,9 @@ def write_error(errors_path: Path, media_path: Path, message: str) -> None:
 
 def write_labels(labels_path: Path, media_path: Path, span: Optional[tuple[float, float]] = None) -> None:
     with labels_path.open("a") as f:
-        data = {"path": str(media_path)}
+        data: dict[str, Any] = {"path": str(media_path)}
         if span:
-            data['span'] = span
+            data["span"] = span
         json_line = json.dumps(data)
         f.write(json_line + "\n")
 
@@ -336,12 +340,17 @@ def split_video(input_path: Path, output_path: Path, segment_duration: float) ->
 
 def extract_audio(input_path: Path, output_path: Path) -> Path:
     command = [
-        "ffmpeg", "-y",
-        "-i", str(input_path),
+        "ffmpeg",
+        "-y",
+        "-i",
+        str(input_path),
         "-vn",
-        "-acodec", "pcm_s16le",
-        "-ar", "44100",
-        "-loglevel", "error",
+        "-acodec",
+        "pcm_s16le",
+        "-ar",
+        "44100",
+        "-loglevel",
+        "error",
         "-nostats",
     ]
 
@@ -379,7 +388,7 @@ if __name__ == "__main__":
         "--indexes-root",
         type=Path,
         default="../indexes",
-        help="Path to the root directory where computed indexes will be stored."
+        help="Path to the root directory where computed indexes will be stored.",
     )
     parser.add_argument(
         "--dataset-path",
@@ -388,15 +397,10 @@ if __name__ == "__main__":
         type=Path,
         required=True,
         default="raw_data/<dataset>/videos/all",
-        help="Path to the dataset containing media files."
+        help="Path to the dataset containing media files.",
     )
     parser.add_argument(
-        "--dataset-name",
-        "--name",
-        "-n",
-        type=str,
-        required=True,
-        help="Name of the dataset (e.g., 'MyDataset')."
+        "--dataset-name", "--name", "-n", type=str, required=True, help="Name of the dataset (e.g., 'MyDataset')."
     )
     parser.add_argument(
         "--dataset-version",
@@ -404,7 +408,7 @@ if __name__ == "__main__":
         "-v",
         type=str,
         required=True,
-        help="Version of the dataset (e.g., 'v1.0', '5s')."
+        help="Version of the dataset (e.g., 'v1.0', '5s').",
     )
     parser.add_argument(
         "--mode",
@@ -412,36 +416,27 @@ if __name__ == "__main__":
         type=Mode,
         required=True,
         choices=list(Mode),  # noqa
-        help="Inferece mode"
+        help="Inferece mode",
     )
     parser.add_argument(
         "--model",
-        type=Model,
+        type=Embedder,
         required=True,
-        choices=list(Model),  # noqa
-        default=Model.LANGUAGE_BIND,
-        help="Embedder model"
+        choices=list(Embedder),  # noqa
+        default=Embedder.LANGUAGE_BIND,
+        help="Embedder model",
     )
     parser.add_argument(
-        "--clip-length", "-cl",
+        "--clip-length",
+        "-cl",
         type=float,
         default=5.0,
-        help="Set the maximum clip length for splitting videos (in seconds)."
+        help="Set the maximum clip length for splitting videos (in seconds).",
     )
     parser.add_argument(
-        "--device",
-        "-d",
-        type=str,
-        default="cuda",
-        help="Device to use for model inference: 'cuda' or 'cpu'."
+        "--device", "-d", type=str, default="cuda", help="Device to use for model inference: 'cuda' or 'cpu'."
     )
-    parser.add_argument(
-        "--batch-size",
-        "-bs",
-        type=int,
-        default=32,
-        help="Batch size for model inference."
-    )
+    parser.add_argument("--batch-size", "-bs", type=int, default=32, help="Batch size for model inference.")
 
     args = parser.parse_args()
     main(

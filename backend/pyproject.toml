@@ -7,6 +7,7 @@ readme = "README.md"
 package-mode = false
 
 [[tool.poetry.source]]
+# TODO: keep only gpu version
 name = "pytorch"
 # GPU (cu116)
 #url = "https://download.pytorch.org/whl/cu116"
@@ -70,6 +71,8 @@ target-version = "py39"
 "scripts/*" = [
     "T201",  # `print` found
     "PLR0915",  # Too many statements
+    "PLR0913",  # Too many arguments in function definition
+    "PLR0912",  # Too many branches
 ]
 
 [tool.ruff.lint.pylint]

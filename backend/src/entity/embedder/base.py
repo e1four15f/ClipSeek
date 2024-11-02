@@ -18,7 +18,7 @@ class Modality(str, Enum):
         return [cls.HYBRID, cls.VIDEO, cls.IMAGE, cls.AUDIO, cls.TEXT]
 
 
-class Model(str, Enum):
+class Embedder(str, Enum):
     LANGUAGE_BIND = "LanguageBind"
     RANDOM = "random"
 
