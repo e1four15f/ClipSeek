@@ -41,7 +41,7 @@ EMBEDDER_TYPE: "LanguageBind"
 DEVICE: "cpu"
 STORAGE_TYPE: "Milvus"
 MILVUS_URL: "http://localhost:19530"
-MILVUS_DB_NAME: "MultimodalMediaSearch"
+MILVUS_DB_NAME: "ClipSeek"
 INDEXES_ROOT: "../indexes"
 TMP_DIR: ".tmp"
 

@@ -6,26 +6,29 @@ import numpy as np
 
 from src.config import Config
 from src.entity.embedder.base import EmbedderType, Modality
+from src.entity.factory import build_storage
 from src.entity.storage.base import StorageType
-from src.entity.storage.milvus import build_milvus_collection, create_milvus_connection
+from src.entity.storage.milvus import build_milvus_collection
 
 
 def main(
     indexes_root: Path,
     dataset_name: str,
     dataset_version: str,
-    model: EmbedderType,
-    storage: StorageType,
+    model_type: EmbedderType,
+    storage_type: StorageType,
 ) -> None:
+    Config.load(config_file="../config.yaml")
+
     index_path = Path(indexes_root) / dataset_name / dataset_version
     index_name = f"{dataset_name}__{dataset_version}"
 
-    modality_embeddings = {}
-    embeddings_dim = None
-    for file in Path(index_path).glob(f"{model}_*_embeddings.npy"):
+    modality_embeddings: dict[Modality, np.ndarray] = {}
+    embeddings_dim: int
+    for file in Path(index_path).glob(f"{model_type}_*_embeddings.npy"):
         modality = file.stem.split("_")[1]  # Extract modality from the filename
         embeddings = np.load(file)
-        modality_embeddings[modality] = embeddings
+        modality_embeddings[Modality(modality)] = embeddings
         embeddings_dim = embeddings.shape[-1]
 
     if len(modality_embeddings) > 1:
@@ -35,26 +38,17 @@ def main(
     with (index_path / "labels.jsonlines").open() as f:
         labels = [json.loads(line) for line in f]
 
-    # TODO here would be an if for FAISS index
-    create_milvus_connection(
-        url=Config.MILVUS_URL,  # TODO move to args
-        database_name=Config.MILVUS_DB_NAME,  # TODO hardcode
-    )
-    # TODO ability to add aknn index or index params. Put them into args as json
+    print("Building Milvus collections...")
+    build_storage(storage_type)
     build_milvus_collection(
-        index_name, modality_embeddings=modality_embeddings, embeddings_dim=embeddings_dim, labels=labels
+        index_name, modality_embeddings=modality_embeddings, embeddings_dim=embeddings_dim, labels=labels  # noqa
     )
+    print("Done!")
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="")
 
-    parser.add_argument(
-        "--indexes-root",
-        type=Path,
-        default="../indexes",
-        help="Path to the root directory where computed indexes will be stored.",
-    )
     parser.add_argument(
         "--dataset-name", "--name", "-n", type=str, required=True, help="Name of the dataset (e.g., 'VideoDataset')."
     )
@@ -68,26 +62,19 @@ if __name__ == "__main__":
     )
     parser.add_argument(
         "--model",
+        "-m",
         type=EmbedderType,
         required=True,
         choices=list(EmbedderType),  # noqa
         default=EmbedderType.LANGUAGE_BIND,
         help="Embedder model",
     )
-    parser.add_argument(
-        "--storage",
-        type=StorageType,
-        required=True,
-        choices=list(StorageType),  # noqa
-        default=StorageType.MILVUS,
-        help="Storage type",
-    )
 
     args = parser.parse_args()
     main(
-        indexes_root=Path(args.indexes_root),
+        indexes_root=Path("../indexes"),
         dataset_name=args.dataset_name,
         dataset_version=args.dataset_version,
-        model=args.model,
-        storage=args.storage,
+        model_type=args.model,
+        storage_type=StorageType.MILVUS,
     )

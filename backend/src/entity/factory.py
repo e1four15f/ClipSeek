@@ -30,11 +30,6 @@ def build_embedder(embedder_type: EmbedderType, device: str) -> IEmbedder:
 @cache
 def build_searcher() -> ISearcher:
     logger.info("Initializing Searcher...")
-    # TODO move this to app.py?
-    create_milvus_connection(
-        url=Config.MILVUS_URL,
-        database_name=Config.MILVUS_DB_NAME,
-    )
     return BatchSearcher(
         retrievers={
             Collection(dataset=d["dataset"], version=d["version"]): _get_milvus_retriever(
@@ -51,23 +46,13 @@ def build_searcher() -> ISearcher:
 def build_storage(storage_type: StorageType) -> IStorage:
     logger.info("Initializing %s Storage...", storage_type)
     if storage_type == StorageType.MILVUS:
+        create_milvus_connection(
+            url=Config.MILVUS_URL,
+            database_name=Config.MILVUS_DB_NAME,
+        )
         client = MilvusClient(uri=Config.MILVUS_URL, db_name=Config.MILVUS_DB_NAME)
         return MilvusStorage(client=client)
-    if storage_type == StorageType.FAISS:
-        pass  # TODO
     raise NotImplementedError(f"Storage type '{storage_type}' is not implemented.")
-
-
-# TODO delete or support
-# def _get_faiss_retriever(dataset: str, version: str, modalities: tuple[str], device: str
-# ) -> FaissSearchIteratorFactory:
-#     logger.info("Initializing FAISS retriever for dataset=%s version=%s...", dataset, version)
-#     index_path = Path(Config.INDEXES_ROOT) / dataset / version
-#     index_embeddings = {
-#         modality: np.load(index_path / f"LanguageBind_{modality}_embeddings.npy") for modality in modalities
-#     }  # TODO model hardcode
-#     labels = (index_path / "labels.txt").open().read().splitlines()
-#     return FaissSearchIteratorFactory(embeddings=index_embeddings, labels=labels, device=device)
 
 
 def _get_milvus_retriever(

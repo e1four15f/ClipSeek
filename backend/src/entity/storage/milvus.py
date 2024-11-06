@@ -48,7 +48,7 @@ def create_milvus_connection(url: str, database_name: str = "default") -> None:
 
 def build_milvus_collection(
     index_name: str, modality_embeddings: dict[Modality, np.ndarray], embeddings_dim: int, labels: list[Label]
-) -> Collection:
+) -> None:
     fields = [
         FieldSchema(name="id", dtype=DataType.INT64, is_primary=True, auto_id=True),
         FieldSchema(name="path", dtype=DataType.VARCHAR, max_length=4096),
@@ -80,4 +80,3 @@ def build_milvus_collection(
         )
         for batch in chunked(entities, 10_000):  # setting limit fix gRPC resource exhausted error
             collection.insert(batch, partition_name=modality)
-    return collection

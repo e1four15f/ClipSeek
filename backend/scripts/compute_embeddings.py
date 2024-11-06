@@ -42,7 +42,7 @@ def main(
     dataset_name: str,
     dataset_version: str,
     mode: Mode,
-    model: EmbedderType,
+    model_type: EmbedderType,
     clip_length: float,
     device: str,
     batch_size: int,
@@ -54,7 +54,7 @@ def main(
         f"Dataset Name: {dataset_name}\n"
         f"Dataset Version: {dataset_version}\n"
         f"Mode: {mode}\n"
-        f"Model: {model}\n"
+        f"Model: {model_type}\n"
         f"Clip Length: {clip_length}\n"
         f"Device: {device}\n"
         f"Batch Size: {batch_size}\n"
@@ -79,7 +79,7 @@ def main(
     errors_path.open("w").close()
 
     print("Loading model...")
-    embedder = build_embedder(embedder_type=model, device=device)
+    embedder = build_embedder(embedder_type=model_type, device=device)
 
     print(f'Computing embeddings to "{index_path}"...')
     embeddings: dict[Modality, list] = {modality: [] for modality in mode.get_modalities()}
@@ -94,7 +94,7 @@ def main(
                 for path in batch:
                     write_error(errors_path, media_path=path.relative_to(dataset_path), message=str(e))
                 continue
-            np.save(tmp_path / "embeddings" / f"{model}_{Modality.IMAGE}_embeddings.{i}", image_embeddings)
+            np.save(tmp_path / "embeddings" / f"{model_type}_{Modality.IMAGE}_embeddings.{i}", image_embeddings)
             embeddings[Modality.IMAGE].append(image_embeddings)
             for path in batch:
                 write_labels(labels_path, media_path=path.relative_to(dataset_path))
@@ -125,7 +125,7 @@ def main(
                         errors_path, media_path=clip_info["media_path"].relative_to(dataset_path), message=str(e)
                     )
                 continue
-            np.save(tmp_path / "embeddings" / f"{model}_{Modality.VIDEO}_embeddings.{i}", video_embeddings)
+            np.save(tmp_path / "embeddings" / f"{model_type}_{Modality.VIDEO}_embeddings.{i}", video_embeddings)
             embeddings[Modality.VIDEO].append(video_embeddings)
             for clip_info in clips_info:
                 write_labels(
@@ -186,10 +186,10 @@ def main(
                     )
                 continue
 
-            np.save(tmp_path / "embeddings" / f"{model}_{Modality.VIDEO}_embeddings.{i}", video_embeddings)
+            np.save(tmp_path / "embeddings" / f"{model_type}_{Modality.VIDEO}_embeddings.{i}", video_embeddings)
             embeddings[Modality.VIDEO].append(video_embeddings)
 
-            np.save(tmp_path / "embeddings" / f"{model}_{Modality.AUDIO}_embeddings.{i}", audio_embeddings)
+            np.save(tmp_path / "embeddings" / f"{model_type}_{Modality.AUDIO}_embeddings.{i}", audio_embeddings)
             embeddings[Modality.AUDIO].append(audio_embeddings)
 
             for clip_info in clips_info:
@@ -208,7 +208,7 @@ def main(
     for modality in mode.get_modalities():
         modality_embeddings = np.vstack(embeddings[modality])
         emb_shapes[str(modality.value)] = modality_embeddings.shape
-        np.save(index_path / f"{model}_{modality}_embeddings.npy", modality_embeddings)
+        np.save(index_path / f"{model_type}_{modality}_embeddings.npy", modality_embeddings)
 
     print("Saving metadata")
     with (index_path / "meta.yaml").open("w") as file:
@@ -238,7 +238,7 @@ def main(
                     "Dataset Name": dataset_name,
                     "Dataset Version": dataset_version,
                     "Mode": str(mode),
-                    "Model": str(model),
+                    "Model": str(model_type),
                     "Clip Length": clip_length,
                     "Device": device,
                     "Batch Size": batch_size,
@@ -377,12 +377,7 @@ def get_video_duration(file_path: Path) -> float:
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Compute embeddings for a multimedia dataset.")
-    parser.add_argument(
-        "--indexes-root",
-        type=Path,
-        default="../indexes",
-        help="Path to the root directory where computed indexes will be stored.",
-    )
+
     parser.add_argument(
         "--dataset-path",
         "--path",
@@ -405,7 +400,6 @@ if __name__ == "__main__":
     )
     parser.add_argument(
         "--mode",
-        "-m",
         type=Mode,
         required=True,
         choices=list(Mode),  # noqa
@@ -413,6 +407,7 @@ if __name__ == "__main__":
     )
     parser.add_argument(
         "--model",
+        "-m",
         type=EmbedderType,
         required=True,
         choices=list(EmbedderType),  # noqa
@@ -433,12 +428,12 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
     main(
-        indexes_root=Path(args.indexes_root),
+        indexes_root=Path("../indexes"),
         dataset_path=Path(args.dataset_path),
         dataset_name=args.dataset_name,
         dataset_version=args.dataset_version,
         mode=args.mode,
-        model=args.model,
+        model_type=args.model,
         clip_length=args.clip_length,
         device=args.device,
         batch_size=args.batch_size,

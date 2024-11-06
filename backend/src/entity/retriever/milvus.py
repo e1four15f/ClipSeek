@@ -7,7 +7,6 @@ from src.entity.retriever.base import IRetriever
 from src.types import Candidate
 
 
-# TODO: check this mess after Adding faiss
 class MilvusRetriever(IRetriever):
     def __init__(
         self,
