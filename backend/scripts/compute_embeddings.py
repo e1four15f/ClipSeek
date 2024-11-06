@@ -238,7 +238,7 @@ def main(
                     "Dataset Name": dataset_name,
                     "Dataset Version": dataset_version,
                     "Mode": str(mode),
-                    "Model": model,
+                    "Model": str(model),
                     "Clip Length": clip_length,
                     "Device": device,
                     "Batch Size": batch_size,
