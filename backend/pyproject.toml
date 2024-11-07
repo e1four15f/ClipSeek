@@ -1,10 +1,18 @@
 [tool.poetry]
 name = "backend"
 version = "0.1.0"
-description = ""
+description = "ClipSeek backend"
 authors = ["v.karmazin"]
 readme = "README.md"
-package-mode = false
+packages = [
+    { include = "src" },
+    { include = "scripts" },
+    { include = "app.py" },
+]
+
+[tool.poetry.scripts]
+compute_embeddings = "scripts.compute_embeddings:run"
+create_index = "scripts.create_index:run"
 
 [[tool.poetry.source]]
 # TODO: keep only gpu version

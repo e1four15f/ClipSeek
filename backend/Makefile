@@ -5,9 +5,9 @@ run:
 	@$(VENV)/bin/python app.py
 
 lint:
-	ruff check $(CODE)
-	mypy --install-types --non-interactive $(CODE)
+	@$(VENV)/bin/ruff check $(CODE)
+	@$(VENV)/bin/mypy --install-types --non-interactive $(CODE)
 
 pretty:
-	ruff format $(CODE)
-	ruff check --fix $(CODE)
+	@$(VENV)/bin/ruff format $(CODE)
+	@$(VENV)/bin/ruff check --fix $(CODE)

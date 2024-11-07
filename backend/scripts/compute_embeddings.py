@@ -375,7 +375,7 @@ def get_video_duration(file_path: Path) -> float:
     return float(duration_info["format"]["duration"])
 
 
-if __name__ == "__main__":
+def run() -> None:
     parser = argparse.ArgumentParser(description="Compute embeddings for a multimedia dataset.")
 
     parser.add_argument(
@@ -402,7 +402,7 @@ if __name__ == "__main__":
         "--mode",
         type=Mode,
         required=True,
-        choices=list(Mode),  # noqa
+        choices=[str(i.value) for i in Mode],  # noqa
         help="Inferece mode",
     )
     parser.add_argument(
@@ -410,7 +410,7 @@ if __name__ == "__main__":
         "-m",
         type=EmbedderType,
         required=True,
-        choices=list(EmbedderType),  # noqa
+        choices=[str(i.value) for i in EmbedderType],  # noqa
         default=EmbedderType.LANGUAGE_BIND,
         help="Embedder model",
     )
@@ -438,3 +438,7 @@ if __name__ == "__main__":
         device=args.device,
         batch_size=args.batch_size,
     )
+
+
+if __name__ == "__main__":
+    run()

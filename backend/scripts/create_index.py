@@ -41,13 +41,18 @@ def main(
     print("Building Milvus collections...")
     build_storage(storage_type)
     build_milvus_collection(
-        index_name, modality_embeddings=modality_embeddings, embeddings_dim=embeddings_dim, labels=labels  # noqa
+        index_name,
+        modality_embeddings=modality_embeddings,
+        embeddings_dim=embeddings_dim,  # noqa
+        labels=labels,
     )
     print("Done!")
 
 
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="")
+def run() -> None:
+    parser = argparse.ArgumentParser(
+        description="Build an index from precomputed embeddings for a specific dataset version."
+    )
 
     parser.add_argument(
         "--dataset-name", "--name", "-n", type=str, required=True, help="Name of the dataset (e.g., 'VideoDataset')."
@@ -65,7 +70,7 @@ if __name__ == "__main__":
         "-m",
         type=EmbedderType,
         required=True,
-        choices=list(EmbedderType),  # noqa
+        choices=[str(i.value) for i in EmbedderType],  # noqa
         default=EmbedderType.LANGUAGE_BIND,
         help="Embedder model",
     )
@@ -78,3 +83,7 @@ if __name__ == "__main__":
         model_type=args.model,
         storage_type=StorageType.MILVUS,
     )
+
+
+if __name__ == "__main__":
+    run()
