@@ -1,7 +1,10 @@
-FROM python:3.9-buster
+FROM nvidia/cuda:12.6.2-base-ubuntu22.04
 
 RUN apt-get update && \
-    apt-get install -y --no-install-recommends ffmpeg libgl1-mesa-glx libglib2.0-0 && \
+    apt-get install -y --no-install-recommends \
+      python3 python3-dev python3-pip \
+      ffmpeg libgl1-mesa-glx libglib2.0-0 && \
+    ln -s /bin/python3 /bin/python && \
     pip install poetry==1.8.3
 
 ENV POETRY_NO_INTERACTION=1 \

@@ -26,6 +26,13 @@ services:
     environment:
       MILVUS_URL: http://milvus:19530
       HF_HOME: /hf
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [ gpu ]
     depends_on:
       - "milvus"
 
