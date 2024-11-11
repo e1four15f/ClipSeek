@@ -1,34 +1,5 @@
 # Datasets Configuration
 DATASETS:
-#  - data_path: /Users/v.karmazin/repos/data/TEST/sample
-#    dataset: TEST
-#    version: 5s
-#    modalities:
-#      - video
-  - data_path: "../../data/MSVD/YouTubeClips"
-    dataset: "MSVD"
-    version: "all"
-    modalities: [ "video" ]
-
-  - data_path: "../../data/MSRVTT/all"
-    dataset: "MSRVTT"
-    version: "train"
-    modalities: [ "video", "audio" ]
-
-  - data_path: "../../data/MSRVTT/test"
-    dataset: "MSRVTT"
-    version: "test"
-    modalities: [ "video" ]
-
-  - data_path: "../../data/COCO/val2017"
-    dataset: "COCO"
-    version: "val2017"
-    modalities: [ "image" ]
-
-  - data_path: "../../data/COCO/test2017"
-    dataset: "COCO"
-    version: "test2017"
-    modalities: [ "image" ]
 
 # Frontend Settings
 RESULT_COLUMNS: 4

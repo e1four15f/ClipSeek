@@ -8,6 +8,7 @@ from pathlib import Path
 from typing import Any, Optional, Union
 
 import numpy as np
+import torch
 import yaml
 from more_itertools import chunked
 from tqdm import tqdm
@@ -60,6 +61,11 @@ def main(
         f"Batch Size: {batch_size}\n"
         "####################"
     )
+
+    if model_type == EmbedderType.LANGUAGE_BIND and device == "cuda" and not torch.cuda.is_available():
+        torch.tensor([], device="cuda")
+        raise
+
     media_paths = find_media_files(directory=dataset_path, extensions=mode.get_extentions())
     print(f'Found "{len(media_paths)}" {mode} files')
     if not len(media_paths):

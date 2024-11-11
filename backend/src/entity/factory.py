@@ -37,7 +37,7 @@ def build_searcher() -> ISearcher:
                 version=d["version"],
                 modalities=[Modality(m) for m in d["modalities"]],
             )
-            for d in Config.DATASETS
+            for d in Config.DATASETS or []
         }
     )
 

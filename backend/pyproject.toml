@@ -14,22 +14,14 @@ packages = [
 compute_embeddings = "scripts.compute_embeddings:run"
 create_index = "scripts.create_index:run"
 
-[[tool.poetry.source]]
-# TODO: keep only gpu version
-name = "pytorch"
-# GPU (cu116)
-#url = "https://download.pytorch.org/whl/cu116"
-# CPU
-url = "https://download.pytorch.org/whl/cpu"
-priority = "explicit"
-
 [tool.poetry.dependencies]
 python = "^3.9.8"
-faiss-cpu = "^1.8.0"
+# faiss-cpu = "^1.8.0"
 pymilvus = "~2.4"  # keep synchronized with actual Milvus version in docker-compose.yaml
 fastapi = "^0.111.0"
 languagebind = {path = "../LanguageBind"}
 cachetools = "^5.5.0"
+more-itertools = "^10.5.0"
 
 [tool.poetry.group.dev.dependencies]
 ruff = "^0.4.2"
@@ -47,6 +39,7 @@ lint.ignore = [
     "ANN204",  # Missing return type annotation for special method `__init__`
     "ANN101",  # Missing type annotation for `self` in method
     "ANN102",  # Missing type annotation for `cls` in classmethod
+    "S104",  # Possible binding to all interfaces
     "S311",  # Standard pseudo-random generators are not suitable for cryptographic purposes
     "S603",  # subprocess call: check for execution of untrusted input
     "A002",  # Argument `id` is shadowing a Python builtin

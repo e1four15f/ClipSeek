@@ -25,7 +25,9 @@ def get_app() -> FastAPI:
     storage = build_storage(Config.STORAGE_TYPE)
     searcher = build_searcher()
 
-    dataset_paths = {Collection(dataset=d["dataset"], version=d["version"]): d["data_path"] for d in Config.DATASETS}
+    dataset_paths = {
+        Collection(dataset=d["dataset"], version=d["version"]): d["data_path"] for d in Config.DATASETS or []
+    }
 
     return AppServer(
         search_handler=SearchHandler(
@@ -41,4 +43,4 @@ def get_app() -> FastAPI:
 if __name__ == "__main__":
     import uvicorn
 
-    uvicorn.run(get_app(), host="localhost", port=8500)
+    uvicorn.run(get_app(), host="0.0.0.0", port=8500)
