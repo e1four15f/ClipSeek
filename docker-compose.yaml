@@ -1,7 +1,6 @@
-version: '3.5'
-
 services:
   frontend:
+    image: e1four15f/clipseek-frontend:${VERSION}
     build:
       context: .
       dockerfile: frontend/Dockerfile
@@ -13,6 +12,7 @@ services:
       - "backend"
 
   backend:
+    image: e1four15f/clipseek-backend:${VERSION}
     build:
       context: .
       dockerfile: backend/Dockerfile
