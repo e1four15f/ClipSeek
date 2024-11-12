@@ -8,7 +8,7 @@ export const REQUESTS_TIMEOUT = cfg.REQUESTS_TIMEOUT;
 export const backendUrl = cfg.BACKEND_URL;
 
 export const getThumbnailUrl = (dataset, version, path, time) => {
-  let url = `${backendUrl}/resources/thumbnail/${dataset}/${version}/${path}`;
+  let url = `/resources/thumbnail/${dataset}/${version}/${path}`;
   if (time) {
     url += `?time=${time}`;
   }
@@ -16,9 +16,9 @@ export const getThumbnailUrl = (dataset, version, path, time) => {
 };
 
 export const getClipUrl = (dataset, version, path, span) => {
-  return `${backendUrl}/resources/clip/${dataset}/${version}/${path}?start=${span[0]}&end=${span[1]}`;
+  return `/resources/clip/${dataset}/${version}/${path}?start=${span[0]}&end=${span[1]}`;
 };
 
 export const getRawUrl = (dataset, version, path) => {
-  return `${backendUrl}/resources/raw/${dataset}/${version}/${path}`;
+  return `/resources/raw/${dataset}/${version}/${path}`;
 };

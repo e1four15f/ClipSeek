@@ -5,13 +5,6 @@
   import { CaretUpSolid } from "flowbite-svelte-icons";
   import { Pulse } from "svelte-loading-spinners";
   import { Gallery, SearchForm, Logger } from "$lib/components";
-  import {
-    searchByText,
-    searchByFile,
-    searchByReference,
-    continueSearch,
-    getIndexesInfo,
-  } from "$lib/api.js";
 
   let logger;
   let isLoaded = false;
@@ -57,39 +50,57 @@
     const { text, file, reference, datasets, modalities } = event.detail;
 
     let input;
-    let searchFunc;
+    let type;
     let message;
 
     if (file) {
       input = file;
-      searchFunc = searchByFile;
+      type = "ByFile";
       message = file.name;
     } else if (reference) {
       input = reference;
-      searchFunc = searchByReference;
+      type = "ByReference";
       message = reference.path;
     } else {
       input = text;
-      searchFunc = searchByText;
+      type = "ByText";
       message = text;
     }
 
     try {
-      const response = await searchFunc(
-        input,
-        modalities.filter((m) => m.checked).map((m) => m.value),
-        datasets
-          .filter((d) => d.checked)
-          .map(({ dataset, version }) => ({ dataset, version })),
-      );
+      let response = await fetch("/search", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          type: type,
+          input: input,
+          modalities: modalities.filter((m) => m.checked).map((m) => m.value),
+          collections: datasets
+            .filter((d) => d.checked)
+            .map(({ dataset, version }) => ({ dataset, version })),
+        }),
+      });
+
+      if (response.status == 404) {
+        const errorData = await response.json();
+        throw new Error(`Not found! ${errorData.detail}`);
+      }
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(`Failed to fetch search data! ${errorData.detail}`);
+      }
+
+      const data = await response.json();
+
       results = Object.values(
-        response.data.reduce((acc, item) => {
+        data.data.reduce((acc, item) => {
           const key = `${item.dataset}-${item.version}-${item.path}`;
           (acc[key] = acc[key] || []).push(item);
           return acc;
         }, {}),
       );
-      sessionId = response.session_id;
+      sessionId = data.session_id;
       logger.info(`Search done in ${searchTime} ms\n${message}`);
     } catch (error) {
       results = [];
@@ -106,9 +117,24 @@
         logger.warning("SessionId is null");
         return;
       }
-      const response = await continueSearch(sessionId);
+      const response = await fetch("/search", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          type: "Continue",
+          sessionId: sessionId,
+        }),
+      });
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(
+          `Failed to fetch continue searching data! ${errorData.detail}`,
+        );
+      }
+      const data = await response.json();
+
       const newResults = Object.values(
-        response.data.reduce((acc, item) => {
+        data.data.reduce((acc, item) => {
           const key = `${item.dataset}-${item.version}-${item.path}`;
           (acc[key] = acc[key] || []).push(item);
           return acc;
@@ -142,8 +168,12 @@
 
   async function fetchFormData() {
     try {
-      const response = await getIndexesInfo();
-      datasets = response
+      const response = await fetch("/indexes", {
+        method: "GET",
+        headers: { "Content-Type": "application/json" },
+      });
+      const data = await response.json();
+      datasets = data
         .map((d) => ({ ...d, checked: false }))
         .sort((a, b) => a.dataset.localeCompare(b.dataset))
         .map((d, index) => ({ ...d, checked: index === 0 }));

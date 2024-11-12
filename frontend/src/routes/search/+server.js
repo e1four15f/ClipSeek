@@ -2,7 +2,42 @@ import { backendUrl, CANDIDATES_PER_PAGE, REQUESTS_TIMEOUT } from "@config";
 
 const backendSearchUrl = `${backendUrl}/api/v1/search`;
 
-export async function searchByText(
+export async function POST({ request }) {
+  const { type, ...params } = await request.json();
+
+  let response;
+
+  switch (type) {
+    case "ByText":
+      response = await searchByText(
+        params.input,
+        params.modalities,
+        params.collections,
+      );
+      break;
+    case "ByFile":
+      response = await searchByFile(
+        params.input,
+        params.modalities,
+        params.collections,
+      );
+      break;
+    case "ByReference":
+      response = await searchByReference(
+        params.input,
+        params.modalities,
+        params.collections,
+      );
+      break;
+    case "Continue":
+      response = await continueSearch(params.sessionId);
+      break;
+  }
+
+  return response;
+}
+
+async function searchByText(
   text,
   modalities,
   collections,
@@ -29,21 +64,10 @@ export async function searchByText(
     signal: AbortSignal.timeout(timeout),
   });
 
-  if (response.status == 404) {
-    const errorData = await response.json();
-    throw new Error(`Not found! ${errorData.detail}`);
-  }
-
-  if (!response.ok) {
-    const errorData = await response.json();
-    throw new Error(`Failed to fetch search data! ${errorData.detail}`);
-  }
-
-  const data = await response.json();
-  return data;
+  return response;
 }
 
-export async function searchByFile(
+async function searchByFile(
   file,
   modalities,
   collections,
@@ -69,21 +93,10 @@ export async function searchByFile(
     signal: AbortSignal.timeout(timeout),
   });
 
-  if (response.status == 404) {
-    const errorData = await response.json();
-    throw new Error(`Not found! ${errorData.detail}`);
-  }
-
-  if (!response.ok) {
-    const errorData = await response.json();
-    throw new Error(`Failed to fetch search data! ${errorData.detail}`);
-  }
-
-  const data = await response.json();
-  return data;
+  return response;
 }
 
-export async function searchByReference(
+async function searchByReference(
   reference,
   modalities,
   collections,
@@ -111,21 +124,10 @@ export async function searchByReference(
     signal: AbortSignal.timeout(timeout),
   });
 
-  if (response.status == 404) {
-    const errorData = await response.json();
-    throw new Error(`Not found! ${errorData.detail}`);
-  }
-
-  if (!response.ok) {
-    const errorData = await response.json();
-    throw new Error(`Failed to fetch search data! ${errorData.detail}`);
-  }
-
-  const data = await response.json();
-  return data;
+  return response;
 }
 
-export async function continueSearch(sessionId, timeout = REQUESTS_TIMEOUT) {
+async function continueSearch(sessionId, timeout = REQUESTS_TIMEOUT) {
   const url = `${backendSearchUrl}/continue`;
   const body = JSON.stringify({ session_id: sessionId });
 
@@ -137,32 +139,5 @@ export async function continueSearch(sessionId, timeout = REQUESTS_TIMEOUT) {
     signal: AbortSignal.timeout(timeout),
   });
 
-  if (!response.ok) {
-    const errorData = await response.json();
-    throw new Error(
-      `Failed to fetch continue searching data! ${errorData.detail}`,
-    );
-  }
-
-  const data = await response.json();
-  return data;
-}
-
-export async function getIndexesInfo(timeout = REQUESTS_TIMEOUT) {
-  const url = `${backendUrl}/indexes/info`;
-
-  console.debug("Sending request to", url);
-  const response = await fetch(url, {
-    method: "GET",
-    headers: { "Content-Type": "application/json" },
-    signal: AbortSignal.timeout(timeout),
-  });
-
-  if (!response.ok) {
-    const errorData = await response.json();
-    throw new Error(`Failed to fetch indexes data! ${errorData.detail}`);
-  }
-
-  const data = await response.json();
-  return data;
+  return response;
 }
