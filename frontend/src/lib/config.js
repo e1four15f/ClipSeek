@@ -15,8 +15,8 @@ export const getThumbnailUrl = (dataset, version, path, time) => {
   return url;
 };
 
-export const getClipUrl = (dataset, version, path, span) => {
-  return `/resources/clip/${dataset}/${version}/${path}?start=${span[0]}&end=${span[1]}`;
+export const getClipUrl = (dataset, version, path, start, end) => {
+  return `/resources/clip/${dataset}/${version}/${path}?start=${start}&end=${end}`;
 };
 
 export const getRawUrl = (dataset, version, path) => {

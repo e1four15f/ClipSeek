@@ -20,7 +20,7 @@ export async function GET({ request, params }) {
       console.log(resourceUrl);
       break;
     case "clip":
-      resourceUrl = getClipUrl(dataset, version, path, (start, end));
+      resourceUrl = getClipUrl(dataset, version, path, start, end);
       break;
     case "thumbnail":
       resourceUrl = getThumbnailUrl(dataset, version, path);

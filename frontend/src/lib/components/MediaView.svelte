@@ -16,7 +16,8 @@
     currentItem.dataset,
     currentItem.version,
     currentItem.path,
-    currentItem.span,
+    currentItem.span[0],
+    currentItem.span[1],
   );
   $: rawUrl = getRawUrl(
     currentItem.dataset,
