@@ -21,5 +21,5 @@ logs:
 logs-%:
 	docker-compose logs -f $(subst logs-,,$@)
 
-scripts: pull
+scripts:
 	docker-compose run --entrypoint /bin/bash backend
