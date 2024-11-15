@@ -29,7 +29,6 @@ WORKDIR /app
 
 COPY LanguageBind /LanguageBind
 COPY backend ./
-COPY config.yaml ../
 
 RUN poetry install --without dev && rm -rf $POETRY_CACHE_DIR
 CMD ["python", "app.py"]
