@@ -1,6 +1,7 @@
 FROM node:22 AS build
 
-COPY config.yaml ./
+ARG BACKEND_URL
+ENV VITE_BACKEND_URL=$BACKEND_URL
 
 WORKDIR /app
 
@@ -15,4 +16,4 @@ FROM node:22
 WORKDIR /app
 COPY --from=build /app .
 
-CMD ["npm","run", "preview","--", "--host", "0.0.0.0"]
+CMD ["npm", "run", "preview", "--", "--host", "0.0.0.0", "--port", "4173"]

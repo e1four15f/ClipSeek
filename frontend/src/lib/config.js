@@ -1,11 +1,16 @@
-const cfg = _CONFIG;
+let config = null;
 
-export const RESULT_COLUMNS = cfg.RESULT_COLUMNS;
-export const DEVELOPER_MODE = cfg.DEVELOPER_MODE;
-export const CANDIDATES_PER_PAGE = cfg.CANDIDATES_PER_PAGE;
-export const REQUESTS_TIMEOUT = cfg.REQUESTS_TIMEOUT;
+export async function fetchConfig(fetch) {
+  const response = await fetch("/", { method: "OPTIONS" });
+  config = await response.json();
+  return config;
+}
 
-export const backendUrl = cfg.BACKEND_URL;
+export const RESULT_COLUMNS = () => config?.RESULT_COLUMNS;
+export const DEVELOPER_MODE = () => config?.DEVELOPER_MODE;
+export const CANDIDATES_PER_PAGE = () => config?.CANDIDATES_PER_PAGE;
+export const REQUESTS_TIMEOUT = () => config?.REQUESTS_TIMEOUT;
+export const BACKEND_URL = () => config?.BACKEND_URL;
 
 export const getThumbnailUrl = (dataset, version, path, time) => {
   let url = `/resources/thumbnail/${dataset}/${version}/${path}`;

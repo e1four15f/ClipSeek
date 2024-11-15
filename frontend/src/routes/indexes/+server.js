@@ -1,12 +1,12 @@
-import { backendUrl, REQUESTS_TIMEOUT } from "@config";
+import { BACKEND_URL, REQUESTS_TIMEOUT } from "@config";
 
 export async function GET() {
-  const url = `${backendUrl}/indexes/info`;
+  const url = `${BACKEND_URL()}/indexes/info`;
 
   const response = await fetch(url, {
     method: "GET",
     headers: { "Content-Type": "application/json" },
-    signal: AbortSignal.timeout(REQUESTS_TIMEOUT),
+    signal: AbortSignal.timeout(REQUESTS_TIMEOUT()),
   });
 
   if (!response.ok) {

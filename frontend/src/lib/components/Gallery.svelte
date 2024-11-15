@@ -5,7 +5,7 @@
   import { RESULT_COLUMNS } from "@config";
 
   const dispatch = createEventDispatcher();
-  const n_cols = RESULT_COLUMNS;
+  const n_cols = RESULT_COLUMNS();
 
   export let items = [];
   $: itemsPerColumn = Array.from({ length: n_cols }, (_, i) =>

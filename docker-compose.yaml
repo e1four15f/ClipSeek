@@ -4,8 +4,10 @@ services:
     build:
       context: .
       dockerfile: frontend/Dockerfile
+      args:
+        BACKEND_URL: http://backend:8500
     ports:
-      - "4173:4173"
+      - "4173:${FRONTEND_PORT}"
     volumes:
       - ./config.yaml:/config.yaml
     depends_on:
@@ -17,7 +19,7 @@ services:
       context: .
       dockerfile: backend/Dockerfile
     ports:
-      - "8500:8500"
+      - "8500:${BACKEND_PORT}"
     volumes:
       - ${HF_HOME:-~/.cache/huggingface}:/hf
       - ./config.yaml:/config.yaml
@@ -40,6 +42,8 @@ services:
     container_name: milvus-standalone
     image: milvusdb/milvus:v2.4.0
     command: ["milvus", "run", "standalone"]
+    ports:
+      - "19530:${MILVUS_PORT}"
     environment:
       ETCD_ENDPOINTS: etcd:2379
       MINIO_ADDRESS: minio:9000
@@ -84,7 +88,7 @@ services:
       SERVER_PORT: 9080
       MILVUS_URL: "milvus:19530"
     ports:
-      - "9080:9080"
+      - "9080:${ATTU_PORT}"
 
 volumes:
   etcd_data:

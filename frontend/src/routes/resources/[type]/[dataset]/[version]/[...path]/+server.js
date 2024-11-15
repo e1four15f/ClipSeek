@@ -1,5 +1,5 @@
 import {
-  backendUrl,
+  BACKEND_URL,
   getThumbnailUrl,
   getClipUrl,
   getRawUrl,
@@ -27,9 +27,9 @@ export async function GET({ request, params }) {
       break;
   }
 
-  const response = await fetch(`${backendUrl}${resourceUrl}`, {
+  const response = await fetch(`${BACKEND_URL()}${resourceUrl}`, {
     method: "GET",
-    signal: AbortSignal.timeout(REQUESTS_TIMEOUT),
+    signal: AbortSignal.timeout(REQUESTS_TIMEOUT()),
   });
 
   if (!response.ok) {

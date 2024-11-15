@@ -1,6 +1,6 @@
-import { backendUrl, CANDIDATES_PER_PAGE, REQUESTS_TIMEOUT } from "@config";
+import { BACKEND_URL, CANDIDATES_PER_PAGE, REQUESTS_TIMEOUT } from "@config";
 
-const backendSearchUrl = `${backendUrl}/api/v1/search`;
+const backendSearchUrl = `${BACKEND_URL()}/api/v1/search`;
 
 export async function POST({ request }) {
   const { type, ...params } = await request.json();
@@ -41,8 +41,8 @@ async function searchByText(
   text,
   modalities,
   collections,
-  n_candidates = CANDIDATES_PER_PAGE,
-  timeout = REQUESTS_TIMEOUT,
+  n_candidates = CANDIDATES_PER_PAGE(),
+  timeout = REQUESTS_TIMEOUT(),
 ) {
   const url = `${backendSearchUrl}/by_text`;
   const body = new URLSearchParams();
@@ -71,8 +71,8 @@ async function searchByFile(
   file,
   modalities,
   collections,
-  n_candidates = CANDIDATES_PER_PAGE,
-  timeout = REQUESTS_TIMEOUT,
+  n_candidates = CANDIDATES_PER_PAGE(),
+  timeout = REQUESTS_TIMEOUT(),
 ) {
   const url = `${backendSearchUrl}/by_file`;
   const body = new FormData();
@@ -100,8 +100,8 @@ async function searchByReference(
   reference,
   modalities,
   collections,
-  n_candidates = CANDIDATES_PER_PAGE,
-  timeout = REQUESTS_TIMEOUT,
+  n_candidates = CANDIDATES_PER_PAGE(),
+  timeout = REQUESTS_TIMEOUT(),
 ) {
   const url = `${backendSearchUrl}/by_reference`;
   const body = new FormData();
@@ -127,7 +127,7 @@ async function searchByReference(
   return response;
 }
 
-async function continueSearch(sessionId, timeout = REQUESTS_TIMEOUT) {
+async function continueSearch(sessionId, timeout = REQUESTS_TIMEOUT()) {
   const url = `${backendSearchUrl}/continue`;
   const body = JSON.stringify({ session_id: sessionId });
 
