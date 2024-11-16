@@ -2,6 +2,7 @@ import asyncio
 import logging
 import mimetypes
 import os
+import pathlib
 import subprocess
 from abc import ABC, abstractmethod
 from io import BytesIO
@@ -39,7 +40,7 @@ class IResourcesHandler(ABC, DocstringMixin):
 
 
 class ResourcesHandler(IResourcesHandler):
-    def __init__(self, dataset_paths: dict[Collection, str], indexes_path: Path) -> None:
+    def __init__(self, dataset_paths: dict[Collection, str], indexes_path: pathlib.Path) -> None:
         self._dataset_paths = dataset_paths
         self._indexes_path = indexes_path
 
