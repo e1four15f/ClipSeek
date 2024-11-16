@@ -2,12 +2,14 @@
 
 # Getting Started
 
-| Service  | Port  | Url                          |
-|----------|-------|------------------------------|
-| Frontend | 4173  | http://localhost:4173        |
-| Backend  | 8500  | http://localhost:8500/docs   |
-| Attu     | 8080  | http://localhost:9080        |
+By default, all services have exposed ports. You can change them in `.env` file. 
 
+| Service  | Port | Url                        |
+|----------|------|----------------------------|
+| Frontend | 9500 | http://localhost:9500      |
+| Backend  | 9501 | http://localhost:9501/docs |
+| Attu     | 9502 | http://localhost:9502      |
+| Milvus   | 9503 | http://localhost:9503      |
 
 ## Embeddings and Indexing
 We use backend environment to run scripts. Start the docker container with the following command, which also ups the Milvus and dependend services
@@ -86,11 +88,77 @@ make logs-backend
 ```
 
 
-## MSR-VTT dataset example 
+# More Examples
 
-Download MSR-VTT dataset
+V100 with 16gb 
+
+## MSR-VTT dataset
+Videos: 10004
+Clips: 25290
+took: 7:32:45
+
+Dataset
 ```bash
 wget -P data https://www.robots.ox.ac.uk/~maxbain/frozen-in-time/data/MSRVTT.zip
 unzip data/MSRVTT.zip -d data
 rm data/MSRVTT.zip
 ```
+Embeddings
+```bash
+poetry run compute_embeddings --path /data/MSRVTT/videos --name MSRVTT --version all --mode video+audio --model LanguageBind --batch-size 64
+```
+
+Indexing
+```bash
+poetry run create_index --name MSRVTT --version all --model LanguageBind
+```
+
+## MSVD dataset
+1970 Videos
+4450 Clips
+took: 1:27:08
+
+Dataset
+```bash
+wget -P data https://www.cs.utexas.edu/~ml/clamp/videoDescription/YouTubeClips.tar
+mkdir -p data/MSVD
+tar -xvf data/YouTubeClips.tar -C data/MSVD
+rm data/YouTubeClips.tar
+```
+
+Embeddings
+```bash
+poetry run compute_embeddings --path /data/MSVD --name MSVD --version v1 --mode video+audio --model LanguageBind --batch-size 64
+```
+
+Indexing
+```bash
+poetry run create_index --name MSVD --version v1 --model LanguageBind
+```
+
+## COCO train 2017
+118287 images
+took: 1:13:16
+
+Dataset
+```bash
+wget -P data http://images.cocodataset.org/zips/train2017.zip
+unzip data/train2017.zip -d data/COCO
+rm data/train2017.zip
+```
+
+Embeddings
+```bash
+poetry run compute_embeddings --path /data/COCO/train2017 --name COCO --version train --mode image --model LanguageBind --batch-size 512
+```
+
+Indexing
+```bash
+poetry run create_index --name COCO --version train --model LanguageBind
+```
+
+
+http://images.cocodataset.org/zips/val2017.zip
+
+unzip data/val2017.zip -d data/COCO
+rm data/val2017.zip
