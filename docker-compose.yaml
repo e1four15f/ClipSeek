@@ -7,7 +7,7 @@ services:
       args:
         BACKEND_URL: http://backend:8500
     ports:
-      - "4173:${FRONTEND_PORT}"
+      - "${FRONTEND_PORT}:4173"
     volumes:
       - ./config.yaml:/config.yaml
     depends_on:
@@ -19,12 +19,12 @@ services:
       context: .
       dockerfile: backend/Dockerfile
     ports:
-      - "8500:${BACKEND_PORT}"
+      - "${BACKEND_PORT}:8500"
     volumes:
       - ${HF_HOME:-~/.cache/huggingface}:/hf
       - ./config.yaml:/config.yaml
       - ./indexes:/indexes
-      - ./data:/data
+      - ./data:/data:ro
     environment:
       MILVUS_URL: http://milvus:19530
       HF_HOME: /hf
@@ -43,7 +43,7 @@ services:
     image: milvusdb/milvus:v2.4.0
     command: ["milvus", "run", "standalone"]
     ports:
-      - "19530:${MILVUS_PORT}"
+      - "${MILVUS_PORT}:19530"
     environment:
       ETCD_ENDPOINTS: etcd:2379
       MINIO_ADDRESS: minio:9000
@@ -85,10 +85,11 @@ services:
     image: zilliz/attu:dev
     environment:
       ATTU_LOG_LEVEL: info
-      SERVER_PORT: 9080
+      SERVER_PORT: 8000
       MILVUS_URL: "milvus:19530"
+      DATABASE: "ClipSeek"
     ports:
-      - "9080:${ATTU_PORT}"
+      - "${ATTU_PORT}:8000"
 
 volumes:
   etcd_data:
