@@ -327,6 +327,9 @@ def split_video(input_path: Path, output_path: Path, segment_duration: float) ->
         "-nostats",
     ]  # fmt: skip
 
+    if input_path.suffix.lower() == ".avi":
+        command += ["-bsf:v", "h264_mp4toannexb"]
+
     output_pattern = output_path / f"{input_path.stem}.clip%03d{input_path.suffix}"
     command += [str(output_pattern)]
 
