@@ -24,9 +24,10 @@ def main(
         if "span" in label:
             time = label["span"][0]
             if time:
-                output_file = thumbnails_path / (label["path"] + ".jpg")
+                output_file = thumbnails_path / (label["path"] + "." + str(time) + ".jpg")
             else:
-                output_file = thumbnails_path / (label["path"] + str(time) + ".jpg")
+                output_file = thumbnails_path / (label["path"] + ".jpg")
+
             output_file.parent.mkdir(parents=True, exist_ok=True)
             command = [
                 "ffmpeg", "-y",

@@ -119,7 +119,7 @@ class ResourcesHandler(IResourcesHandler):
         if time is None:
             cache_path = self._indexes_path / dataset / version / "thumbnails" / (file_path + ".jpg")
         else:
-            cache_path = self._indexes_path / dataset / version / "thumbnails" / (file_path + str(time) + ".jpg")
+            cache_path = self._indexes_path / dataset / version / "thumbnails" / (file_path + "." + str(time) + ".jpg")
         if cache_path.exists():
             return FileResponse(cache_path, headers={"X-CACHED": "true"})
 
