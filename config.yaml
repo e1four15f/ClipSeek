@@ -7,11 +7,11 @@ CANDIDATES_PER_PAGE: 32
 REQUESTS_TIMEOUT: 60000  # 60 seconds
 
 # Backend Settings
-BACKEND_URL: "http://localhost:8500"
+BACKEND_URL: "http://localhost:9501"
 EMBEDDER_TYPE: "LanguageBind"
 DEVICE: "cpu"
 STORAGE_TYPE: "Milvus"
-MILVUS_URL: "http://localhost:19530"
+MILVUS_URL: "http://localhost:9503"
 MILVUS_DB_NAME: "ClipSeek"
 INDEXES_ROOT: "../indexes"
 TMP_DIR: ".tmp"
