@@ -1,6 +1,6 @@
 # Datasets
 
-Several datasets have been indexed with ClipSeek using an Nvidia V100 GPU with 16GB memory. Precomputed values are available for download from Google Drive. Extract the downloaded files into the `indexes` directory.
+Several datasets have been indexed with ClipSeek using an Nvidia V100 GPU with 16GB memory. Precomputed values are available for download from [Google Drive](https://drive.google.com/file/d/18WkxXOhYx-gXVrVMuEglH30oSqvwIh6f/view?usp=sharing). Extract the downloaded files into the `indexes` directory.
 
 ## MSR-VTT dataset
 - Videos: 10004
