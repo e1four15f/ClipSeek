@@ -1,4 +1,5 @@
 import logging
+from pathlib import Path
 
 import transformers
 from fastapi import FastAPI
@@ -36,7 +37,7 @@ def get_app() -> FastAPI:
             searcher=searcher,
         ),
         info_handler=InfoHandler(storage=storage, available_collections=list(dataset_paths.keys())),
-        resources_handler=ResourcesHandler(dataset_paths=dataset_paths),
+        resources_handler=ResourcesHandler(dataset_paths=dataset_paths, indexes_path=Path(Config.INDEXES_ROOT)),
     ).create_application()
 
 

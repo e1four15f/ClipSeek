@@ -13,6 +13,7 @@ packages = [
 [tool.poetry.scripts]
 compute_embeddings = "scripts.compute_embeddings:run"
 create_index = "scripts.create_index:run"
+generate_thumbnails = "scripts.generate_thumbnails:run"
 
 [tool.poetry.dependencies]
 python = "^3.9.8"

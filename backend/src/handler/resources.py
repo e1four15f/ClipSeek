@@ -39,8 +39,9 @@ class IResourcesHandler(ABC, DocstringMixin):
 
 
 class ResourcesHandler(IResourcesHandler):
-    def __init__(self, dataset_paths: dict[Collection, str]) -> None:
+    def __init__(self, dataset_paths: dict[Collection, str], indexes_path: Path) -> None:
         self._dataset_paths = dataset_paths
+        self._indexes_path = indexes_path
 
     async def get_raw(
         self,
@@ -113,6 +114,13 @@ class ResourcesHandler(IResourcesHandler):
         time: Optional[float] = Query(None, description="Time (in seconds) to extract the thumbnail from"),
     ) -> Response:
         full_path = self._get_full_path(file_path, dataset, version)
+
+        if time is None:
+            cache_path = self._indexes_path / dataset / version / "thumbnails" / (file_path + ".jpg")
+        else:
+            cache_path = self._indexes_path / dataset / version / "thumbnails" / (file_path + str(time) + ".jpg")
+        if cache_path.exists():
+            return FileResponse(cache_path, headers={"X-CACHED": "true"})
 
         mime_type, _ = mimetypes.guess_type(full_path)
         if mime_type and mime_type.startswith("video"):
