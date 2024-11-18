@@ -16,6 +16,7 @@ def main(
     dataset_name: str,
     dataset_version: str,
     model_type: EmbedderType,
+    index_type: str,
     storage_type: StorageType,
 ) -> None:
     Config.load(config_file="../config.yaml")
@@ -45,6 +46,7 @@ def main(
         modality_embeddings=modality_embeddings,
         embeddings_dim=embeddings_dim,  # noqa
         labels=labels,
+        index_type=index_type,
     )
     print("Done!")
 
@@ -74,6 +76,15 @@ def run() -> None:
         default=EmbedderType.LANGUAGE_BIND,
         help="Embedder model",
     )
+    parser.add_argument(
+        "--index-type",
+        "--type",
+        "-t",
+        type=str,
+        required=True,
+        default="FLAT",
+        help="Index type (e.g., 'FLAT', 'IVF_FLAT', ...).",
+    )
 
     args = parser.parse_args()
     main(
@@ -81,6 +92,7 @@ def run() -> None:
         dataset_name=args.dataset_name,
         dataset_version=args.dataset_version,
         model_type=args.model,
+        index_type=args.index_type,
         storage_type=StorageType.MILVUS,
     )
 

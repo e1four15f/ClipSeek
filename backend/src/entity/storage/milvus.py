@@ -1,3 +1,4 @@
+
 import numpy as np
 from more_itertools import chunked
 from pymilvus import Collection, CollectionSchema, DataType, FieldSchema, MilvusClient, connections
@@ -47,7 +48,11 @@ def create_milvus_connection(url: str, database_name: str = "default") -> None:
 
 
 def build_milvus_collection(
-    index_name: str, modality_embeddings: dict[Modality, np.ndarray], embeddings_dim: int, labels: list[Label]
+    index_name: str,
+    modality_embeddings: dict[Modality, np.ndarray],
+    embeddings_dim: int,
+    labels: list[Label],
+    index_type: str = "FLAT",
 ) -> None:
     fields = [
         FieldSchema(name="id", dtype=DataType.INT64, is_primary=True, auto_id=True),
@@ -60,9 +65,10 @@ def build_milvus_collection(
     collection = Collection(name=index_name, schema=CollectionSchema(fields, enable_dynamic_field=False))
     index_params = {
         "metric_type": "COSINE",
-        "index_type": "FLAT",  # "IVF_FLAT",  # TODO AKNN
-        # "params": {"nlist": 128},
+        "index_type": index_type,
     }
+    if index_type == 'IVF_FLAT':
+        index_params["nlist"] = 1024
     collection.create_index("embedding", index_params)
 
     collection.load()
