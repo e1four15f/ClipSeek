@@ -58,7 +58,7 @@ def main(
 
 def run() -> None:
     parser = argparse.ArgumentParser(
-        description="Build an index from precomputed embeddings for a specific dataset version."
+        description="Generates thumbnails from video files based on provided dataset details."
     )
 
     parser.add_argument(
