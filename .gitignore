@@ -3,7 +3,7 @@
 indexes/**
 !/indexes/INDEXES.md
 backend/.tmp/**
-data/
+data/**
 !/data/DATASETS.md
 
 ### JetBrains template
