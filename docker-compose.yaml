@@ -82,7 +82,7 @@ services:
 
   attu:
     container_name: attu
-    image: zilliz/attu:dev
+    image: zilliz/attu:v2.4.11
     environment:
       ATTU_LOG_LEVEL: info
       SERVER_PORT: 8000
