@@ -72,16 +72,17 @@
       if (input instanceof File) {
         formData.append("file", input);
       }
-      const params = JSON.stringify({
-        type: type,
-        input: input,
-        modalities: modalities.filter((m) => m.checked).map((m) => m.value),
-        collections: datasets
-          .filter((d) => d.checked)
-          .map(({ dataset, version }) => ({ dataset, version })),
-      });
-      formData.append("params", params);
-
+      formData.append(
+        "params",
+        JSON.stringify({
+          type: type,
+          input: input,
+          modalities: modalities.filter((m) => m.checked).map((m) => m.value),
+          collections: datasets
+            .filter((d) => d.checked)
+            .map(({ dataset, version }) => ({ dataset, version })),
+        }),
+      );
       let response = await fetch("/search", {
         method: "POST",
         body: formData,
@@ -123,13 +124,17 @@
         logger.warning("SessionId is null");
         return;
       }
-      const response = await fetch("/search", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
+      const formData = new FormData();
+      formData.append(
+        "params",
+        JSON.stringify({
           type: "Continue",
           sessionId: sessionId,
         }),
+      );
+      const response = await fetch("/search", {
+        method: "POST",
+        body: formData,
       });
       if (!response.ok) {
         const errorData = await response.json();

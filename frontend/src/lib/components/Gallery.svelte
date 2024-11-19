@@ -43,17 +43,17 @@
   onMount(() => {
     window.addEventListener("scroll", handleScroll);
 
-   // let tries = 0;
-   // const interval = setInterval(() => {
-   //   if (!isLoading) {
-   //     const IsScrolled = handleScroll();
-   //     tries++;
-   //
-   //     if (!IsScrolled || tries >= 5) {
-   //       clearInterval(interval);
-   //     }
-   //   }
-   // }, 1000);
+    // let tries = 0;
+    // const interval = setInterval(() => {
+    //   if (!isLoading) {
+    //     const IsScrolled = handleScroll();
+    //     tries++;
+    //
+    //     if (!IsScrolled || tries >= 5) {
+    //       clearInterval(interval);
+    //     }
+    //   }
+    // }, 1000);
 
     return () => window.removeEventListener("scroll", handleScroll);
   });
