@@ -3,7 +3,8 @@ import { BACKEND_URL, CANDIDATES_PER_PAGE, REQUESTS_TIMEOUT } from "@config";
 const backendSearchUrl = `${BACKEND_URL()}/api/v1/search`;
 
 export async function POST({ request }) {
-  const { type, ...params } = await request.json();
+  const formData = await request.formData();
+  const { type, ...params } = JSON.parse(formData.get("params"));
 
   let response;
 
@@ -16,8 +17,9 @@ export async function POST({ request }) {
       );
       break;
     case "ByFile":
+      const file = formData.get("file");
       response = await searchByFile(
-        params.input,
+        file,
         params.modalities,
         params.collections,
       );
