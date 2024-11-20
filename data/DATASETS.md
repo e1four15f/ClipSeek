@@ -6,7 +6,7 @@ The `ExampleDataset` includes videos and images in various formats and serves as
 
 ## More Datasets
 
-Below are commands for indexing datasets, which have been processed with ClipSeek using an Nvidia V100 GPU with 16GB of memory within a docker container (`make scripts`). Precomputed values are available for download from [Google Drive](https://drive.google.com/file/d/1gWbQYSI55vErEwdYPrFP06CEsJZY-B1a/view?usp=sharing). Simply extract the downloaded files into the `indexes` directory.
+Below are commands for indexing datasets, which have been processed with ClipSeek using an Nvidia V100 GPU with 16GB of memory within a docker container (`make scripts`). Precomputed values are available for download from [Google Drive](https://drive.google.com/file/d/1qItXWAhPYmjaqGsloE1U8OQQk3iPNwxx/view?usp=sharing). Simply extract the downloaded files into the `indexes` directory.
 
 For more information on the datasets used, visit: [Collaborative Experts Datasets](https://github.com/albanie/collaborative-experts/tree/master/misc/datasets)
 

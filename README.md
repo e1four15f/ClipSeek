@@ -84,6 +84,7 @@ DATASETS:
     modalities:
     - video
     - audio
+    - hybrid
 ```
 
 ### Running

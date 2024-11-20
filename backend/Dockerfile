@@ -28,7 +28,9 @@ RUN pyenv install ${PYTHON_VERSION} && \
 WORKDIR /app
 
 COPY LanguageBind /LanguageBind
+COPY backend/pyproject.toml backend/poetry.lock ./
+RUN poetry install --without dev && rm -rf $POETRY_CACHE_DIR
+
 COPY backend ./
 
-RUN poetry install --without dev && rm -rf $POETRY_CACHE_DIR
 CMD ["python", "app.py"]

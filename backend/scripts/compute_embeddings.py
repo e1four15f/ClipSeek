@@ -32,7 +32,7 @@ class Mode(str, Enum):
     def get_modalities(self) -> list[Modality]:
         return {
             Mode.VIDEO: [Modality.VIDEO],
-            Mode.VIDEO_WITH_AUDIO: [Modality.VIDEO, Modality.AUDIO],
+            Mode.VIDEO_WITH_AUDIO: [Modality.VIDEO, Modality.AUDIO, Modality.HYBRID],
             Mode.IMAGE: [Modality.IMAGE],
         }[self]
 
