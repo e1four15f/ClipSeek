@@ -1,4 +1,3 @@
-
 import numpy as np
 from more_itertools import chunked
 from pymilvus import Collection, CollectionSchema, DataType, FieldSchema, MilvusClient, connections
@@ -67,7 +66,7 @@ def build_milvus_collection(
         "metric_type": "COSINE",
         "index_type": index_type,
     }
-    if index_type == 'IVF_FLAT':
+    if index_type == "IVF_FLAT":
         index_params["nlist"] = 1024
     collection.create_index("embedding", index_params)
 

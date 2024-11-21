@@ -106,7 +106,9 @@ def main(
                 write_labels(labels_path, media_path=path.relative_to(dataset_path))
     elif mode == mode.VIDEO:
         for i, clips_info in enumerate(
-            clip_generator(media_paths, output_path=(tmp_path / "clips"), batch_size=batch_size)
+            clip_generator(
+                media_paths, output_path=(tmp_path / "clips"), batch_size=batch_size, clip_length=clip_length
+            )
         ):
             if isinstance(clips_info, dict):
                 clip_info = clips_info
@@ -141,7 +143,9 @@ def main(
                     clip_info["clip_path"].unlink()
     elif mode == mode.VIDEO_WITH_AUDIO:
         for i, clips_info in enumerate(
-            clip_generator(media_paths, output_path=(tmp_path / "clips"), batch_size=batch_size)
+            clip_generator(
+                media_paths, output_path=(tmp_path / "clips"), batch_size=batch_size, clip_length=clip_length
+            )
         ):
             if isinstance(clips_info, dict):
                 clip_info = clips_info
@@ -259,12 +263,14 @@ def main(
 
 
 def clip_generator(
-    paths: list[Path], output_path: Path, batch_size: int
+    paths: list[Path], output_path: Path, batch_size: int, clip_length: float
 ) -> Generator[Union[list[dict], dict], None, None]:
     buffer = []
     for path in tqdm(paths):
         try:
-            clip_paths_and_timings = get_video_clips_with_timing(input_path=path, output_path=output_path)
+            clip_paths_and_timings = get_video_clips_with_timing(
+                input_path=path, output_path=output_path, segment_duration=clip_length
+            )
             buffer += clip_paths_and_timings
         except Exception as e:
             print(f"Error processing {path}: {e}")
