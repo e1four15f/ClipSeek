@@ -6,8 +6,8 @@
 Specific docs:
 - [Frontend](frontend/README.md)
 - [Backend](backend/README.md)
-- [Indexes](indexes/INDEXES.md)
-- [Datasets](data/DATASETS.md)
+- [Indexes](indexes/README.md)
+- [Datasets](data/README.md)
 
 ## Configuration
 
