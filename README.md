@@ -63,7 +63,7 @@ poetry run create_index --name VideoDataset --version v1 --model LanguageBind
 poetry run create_index --name ImageDataset --version v1 --model LanguageBind
 ```
 
-You can check created collections in Attu web interface: http://localhost:8080/#/databases/ClipSeek
+You can check created collections in Attu web interface: http://localhost:9502/#/databases/ClipSeek
 
 ### Configuration
 
