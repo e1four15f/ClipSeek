@@ -1,6 +1,6 @@
 <script>
   import { createEventDispatcher, onMount } from "svelte";
-  import { Gallery } from "flowbite-svelte";
+  import { Button, Gallery } from "flowbite-svelte";
   import { MediaView } from "$lib/components";
   import { RESULT_COLUMNS } from "@config";
 
@@ -75,5 +75,11 @@
   </Gallery>
   {#if !items.length}
     <span class="mt-4">No results!</span>
+  {:else}
+    <Button
+      class="group relative mt-5 w-full cursor-pointer bg-opacity-50"
+      on:click={() => dispatch("continue")}
+      aria-label="Load more">Load more</Button
+    >
   {/if}
 </div>
