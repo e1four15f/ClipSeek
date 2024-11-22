@@ -78,10 +78,9 @@ def run() -> None:
     )
     parser.add_argument(
         "--index-type",
-        "--type",
-        "-t",
+        "--index",
+        "-i",
         type=str,
-        required=True,
         default="FLAT",
         help="Index type (e.g., 'FLAT', 'IVF_FLAT', ...).",
     )
