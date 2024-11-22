@@ -1,14 +1,14 @@
 build:
-	docker-compose build
+	docker compose build
 
 pull:
-	docker-compose pull
+	docker compose pull
 
 up:
-	docker-compose up -d
+	docker compose up -d
 
 logs:
-	docker-compose logs -f frontend backend attu
+	docker compose logs -f frontend backend attu
 
 scripts:
-	docker-compose run --entrypoint /bin/bash backend
+	docker compose run --entrypoint /bin/bash backend
