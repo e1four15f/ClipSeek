@@ -4,7 +4,7 @@
 |----------|------|
 
 <p style="text-align:center;">
-    <img src="demo.gif" alt="Demo">
+    <img src="demo.gif" alt="Demo" style="width:100%;">
 </p>
 
 Specific docs:
