@@ -3,6 +3,8 @@
 | ![ClipSeek](frontend/static/favicon.png)  | ClipSeek is a text-to-clip retrieval system that allows users to search for specific moments in videos using text queries. The system segments videos into clips and matches them with textual input using a multimodal deep learning model. It features a web-based interface and visualization of search results. |
 |----------|------|
 
+![](demo.gif)
+
 Specific docs:
 - [Frontend](frontend/README.md)
 - [Backend](backend/README.md)
