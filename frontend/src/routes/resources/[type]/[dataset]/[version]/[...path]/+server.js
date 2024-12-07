@@ -23,7 +23,7 @@ export async function GET({ request, params }) {
       resourceUrl = getClipUrl(dataset, version, path, start, end);
       break;
     case "thumbnail":
-      resourceUrl = getThumbnailUrl(dataset, version, path);
+      resourceUrl = getThumbnailUrl(dataset, version, path, time);
       break;
   }
 
