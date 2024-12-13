@@ -15,7 +15,7 @@ indexes/<dataset>/<version>
 Example of directory structure
 ```
 indexes
-├── INDEXES.md
+├── README.md
 ├── COCO
 │   └── valid
 │       ├── thumbnails
@@ -70,6 +70,7 @@ Dataset:
     modalities:
     - video
     - audio
+    - hybrid
 Dataset Meta:
     Video Count: 10004
     Clips Count: 25290

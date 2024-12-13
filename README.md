@@ -1,5 +1,9 @@
 # ClipSeek: A Text-to-Clip Retrieval System
 
+<p align="center">
+    <img src="demo.gif" alt="Demo" style="width:100%;">
+</p>
+
 | ![ClipSeek](frontend/static/favicon.png)  | ClipSeek is a text-to-clip retrieval system that allows users to search for specific moments in videos using text queries. The system segments videos into clips and matches them with textual input using a multimodal deep learning model. It features a web-based interface and visualization of search results. |
 |----------|------|
 
@@ -8,6 +12,7 @@ Specific docs:
 - [Backend](backend/README.md)
 - [Indexes](indexes/README.md)
 - [Datasets](data/README.md)
+- [Scripts](backend/scripts/README.md)
 
 ## Configuration
 
@@ -20,7 +25,7 @@ By default, all services have exposed ports. You can change them in `.env` file.
 | Attu     | 9502 | http://localhost:9502      |
 | Milvus   | 9503 | http://localhost:9503      |
 
-## Example
+## Quick Start
 
 ### Embeddings
 We use backend environment to run scripts. Start the docker container with the following command, which also ups the Milvus and dependend services.
@@ -65,7 +70,7 @@ poetry run create_index --name ImageDataset --version v1 --model LanguageBind
 
 You can check created collections in Attu web interface: http://localhost:9502/#/databases/ClipSeek
 
-### Configuration
+### Config
 
 After creating collection it needed to be added to configuration file `config.yaml`. You can directly copy and paste the dataset definition from `meta.yaml`.
 
