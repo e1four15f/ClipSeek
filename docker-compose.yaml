@@ -14,10 +14,12 @@ services:
       - "backend"
 
   backend:
-    image: e1four15f/clipseek-backend:${VERSION}
+    image: e1four15f/clipseek-backend:${VERSION}-cu${CUDA_VERSION}
     build:
       context: .
       dockerfile: backend/Dockerfile
+      args:
+        CUDA_VERSION: ${CUDA_VERSION}
     ports:
       - "${BACKEND_PORT}:8500"
     volumes:
