@@ -216,6 +216,8 @@ def main(
 
     emb_shapes = {}
     for modality in mode.get_modalities():
+        if modality == Modality.HYBRID:
+            continue
         modality_embeddings = np.vstack(embeddings[modality])
         emb_shapes[str(modality.value)] = modality_embeddings.shape
         np.save(index_path / f"{model_type}_{modality}_embeddings.npy", modality_embeddings)
